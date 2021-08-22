@@ -1,3 +1,6 @@
 
 /.hg/
 
+/Haribote.img
+*.o
+
