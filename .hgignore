@@ -4,5 +4,3 @@ syntax: glob
 syntax: regexp
 ^\.git/
 
-^ln-virtualbox
-
