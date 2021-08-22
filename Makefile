@@ -4,19 +4,20 @@
 ##
 
 TARGET_IMAGE        =  Haribote.img
-INSTALL_DEST_DIR    =  ln-virtualbox/
 
 ##
 ##    Commands.
 ##
 
-CP      =  cp
+AS      =  /usr/bin/as
+CP      =  /bin/cp
+LD      =  /usr/bin/ld
 
 ##
 ##    Targets.
 ##
 
-.PHONY  :  all  clean  cleanall  cleanobj  install  init
+.PHONY  :  all  clean  cleanall  cleanobj
 
 all      :  ${TARGET_IMAGE}
 
@@ -24,15 +25,27 @@ clean    :  cleanobj
 	${RM}  -f  ${TARGET_IMAGE}
 
 cleanall :  clean
+	${RM}  -f  ${TARGET_IMAGE:%.img=%.lst}
 
 cleanobj :
+	${RM}  -f  ${TARGET_IMAGE:%.img=%.o}
 
-install  :  ${TARGET_IMAGE}
-	${CP}  -pv  ${TARGET_IMAGE}  ${INSTALL_DEST_DIR}
+##
+##    Compile and Link Flags.
+##
 
-init     :
-	dd  if=/dev/zero  of=${TARGET_IMAGE}  bs=512  count=2880
+ASFLAGS     =  -march=i386  --32
 
 ##
 ##    Build.
 ##
+
+${TARGET_IMAGE} : ${TARGET_IMAGE:%.img=%.o}
+	${LD}  -T LinkerScript  -o $@  $^
+
+##
+##    Suffix Rules.
+##
+
+.S.o  :
+	${AS}  -o $@  ${ASFLAGS}  $^
