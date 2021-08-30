@@ -2,5 +2,6 @@
 /.hg/
 
 /Haribote.img
+*.bin
 *.o
 

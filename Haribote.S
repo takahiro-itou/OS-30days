@@ -33,10 +33,28 @@ entry:
     movw    %ax,    %ss
     movw    $0x7c00,    %sp
     movw    %ax,    %ds
+
+/* ディスクを読む。 */
+    movw     $0x0820,    %ax
     movw    %ax,    %es
 
-    movw    $msg,   %si
+    movb    $0,     %ch     /*  シリンダ 0  */
+    movb    $0,     %dh     /*  ヘッド 0    */
+    movb    $2,     %cl     /*  セクタ 2    */
 
+    movb    $0x02,  %ah     /*  AH=0x02:ディスク読み込み。  */
+    movb    $0x01,  %al     /*  1 セクタ    */
+    movw    $0,     %bx
+    movb    $0x00,  %dl     /*  A ドライブ  */
+    int     $0x13           /*  ディスク BIOS 呼び出し  */
+    jc      error
+
+fin:
+    hlt                     /*  何かあるまで CPU  を停止させる  */
+    jmp     fin             /*  無限ループ  */
+
+error:
+    mov     $msg,   %si
 putloop:
     movb    (%si),  %al
     addw    $1,     %si     /*  SI に 1 を足す  */
@@ -47,14 +65,10 @@ putloop:
     int     $0x10           /*  ビデオ BIOS 呼び出し    */
     jmp     putloop
 
-fin:
-    hlt                     /*  何かあるまで CPU  を停止させる  */
-    jmp     fin             /*  無限ループ  */
-
 /*  メッセージ部分  */
 .data
 msg:
     .byte   0x0a, 0x0a      /*  改行を２つ  */
-    .ascii  "hello, world"
+    .ascii  "load error"
     .byte   0x0a            /*  改行    */
     .byte   0
