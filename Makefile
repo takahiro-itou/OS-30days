@@ -4,7 +4,7 @@
 ##
 
 TARGET_IMAGE        =  Haribote.img
-IPLBIN_IMAGE        =  ipl.bin
+IPLBIN_IMAGE        =  Ipl.bin
 
 ##
 ##    Commands.
@@ -20,7 +20,7 @@ LD      =  /usr/bin/ld
 ##
 
 .PHONY      :  all  clean  cleanall  cleanobj
-.SUFFIXES   :  .o   .S
+.SUFFIXES   :  .o   .s
 
 all         :  ${TARGET_IMAGE}
 
@@ -55,8 +55,6 @@ ${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.o}
 ##    Suffix Rules.
 ##
 
-.S.o  :
+.s.o  :
 	${AS}  -o $@  ${ASFLAGS}  $^
 
-ipl.o :  Haribote.S
-	${AS}  -o $@  ${ASFLAGS}  $^
