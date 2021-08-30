@@ -4,6 +4,7 @@
 ##
 
 TARGET_IMAGE        =  Haribote.img
+IPLBIN_IMAGE        =  ipl.bin
 
 ##
 ##    Commands.
@@ -11,23 +12,26 @@ TARGET_IMAGE        =  Haribote.img
 
 AS      =  /usr/bin/as
 CP      =  /bin/cp
+DD      =  /bin/dd
 LD      =  /usr/bin/ld
 
 ##
 ##    Targets.
 ##
 
-.PHONY  :  all  clean  cleanall  cleanobj
+.PHONY      :  all  clean  cleanall  cleanobj
+.SUFFIXES   :  .o   .S
 
-all      :  ${TARGET_IMAGE}
+all         :  ${TARGET_IMAGE}
 
-clean    :  cleanobj
-	${RM}  -f  ${TARGET_IMAGE}
+clean       :  cleanobj
+	${RM}  -f  ${TARGET_IMAGE}  ${IPLBIN_IMAGE}
 
 cleanall :  clean
 	${RM}  -f  ${TARGET_IMAGE:%.img=%.lst}
 
 cleanobj :
+	${RM}  -f  ${IPLBIN_IMAGE:%.bin=%.o}
 	${RM}  -f  ${TARGET_IMAGE:%.img=%.o}
 
 ##
@@ -40,7 +44,11 @@ ASFLAGS     =  -march=i386  --32
 ##    Build.
 ##
 
-${TARGET_IMAGE} : ${TARGET_IMAGE:%.img=%.o}
+${TARGET_IMAGE} : ${IPLBIN_IMAGE}
+	mformat  -f 1440  -C  -B ${IPLBIN_IMAGE}  -i $@  ::
+	${DD}  if=${IPLBIN_IMAGE}  bs=512  count=1  of=$@  conv=notrunc
+
+${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.o}
 	${LD}  -T LinkerScript  -o $@  $^
 
 ##
@@ -48,4 +56,7 @@ ${TARGET_IMAGE} : ${TARGET_IMAGE:%.img=%.o}
 ##
 
 .S.o  :
+	${AS}  -o $@  ${ASFLAGS}  $^
+
+ipl.o :  Haribote.S
 	${AS}  -o $@  ${ASFLAGS}  $^

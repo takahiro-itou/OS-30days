@@ -28,24 +28,33 @@
     .skip   18, 0x00        /*  とりあえず 18 バイトあけておく  */
 
 /*  プログラム本体  */
-    .byte   0xb8, 0x00, 0x00, 0x8e,  0xd0, 0xbc, 0x00, 0x7c
-    .byte   0x8e, 0xd8, 0x8e, 0xc0,  0xbe, 0x74, 0x7c, 0x8a
-    .byte   0x04, 0x83, 0xc6, 0x01,  0x3c, 0x00, 0x74, 0x09
-    .byte   0xb4, 0x0e, 0xbb, 0x0f,  0x00, 0xcd, 0x10, 0xeb
-    .byte   0xee, 0xf4, 0xeb, 0xfd
+entry:
+    movw    $0,     %ax     /*  レジスタ初期化  */
+    movw    %ax,    %ss
+    movw    $0x7c00,    %sp
+    movw    %ax,    %ds
+    movw    %ax,    %es
+
+    movw    $msg,   %si
+
+putloop:
+    movb    (%si),  %al
+    addw    $1,     %si     /*  SI に 1 を足す  */
+    cmpb    $0,     %al
+    je      fin
+    movb    $0x0e,  %ah     /*  壱文字表示ファンクション    */
+    movw    $15,    %bx     /*  カラーコード    */
+    int     $0x10           /*  ビデオ BIOS 呼び出し    */
+    jmp     putloop
+
+fin:
+    hlt                     /*  何かあるまで CPU  を停止させる  */
+    jmp     fin             /*  無限ループ  */
 
 /*  メッセージ部分  */
+.data
+msg:
     .byte   0x0a, 0x0a      /*  改行を２つ  */
     .ascii  "hello, world"
     .byte   0x0a            /*  改行    */
     .byte   0
-
-    .org    0x1fe
-    .byte   0x55, 0xaa
-
-/*  以下はブートセクタ以外の部分の記述  */
-    .byte   0xf0, 0xff, 0xff, 0x00,  0x00, 0x00, 0x00, 0x00
-    .space  4600, 0x00
-    .byte   0xf0, 0xff, 0xff, 0x00,  0x00, 0x00, 0x00, 0x00
-    .space  1469432,    0x00
-
