@@ -29,58 +29,58 @@
 
 /*  プログラム本体  */
 entry:
-    movw    $0,     %ax     /*  レジスタ初期化  */
-    movw    %ax,    %ss
-    movw    $0x7c00,    %sp
-    movw    %ax,    %ds
+    MOVW    $0,     %AX     /*  レジスタ初期化  */
+    MOVW    %AX,    %SS
+    MOVW    $0x7c00,    %SP
+    MOVW    %AX,    %DS
 
 /* ディスクを読む。 */
-    movw     $0x0820,    %ax
-    movw    %ax,    %es
+    MOVW    $0x0820,    %AX
+    MOVW    %AX,    %ES
 
-    movb    $0,     %ch     /*  シリンダ 0  */
-    movb    $0,     %dh     /*  ヘッド 0    */
-    movb    $2,     %cl     /*  セクタ 2    */
+    MOVB    $0,     %CH     /*  シリンダ 0  */
+    MOVB    $0,     %DH     /*  ヘッド 0    */
+    MOVB    $2,     %CL     /*  セクタ 2    */
 
 readloop:
-    movw    $0,     %si     /*  失敗回数を数えるレジスタ。  */
+    MOVW    $0,     %SI     /*  失敗回数を数えるレジスタ。  */
 retry:
-    movb    $0x02,  %ah     /*  AH=0x02:ディスク読み込み。  */
-    movb    $0x01,  %al     /*  1 セクタ    */
-    movw    $0,     %bx
-    movb    $0x00,  %dl     /*  A ドライブ  */
-    int     $0x13           /*  ディスク BIOS 呼び出し  */
-    jnc     next            /*  エラーがおきなければ next へ。  */
-    addw    $1,     %si     /*  SI に 1 を足す  */
-    cmpw    $5,     %si     /*  SI と 5 を比較  */
-    jae     error           /*  SI >= 5 だったら error  へ  */
+    MOVB    $0x02,  %AH     /*  AH=0x02:ディスク読み込み。  */
+    MOVB    $0x01,  %AL     /*  1 セクタ    */
+    MOVW    $0,     %BX
+    MOVB    $0x00,  %DL     /*  A ドライブ  */
+    INT     $0x13           /*  ディスク BIOS 呼び出し  */
+    JNC     next            /*  エラーがおきなければ next へ。  */
+    ADDW    $1,     %SI     /*  SI に 1 を足す  */
+    CMPW    $5,     %SI     /*  SI と 5 を比較  */
+    JAE     error           /*  SI >= 5 だったら error  へ  */
 
-    movb    $0x00,  %ah
-    movb    $0x00,  %dl     /*  A ドライブ  */
-    int     $0x13           /*  ドライブのリセット  */
-    jmp     retry
+    MOVB    $0x00,  %AH
+    MOVB    $0x00,  %DL     /*  A ドライブ  */
+    INT     $0x13           /*  ドライブのリセット  */
+    JMP     retry
 next:
-    movw    %es,    %ax     /*  アドレスを 0x0200 進める。  */
-    addw    $0x0020,    %ax
-    movw    %ax,    %es
-    addb    $1,     %cl     /*  CL に 1 を足す  */
-    cmpb    $18,    %cl
-    jbe     readloop
+    MOVW    %ES,    %AX     /*  アドレスを 0x0200 進める。  */
+    ADDW    $0x0020,    %AX
+    MOVW    %AX,    %ES
+    ADDB    $1,     %CL     /*  CL に 1 を足す  */
+    CMPB    $18,    %CL
+    JBE     readloop
 fin:
-    hlt                     /*  何かあるまで CPU  を停止させる  */
-    jmp     fin             /*  無限ループ  */
+    HLT                     /*  何かあるまで CPU  を停止させる  */
+    JMP     fin             /*  無限ループ  */
 
 error:
-    mov     $msg,   %si
+    MOV     $msg,   %SI
 putloop:
-    movb    (%si),  %al
-    addw    $1,     %si     /*  SI に 1 を足す  */
-    cmpb    $0,     %al
-    je      fin
-    movb    $0x0e,  %ah     /*  壱文字表示ファンクション    */
-    movw    $15,    %bx     /*  カラーコード    */
-    int     $0x10           /*  ビデオ BIOS 呼び出し    */
-    jmp     putloop
+    MOVB    (%SI),  %AL
+    ADDW    $1,     %SI     /*  SI に 1 を足す  */
+    CMPB    $0,     %AL
+    JE      fin
+    MOVB    $0x0e,  %AH     /*  壱文字表示ファンクション    */
+    MOVW    $15,    %BX     /*  カラーコード    */
+    INT     $0x10           /*  ビデオ BIOS 呼び出し    */
+    JMP     putloop
 
 /*  メッセージ部分  */
 .data
