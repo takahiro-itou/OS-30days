@@ -3,5 +3,6 @@
 
 /Haribote.img
 *.bin
+*.lst
 *.o
 
