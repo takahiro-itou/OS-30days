@@ -43,11 +43,17 @@ ASFLAGS     =  -march=i386  --32
 ##
 
 ${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.o}
-	${LD}  -T LinkerScript  -o $@  $^
+	${LD}  -T LinkerScript  -o $@  $<
 
 ##
 ##    Suffix Rules.
 ##
 
 .s.o  :
-	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $^
+	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $<
+
+##
+##    Dependencies
+##
+
+${IPLBIN_IMAGE} : Makefile  LinkerScript

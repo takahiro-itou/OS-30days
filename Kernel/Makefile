@@ -3,7 +3,7 @@
 ##    List of Files.
 ##
 
-KERNEL_IMAGE        =  Haribote.sys
+KERNEL_IMAGE        =  haribote.sys
 
 ##
 ##    Commands.
@@ -43,11 +43,17 @@ ASFLAGS     =  -march=i386  --32
 ##
 
 ${KERNEL_IMAGE} : ${KERNEL_IMAGE:%.sys=%.o}
-	${LD}  -T LinkerScript  -o $@  $^
+	${LD}  -T LinkerScript  -o $@  $<
 
 ##
 ##    Suffix Rules.
 ##
 
 .s.o  :
-	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $^
+	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $<
+
+##
+##    Dependencies
+##
+
+${KERNEL_IMAGE} : Makefile  LinkerScript

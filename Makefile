@@ -11,7 +11,7 @@ SUBDIRS  =  BootSector  Kernel
 
 TARGET_IMAGE        =  Haribote.img
 IPLBIN_IMAGE        =  BootSector/Ipl.bin
-KERNEL_IMAGE        =  Kernel/Haribote.sys
+KERNEL_IMAGE        =  Kernel/haribote.sys
 
 ##
 ##    Commands.
@@ -56,7 +56,7 @@ ASFLAGS     =  -march=i386  --32
 ##    Build.
 ##
 
-${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}
+${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
 	mformat  -f 1440  -C  -B ${IPLBIN_IMAGE}  -i $@  ::
 	${DD}  if=${IPLBIN_IMAGE}  bs=512  count=1  of=$@  conv=notrunc
 	mcopy  -i $@  ${KERNEL_IMAGE}  ::

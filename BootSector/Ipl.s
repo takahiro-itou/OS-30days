@@ -79,9 +79,8 @@ next:
     CMPB    CYLS,   %CH
     JB      readloop
 
-fin:
-    HLT                     /*  何かあるまで CPU  を停止させる  */
-    JMP     fin             /*  無限ループ  */
+/*  読み終わったので haribote.sys を実行。  */
+    JMP     0xc200
 
 error:
     MOV     $msg,   %SI
@@ -94,6 +93,9 @@ putloop:
     MOVW    $15,    %BX     /*  カラーコード    */
     INT     $0x10           /*  ビデオ BIOS 呼び出し    */
     JMP     putloop
+fin:
+    HLT                     /*  何かあるまで CPU  を停止させる  */
+    JMP     fin             /*  無限ループ  */
 
 /*  メッセージ部分  */
 .data
