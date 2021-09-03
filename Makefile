@@ -1,10 +1,16 @@
 
 ##
+##    List of Sub Directory.
+##
+
+SUBDIRS  =  BootSector
+
+##
 ##    List of Files.
 ##
 
 TARGET_IMAGE        =  Haribote.img
-IPLBIN_IMAGE        =  Ipl.bin
+IPLBIN_IMAGE        =  BootSector/Ipl.bin
 
 ##
 ##    Commands.
@@ -22,17 +28,22 @@ LD      =  /usr/bin/ld
 .PHONY      :  all  clean  cleanall  cleanobj
 .SUFFIXES   :  .o   .s
 
-all         :  ${TARGET_IMAGE}
+all         :  ${SUBDIRS}  ${TARGET_IMAGE}
 
-clean       :  cleanobj
-	${RM}  -f  ${TARGET_IMAGE}  ${IPLBIN_IMAGE}
+clean       :  ${SUBDIRS}  cleanobj
+	${RM}  -f  ${TARGET_IMAGE}
 
-cleanall :  clean
-	${RM}  -f  ${TARGET_IMAGE:%.img=%.lst}
+cleanall    :  ${SUBDIRS}  clean
 
-cleanobj :
-	${RM}  -f  ${IPLBIN_IMAGE:%.bin=%.o}
-	${RM}  -f  ${TARGET_IMAGE:%.img=%.o}
+cleanobj    :  ${SUBDIRS}
+
+##
+##    Make Sub Directories.
+##
+
+RECURSIVE   :
+${SUBDIRS}  :  RECURSIVE
+	${MAKE}  -C $@  ${MAKECMDGOALS}
 
 ##
 ##    Compile and Link Flags.
@@ -48,12 +59,6 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}
 	mformat  -f 1440  -C  -B ${IPLBIN_IMAGE}  -i $@  ::
 	${DD}  if=${IPLBIN_IMAGE}  bs=512  count=1  of=$@  conv=notrunc
 
-${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.o}
-	${LD}  -T LinkerScript  -o $@  $^
-
 ##
 ##    Suffix Rules.
 ##
-
-.s.o  :
-	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $^
