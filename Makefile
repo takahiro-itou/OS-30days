@@ -56,5 +56,4 @@ ${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.o}
 ##
 
 .s.o  :
-	${AS}  -o $@  ${ASFLAGS}  $^
-
+	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $^

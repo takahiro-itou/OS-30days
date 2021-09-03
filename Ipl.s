@@ -2,6 +2,8 @@
 ##  hello-os
 ##  TAB=4
 
+    .EQU    CYLS,   10
+
     .code16
     .org    0x0000
 
@@ -66,6 +68,17 @@ next:
     ADDB    $1,     %CL     /*  CL に 1 を足す  */
     CMPB    $18,    %CL
     JBE     readloop
+
+    MOVB    $1,     %CL
+    ADDB    $1,     %DH     /*  ヘッド+1    */
+    CMPB    $2,     %DH
+    JB      readloop
+
+    MOVB    $0,     %DH
+    ADDB    $1,     %CH     /*  シリンダ+1  */
+    CMPB    CYLS,   %CH
+    JB      readloop
+
 fin:
     HLT                     /*  何かあるまで CPU  を停止させる  */
     JMP     fin             /*  無限ループ  */
