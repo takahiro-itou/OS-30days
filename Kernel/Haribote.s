@@ -1,0 +1,5 @@
+
+fin:
+    HLT
+    JMP     fin
+
