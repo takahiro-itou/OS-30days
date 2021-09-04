@@ -90,18 +90,19 @@ pipelineflush:
         あとは bootpack に任せる    */
     /*  bootpackの起動  */
     MOVL    $BOTPAK,    %EBX
-    MOVL    16(%EBX),   %ECX
+    MOVL    $0x11a8,    %ECX        # MOVL    16(%EBX),   %ECX
     ADDL    $3,     %ECX
     SHRL    $2,     %ECX
     JZ      skip
-    MOVL    20(%EBX),   %ESI
+    MOVL    $0x10c8,    %ESI        # MOVL    20(%EBX),   %ESI
     ADDL    %EBX,       %ESI
-    MOVL    12(%EBX),   %EDI
+    MOVL    $0x00310000,    %EDI    # MOVL    12(%EBX),   %EDI
     CALL    memcpy
 
 skip:
-    MOVL    12(%EBX),   %ESP    /*  スタック初期値  */
-    LJMPL   $2*8, $0x0000001b
+    # MOVL    12(%EBX),   %ESP    /*  スタック初期値  */
+    MOVL    $0x00310000,    %ESP    /*  スタック初期値  */
+    LJMPL   $2*8, $0x00000000
 
 ##################################################################
 ##  function
@@ -124,7 +125,7 @@ memcpy:
 ##################################################################
 ##  GDT
 
-.align  8
+.align  16
 GDT0:
     .skip   8, 0x00                 /*  ヌルセレクタ    */
     .word   0xffff, 0x0000, 0x9200, 0x00cf  /*  読み書き可能セグメント  */
@@ -134,5 +135,5 @@ GDTR0:
     .word   8*3-1
     .int    GDT0
 
-.align  8
+.align  16
 bootpack:
