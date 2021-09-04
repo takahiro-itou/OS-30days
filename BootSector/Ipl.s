@@ -81,6 +81,7 @@ next:
     JB      readloop
 
 /*  読み終わったので haribote.sys を実行。  */
+    MOVB    %CH,    (0x0FF0)    /*  IPL がどこまで読んだのかをメモ  */
     JMP     0xC200
 
 error:
