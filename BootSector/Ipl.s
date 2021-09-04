@@ -3,9 +3,10 @@
 ##  TAB=4
 
     .EQU    CYLS,   10
+    .EQU    ADDR,   0xC200
 
+    .text
     .code16
-    .org    0x0000
 
 /*  以下は標準的な FAT 12 フォーマットフロッピーディスクのための記述    */
 
@@ -80,7 +81,7 @@ next:
     JB      readloop
 
 /*  読み終わったので haribote.sys を実行。  */
-    JMP     0xc200
+    JMP     0xC200
 
 error:
     MOV     $msg,   %SI
