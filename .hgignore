@@ -6,7 +6,8 @@ syntax: regexp
 
 ^Haribote.img
 .*\.bin
+.*\.hrb
 .*\.lst
-.*\.o
+.*\.obj
 .*\.sys
 

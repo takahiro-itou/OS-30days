@@ -10,6 +10,7 @@ KERNEL_IMAGE        =  haribote.sys
 ##
 
 AS      =  /usr/bin/as
+CAT     =  /bin/cat
 CP      =  /bin/cp
 DD      =  /bin/dd
 LD      =  /usr/bin/ld
@@ -19,7 +20,7 @@ LD      =  /usr/bin/ld
 ##
 
 .PHONY      :  all  clean  cleanall  cleanobj
-.SUFFIXES   :  .o   .s
+.SUFFIXES   :  .obj   .s
 
 all         :  ${KERNEL_IMAGE}
 
@@ -29,8 +30,8 @@ clean       :  cleanobj
 cleanall :  clean
 
 cleanobj :
-	${RM}  -f  ${KERNEL_IMAGE:%.sys=%.o}
-	${RM}  -f  ${KERNEL_IMAGE:%.sys=%.lst}
+	${RM}  -f  AsmHead.bin  AsmHead.obj
+	${RM}  -f  BootPack.obj
 
 ##
 ##    Compile and Link Flags.
@@ -42,18 +43,28 @@ ASFLAGS     =  -march=i386  --32
 ##    Build.
 ##
 
-${KERNEL_IMAGE} : ${KERNEL_IMAGE:%.sys=%.o}
+${KERNEL_IMAGE} :  AsmHead.bin BootPack.hrb
+	${CAT}  AsmHead.bin  BootPack.hrb  >  $@
+
+AsmHead.bin     :  AsmHead.obj
 	${LD}  -T LinkerScript  -o $@  $<
+
+BootPack.hrb    :  BootPack.obj
+	${LD}  -o $@  -e HariMain  --oformat=binary  $<
 
 ##
 ##    Suffix Rules.
 ##
 
-.s.o  :
+.s.obj  :
 	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $<
+
+.c.obj  :
+	${CC}  -o $@  -c  -nostdlib  $<
 
 ##
 ##    Dependencies
 ##
 
-${KERNEL_IMAGE} : Makefile  LinkerScript
+AsmHead.bin     :  Makefile LinkerScript
+BootPack.hrb    :  Makefile LinkerScript

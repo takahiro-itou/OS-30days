@@ -19,7 +19,7 @@ LD      =  /usr/bin/ld
 ##
 
 .PHONY      :  all  clean  cleanall  cleanobj
-.SUFFIXES   :  .o   .s
+.SUFFIXES   :  .obj   .s
 
 all         :  ${IPLBIN_IMAGE}
 
@@ -29,7 +29,7 @@ clean       :  cleanobj
 cleanall :  clean
 
 cleanobj :
-	${RM}  -f  ${IPLBIN_IMAGE:%.bin=%.o}
+	${RM}  -f  ${IPLBIN_IMAGE:%.bin=%.obj}
 	${RM}  -f  ${IPLBIN_IMAGE:%.bin=%.lst}
 
 ##
@@ -42,14 +42,14 @@ ASFLAGS     =  -march=i386  --32
 ##    Build.
 ##
 
-${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.o}
+${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.obj}
 	${LD}  -T LinkerScript  -o $@  $<
 
 ##
 ##    Suffix Rules.
 ##
 
-.s.o  :
+.s.obj  :
 	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $<
 
 ##
