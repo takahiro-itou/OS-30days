@@ -30,8 +30,9 @@ clean       :  cleanobj
 cleanall :  clean
 
 cleanobj :
-	${RM}  -f  AsmHead.bin  AsmHead.obj
+	${RM}  -f  AsmHead.bin  AsmHead.obj AsmHead.lst
 	${RM}  -f  BootPack.obj
+	${RM}  -f  Func.obj Func.lst
 
 ##
 ##    Compile and Link Flags.
@@ -51,9 +52,9 @@ ${KERNEL_IMAGE} :  AsmHead.bin BootPack.hrb
 AsmHead.bin     :  AsmHead.obj
 	${LD}  -T ${@:%.bin=%.ls}  -o $@  $<
 
-BootPack.hrb    :  BootPack.obj
+BootPack.hrb    :  BootPack.obj Func.obj
 	${LD}  -T ${@:%.hrb=%.ls}  -o $@    \
-        BootPack.obj
+        BootPack.obj Func.obj
 
 ##
 ##    Suffix Rules.
