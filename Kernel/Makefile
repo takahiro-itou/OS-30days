@@ -38,7 +38,7 @@ cleanobj :
 ##
 
 ASFLAGS     =  -march=i386  --32
-CFLAGS      =  -march=i386  -m32  -nostdlib
+CFLAGS      =  -march=i386  -m32  -fno-pie  -nostdlib
 CCVERBOSE   =
 
 ##
@@ -49,10 +49,11 @@ ${KERNEL_IMAGE} :  AsmHead.bin BootPack.hrb
 	${CAT}  AsmHead.bin  BootPack.hrb  >  $@
 
 AsmHead.bin     :  AsmHead.obj
-	${LD}  -T LinkerScript  -o $@  $<
+	${LD}  -T ${@:%.bin=%.ls}  -o $@  $<
 
 BootPack.hrb    :  BootPack.obj
-	${LD}  -o $@  -e HariMain  --oformat=binary  $<
+	${LD}  -T ${@:%.hrb=%.ls}  -o $@    \
+        BootPack.obj
 
 ##
 ##    Suffix Rules.
@@ -68,5 +69,5 @@ BootPack.hrb    :  BootPack.obj
 ##    Dependencies
 ##
 
-AsmHead.bin     :  Makefile LinkerScript
-BootPack.hrb    :  Makefile LinkerScript
+AsmHead.bin     :  Makefile AsmHead.ls
+BootPack.hrb    :  Makefile BootPack.ls
