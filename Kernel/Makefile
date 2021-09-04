@@ -38,6 +38,8 @@ cleanobj :
 ##
 
 ASFLAGS     =  -march=i386  --32
+CFLAGS      =  -nostdlib
+CCVERBOSE   =
 
 ##
 ##    Build.
@@ -57,10 +59,10 @@ BootPack.hrb    :  BootPack.obj
 ##
 
 .s.obj  :
-	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $<
+	${AS}  -o $@  -a=${@:%.obj=%.lst}  ${ASFLAGS}  $<
 
 .c.obj  :
-	${CC}  -o $@  -c  -nostdlib  $<
+	${CC}  -o $@  ${CCVERBOSE}  ${CFLAGS}  -c  $<
 
 ##
 ##    Dependencies

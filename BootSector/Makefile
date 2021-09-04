@@ -50,7 +50,7 @@ ${IPLBIN_IMAGE} : ${IPLBIN_IMAGE:%.bin=%.obj}
 ##
 
 .s.obj  :
-	${AS}  -o $@  -a=${@:%.o=%.lst}  ${ASFLAGS}  $<
+	${AS}  -o $@  -a=${@:%.obj=%.lst}  ${ASFLAGS}  $<
 
 ##
 ##    Dependencies
