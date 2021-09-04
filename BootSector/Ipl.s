@@ -5,13 +5,13 @@
     .EQU    CYLS,   10
     .EQU    ADDR,   0xC200
 
-    .text
-    .code16
+.code16
+.text
 
 /*  以下は標準的な FAT 12 フォーマットフロッピーディスクのための記述    */
 
     .byte   0xeb, 0x4e, 0x90
-    .ascii  "HELLOIPL"      /*  ブートセクタの名前を自由に書いてよい    */
+    .ascii  "HARIBOTE"      /*  ブートセクタの名前を自由に書いてよい    */
     .word   512             /*  １セクタの大きさ    */
     .byte   1               /*  クラスタの大きさ    */
     .word   1               /*  FAT がどこから始まるか  */
@@ -26,7 +26,7 @@
     .long   2880            /*  このドライブの大きさをもう一度書く  */
     .byte   0, 0, 0x29      /*  よく分からないけどこの値にしておく  */
     .long   0xffffffff      /*  たぶんボリュームシリアル番号    */
-    .ascii  "HELLO-OS   "   /*  ディスクの名前 (11バイト)       */
+    .ascii  "HARIBOTEOS "   /*  ディスクの名前 (11バイト)       */
     .ascii  "FAT12   "      /*  フォーマットの名前 ( 8バイト)   */
     .skip   18, 0x00        /*  とりあえず 18 バイトあけておく  */
 
@@ -77,7 +77,7 @@ next:
 
     MOVB    $0,     %DH
     ADDB    $1,     %CH     /*  シリンダ+1  */
-    CMPB    CYLS,   %CH
+    CMPB    $CYLS,  %CH
     JB      readloop
 
 /*  読み終わったので haribote.sys を実行。  */
