@@ -30,9 +30,10 @@ clean       :  cleanobj
 cleanall :  clean
 
 cleanobj :
-	${RM}  -f  AsmHead.bin  AsmHead.obj AsmHead.lst
-	${RM}  -f  BootPack.obj
-	${RM}  -f  Func.obj Func.lst
+	${RM}  -f  AsmHead.bin          \
+        AsmHead.obj AsmHead.lst     \
+        BootPack.hrb BootPack.obj   \
+        Func.obj Func.lst
 
 ##
 ##    Compile and Link Flags.
