@@ -38,7 +38,7 @@ cleanobj :
 ##
 
 ASFLAGS     =  -march=i386  --32
-CFLAGS      =  -nostdlib
+CFLAGS      =  -march=i386  -m32  -nostdlib
 CCVERBOSE   =
 
 ##
