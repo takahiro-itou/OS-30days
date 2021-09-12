@@ -11,3 +11,5 @@ syntax: regexp
 .*\.obj
 .*\.sys
 
+^Kernel/FontHankaku.c
+
