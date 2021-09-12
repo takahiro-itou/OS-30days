@@ -44,11 +44,7 @@ void HariMain(void)
     init_palette();
 
     binfo = (struct BOOTINFO *)(0xff0);
-    xsize = (*binfo).scrnx;
-    ysize = (*binfo).scrny;
-    vram = (*binfo).vram;
-
-    init_screen(vram, xsize, ysize);
+    init_screen(binfo->vram, binfo->xsize, binfo->ysize);
 
     for (;;) {
         io_hlt();
