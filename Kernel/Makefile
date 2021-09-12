@@ -28,11 +28,13 @@ clean       :  cleanobj
 	${RM}  -f  ${KERNEL_IMAGE}
 
 cleanall :  clean
+	${RM}  -f                           \
+        FontHankaku.o FontHankaku.c
 
 cleanobj :
-	${RM}  -f  AsmHead.bin          \
-        AsmHead.obj AsmHead.lst     \
-        BootPack.hrb BootPack.obj   \
+	${RM}  -f  AsmHead.bin              \
+        AsmHead.obj AsmHead.lst         \
+        BootPack.hrb BootPack.obj       \
         Func.obj Func.lst
 
 ##
@@ -53,9 +55,13 @@ ${KERNEL_IMAGE} :  AsmHead.bin BootPack.hrb
 AsmHead.bin     :  AsmHead.obj
 	${LD}  -T ${@:%.bin=%.ls}  -o $@  $<
 
-BootPack.hrb    :  BootPack.obj Func.obj
+BootPack.hrb    :  BootPack.obj Func.obj FontHankaku.obj
 	${LD}  -T ${@:%.hrb=%.ls}  -o $@    \
         BootPack.obj Func.obj
+
+FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
+	/usr/bin/gawk  -f GenerateFontDef.awk   \
+        < $<  > $@
 
 ##
 ##    Suffix Rules.
