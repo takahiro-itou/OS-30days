@@ -57,7 +57,7 @@ AsmHead.bin     :  AsmHead.obj
 
 BootPack.hrb    :  BootPack.obj Func.obj FontHankaku.obj
 	${LD}  -T ${@:%.hrb=%.ls}  -o $@    \
-        BootPack.obj Func.obj
+        BootPack.obj FontHankaku.obj Func.obj
 
 FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
 	/usr/bin/gawk  -f GenerateFontDef.awk   \

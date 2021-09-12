@@ -20,7 +20,7 @@ BEGIN {
 }
 
 END {
-    printf("static const char hankaku[4096] = {\n");
+    printf("const char hankaku[4096] = {\n");
     for (c = 0; c < 255; ++ c ) {
         printf("%.94s, \t/* 0x%02x */\n", data[c], c);
     }
