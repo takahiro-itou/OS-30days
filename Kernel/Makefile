@@ -3,6 +3,8 @@
 ##    List of Files.
 ##
 
+BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj    \
+                       ../Common/stdio.obj
 KERNEL_IMAGE        =  haribote.sys
 
 ##
@@ -34,7 +36,7 @@ cleanall :  clean
 cleanobj :
 	${RM}  -f  AsmHead.bin              \
         AsmHead.obj AsmHead.lst         \
-        BootPack.hrb BootPack.obj       \
+        ${BOOTPACK_OBJS}                \
         Func.obj Func.lst
 
 ##
@@ -55,9 +57,9 @@ ${KERNEL_IMAGE} :  AsmHead.bin BootPack.hrb
 AsmHead.bin     :  AsmHead.obj
 	${LD}  -T ${@:%.bin=%.ls}  -o $@  $<
 
-BootPack.hrb    :  BootPack.obj Func.obj FontHankaku.obj
+BootPack.hrb    :  ${BOOTPACK_OBJS}
 	${LD}  -T ${@:%.hrb=%.ls}  -o $@    \
-        BootPack.obj FontHankaku.obj Func.obj
+        ${BOOTPACK_OBJS}
 
 FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
 	/usr/bin/gawk  -f GenerateFontDef.awk   \
