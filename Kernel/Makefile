@@ -4,7 +4,7 @@
 ##
 
 BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj    \
-                       Graphic.obj DscTbl.obj                   \
+                       DscTbl.obj Graphic.obj Int.obj           \
                        ../Common/stdio.obj
 KERNEL_IMAGE        =  haribote.sys
 
@@ -82,3 +82,7 @@ FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
 
 AsmHead.bin     :  Makefile AsmHead.ls
 BootPack.hrb    :  Makefile BootPack.ls
+BootPack.obj    :  Makefile BootPack.h
+DscTbl.obj      :  Makefile BootPack.h
+Graphic.obj     :  Makefile BootPack.h
+Int.obj         :  Makefile BootPack.h
