@@ -4,6 +4,7 @@
 ##
 
 BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj    \
+                       Graphic.obj DscTbl.obj                   \
                        ../Common/stdio.obj
 KERNEL_IMAGE        =  haribote.sys
 
