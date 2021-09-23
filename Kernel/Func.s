@@ -6,6 +6,9 @@
 .global     io_out8, io_out16, io_out32
 .global     io_load_eflags, io_store_eflags
 .global     load_gdtr, load_idtr
+.global     asm_inthandler21
+.global     asm_inthandler27
+.global     asm_inthandler2c
 
 .text
 
@@ -83,3 +86,51 @@ load_idtr:          # void load_idtr(int limit, int addr)
     MOVW    %AX,    6(%ESP)
     LIDT    6(%ESP)
     RET
+
+asm_inthandler21:
+    PUSHW   %ES
+    PUSHW   %DS
+    PUSHA
+    MOVL    %ESP,   %EAX
+    PUSHL   %EAX
+    MOVW    %SS,    %AX
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    CALL    inthandler21
+    POP     %EAX
+    POPA
+    POPW    %DS
+    POPW    %ES
+    IRET
+
+asm_inthandler27:
+    PUSHW   %ES
+    PUSHW   %DS
+    PUSHA
+    MOVL    %ESP,   %EAX
+    PUSHL   %EAX
+    MOVW    %SS,    %AX
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    CALL    inthandler27
+    POP     %EAX
+    POPA
+    POPW    %DS
+    POPW    %ES
+    IRET
+
+asm_inthandler2c:
+    PUSHW   %ES
+    PUSHW   %DS
+    PUSHA
+    MOVL    %ESP,   %EAX
+    PUSHL   %EAX
+    MOVW    %SS,    %AX
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    CALL    inthandler2c
+    POP     %EAX
+    POPA
+    POPW    %DS
+    POPW    %ES
+    IRET

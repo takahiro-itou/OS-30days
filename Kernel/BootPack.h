@@ -24,6 +24,11 @@ void io_store_eflags(int eflas);
 void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
 
+void asm_inthandler21(void);
+void asm_inthandler27(void);
+void asm_inthandler2c(void);
+
+
 /*  Graphic.c   */
 
 void init_palette(void);
@@ -84,9 +89,13 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd,
 #define LIMIT_BOTPAK    0x007ffff
 #define AR_DATA32_RW    0x4092
 #define AR_CODE32_ER    0x409a
+#define AR_INTGATE32    0x008e
 
 /*  Int.c   */
 void init_pic(void);
+void inthandler21(int *esp);
+void inthandler27(int *esp);
+void inthandler2c(int *esp);
 
 #define PIC0_ICW1       0x0020
 #define PIC0_OCW2       0x0020
