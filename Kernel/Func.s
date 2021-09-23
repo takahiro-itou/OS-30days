@@ -1,14 +1,15 @@
 
 .code32
-.global     io_hlt
-.global     io_cli, io_sti, io_stihlt
-.global     io_in8, io_in16, io_in32
-.global     io_out8, io_out16, io_out32
-.global     io_load_eflags, io_store_eflags
-.global     load_gdtr, load_idtr
-.global     asm_inthandler21
-.global     asm_inthandler27
-.global     asm_inthandler2c
+.globl      io_hlt
+.globl      io_cli, io_sti, io_stihlt
+.globl      io_in8, io_in16, io_in32
+.globl      io_out8, io_out16, io_out32
+.globl      io_load_eflags, io_store_eflags
+.globl      load_gdtr, load_idtr
+.globl      asm_inthandler21
+.globl      asm_inthandler27
+.globl      asm_inthandler2c
+.extern     inthandler21, inthandler27, inthandler2c
 
 .text
 
