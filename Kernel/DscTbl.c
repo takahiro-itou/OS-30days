@@ -55,6 +55,6 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd,
     gd->selector     = selector;
     gd->dw_count     = (ar >> 8) & 0xff;
     gd->access_right = ar & 0xff;
-    gd->offset_high  - (offset >> 16) & 0xffff;
+    gd->offset_high  = (offset >> 16) & 0xffff;
     return;
 }
