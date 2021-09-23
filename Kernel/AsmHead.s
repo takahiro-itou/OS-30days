@@ -100,6 +100,13 @@ pipelineflush:
     CALL    memcpy
 
 skip:
+    MOVW    $1*8,   %AX     /*  書き込み可能セグメント  */
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    MOVW    %AX,    %FS
+    MOVW    %AX,    %GS
+    MOVW    %AX,    %SS
+
     # MOVL    12(%EBX),   %ESP    /*  スタック初期値  */
     MOVL    $0x00310000,    %ESP    /*  スタック初期値  */
     LJMPL   $4*8, $0x00000000
