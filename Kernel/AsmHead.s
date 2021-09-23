@@ -55,8 +55,8 @@
 .arch   i486
     LGDTL   (GDTR0)
     MOVL    %CR0,   %EAX
-    ANDL    $0x7fffffff,    %EAX    /*  bit31を0にする。ページング禁止  */
-    ORL     $0x00000001,    %EAX    /*  bit00を1にする。プロテクトモード  */
+    ANDL    $0x7fffffff,    %EAX    /*  bit31を0にする。ページング禁止      */
+    ORL     $0x00000001,    %EAX    /*  bit00を1にする。プロテクトモード    */
     MOVL    %EAX,   %CR0
     JMP     pipelineflush
 pipelineflush:
@@ -102,7 +102,7 @@ pipelineflush:
 skip:
     # MOVL    12(%EBX),   %ESP    /*  スタック初期値  */
     MOVL    $0x00310000,    %ESP    /*  スタック初期値  */
-    LJMPL   $2*8, $0x00000000
+    LJMPL   $4*8, $0x00000000
 
 ##################################################################
 ##  function
@@ -128,11 +128,18 @@ memcpy:
 .align  16
 GDT0:
     .skip   8, 0x00                 /*  ヌルセレクタ    */
+
+    /*  全領域を含むシステムセグメント。    */
     .word   0xffff, 0x0000, 0x9200, 0x00cf  /*  読み書き可能セグメント  */
+    .word   0xffff, 0x0000, 0x9a00, 0x00cf  /*  実行可能セグメント      */
+
+    /*  カーネルを含むシステムセグメント。  */
+    .word   0xffff, 0x0000, 0x9228, 0x0047  /*  読み書き可能セグメント  */
     .word   0xffff, 0x0000, 0x9a28, 0x0047  /*  実行可能セグメント      */
+
     .word   0x0000
 GDTR0:
-    .word   8*3-1
+    .word   8*5-1
     .int    GDT0
 
 .align  16
