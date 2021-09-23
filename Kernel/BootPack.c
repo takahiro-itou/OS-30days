@@ -14,6 +14,7 @@ void HariMain(void)
 
     init_palette();
     init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
+    io_sti();
 
     mx = (binfo->scrnx - 16) / 2;
     my = (binfo->scrny - 28 - 16) / 2;
@@ -22,6 +23,9 @@ void HariMain(void)
 
     snprintf(s, sizeof(s) - 1, "(%d, %d)", mx, my);
     putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
+
+    io_out8(PIC0_IMR, 0xf9);
+    io_out8(PIC1_IMR, 0xef);
 
     for (;;) {
         io_hlt();
