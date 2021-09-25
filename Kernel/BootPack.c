@@ -6,13 +6,14 @@
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(0xff0);
-    char s[40], mcursor[256];
+    char s[40], mcursor[256], keybuf[32];
     int mx, my, i;
 
     init_gdtidt();
     init_pic();
     io_sti();
 
+    fifo8_init(&keyfifo, sizeof(keybuf), keybuf);
     io_out8(PIC0_IMR, 0xf9);    /*  PIC1とキーボードを許可  */
     io_out8(PIC1_IMR, 0xef);    /*  マウスを許可            */
 
@@ -29,16 +30,10 @@ void HariMain(void)
 
     for (;;) {
         io_cli();
-        if (keybuf.len == 0) {
+        if (fifo8_status(&keyfifo) == 0) {
             io_stihlt();
         } else {
-            i = keybuf.data[keybuf.next_r];
-            -- keybuf.len;
-            ++ keybuf.next_r;
-            if (keybuf.next_r == 32) {
-                keybuf.next_r = 0;
-            }
-
+            i = fifo8_get(&keyfifo);
             io_sti();
             snprintf(s, sizeof(s), "%02x", i);
             boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 0, 16, 15, 31);
