@@ -49,11 +49,18 @@ void HariMain(void)
             io_sti();
             if (mouse_decode(&mdec, i) != 0) {
                 /*  データが揃ったので表示  */
-                snprintf(
-                        s, sizeof(s), "%02x %02x %02x",
-                        mdec.buf[0], mdec.buf[1], mdec.buf[2]);
+                snprintf(s, sizeof(s), "[lcr %4d %4d]", mdec.x, mdec.y);
+                if ((mdec.btn & 0x01) != 0) {
+                    s[1] = 'L';
+                }
+                if ((mdec.btn & 0x02) != 0) {
+                    s[3] = 'R';
+                }
+                if ((mdec.btn & 0x04) != 0) {
+                    s[2] = 'C';
+                }
                 boxfill8(binfo->vram, binfo->scrnx, COL8_008484,
-                         32, 16, 32 + 8 * 8 - 1, 31);
+                         32, 16, 32 + 15 * 8 - 1, 31);
                 putfonts8_asc(binfo->vram, binfo->scrnx,
                               32, 16, COL8_FFFFFF, s);
             }
@@ -107,8 +114,11 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat)
     }
     if (mdec->phase == 1) {
         /*  マウスの 1バイト目を待っている段階  */
-        mdec->buf[0] = dat;
-        mdec->phase = 2;
+        if ((dat & 0xc8) == 0x08) {
+            /*  正しい 1バイト目だった  */
+            mdec->buf[0] = dat;
+            mdec->phase = 2;
+        }
         return ( 0 );
     }
     if (mdec->phase == 2) {
@@ -121,6 +131,16 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat)
         /*  マウスの 3バイト目を待っている段階  */
         mdec->buf[2] = dat;
         mdec->phase = 1;
+        mdec->btn = (mdec->buf[0] & 0x07);
+        mdec->x = mdec->buf[1];
+        mdec->y = mdec->buf[2];
+        if ((mdec->buf[0] & 0x10) != 0) {
+            mdec->x |= 0xffffff00;
+        }
+        if ((mdec->buf[0] & 0x20) != 0) {
+            mdec->y |= 0xffffff00;
+        }
+        mdec->y = -(mdec->y);   /*  マウスでは縦方向の符号が画面と逆。  */
         return ( 1 );
     }
     /*  ここにくることはないはず。  */

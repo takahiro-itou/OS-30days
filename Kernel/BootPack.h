@@ -138,6 +138,7 @@ extern struct FIFO8 mousefifo;
 
 struct MOUSE_DEC {
     unsigned char buf[3], phase;
+    int x, y, btn;
 };
 
 void init_keyboard(void);
