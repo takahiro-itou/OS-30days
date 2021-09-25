@@ -136,8 +136,13 @@ extern struct FIFO8 mousefifo;
 
 /*  BootPack.c  */
 
+struct MOUSE_DEC {
+    unsigned char buf[3], phase;
+};
+
 void init_keyboard(void);
-void enable_mouse(void);
+void enable_mouse(struct MOUSE_DEC *mdec);
+int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 
 #define PORT_KEYDAT             0x0060
 #define PORT_KEYSTA             0x0064

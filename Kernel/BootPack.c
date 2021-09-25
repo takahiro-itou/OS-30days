@@ -8,7 +8,7 @@ void HariMain(void)
     struct BOOTINFO *binfo = (struct BOOTINFO *)(0xff0);
     char s[40], mcursor[256], keybuf[32], mousebuf[128];
     int mx, my, i;
-    unsigned char mouse_dbuf[3], mouse_phase;
+    struct MOUSE_DEC mdec;
 
     init_gdtidt();
     init_pic();
@@ -32,8 +32,7 @@ void HariMain(void)
     snprintf(s, sizeof(s) - 1, "(%d, %d)", mx, my);
     putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
-    enable_mouse();
-    mouse_phase = 0;    /*  マウスの 0xfa を待っている段階へ。  */
+    enable_mouse(&mdec);
 
     for (;;) {
         io_cli();
@@ -48,27 +47,11 @@ void HariMain(void)
         } else if (fifo8_status(&mousefifo) != 0) {
             i = fifo8_get(&mousefifo);
             io_sti();
-            if (mouse_phase == 0 ) {
-                /*  マウスの 0xfa を待っている段階  */
-                if (i == 0xfa) {
-                    mouse_phase = 1;
-                }
-            } else if (mouse_phase == 1) {
-                /*  マウスの１バイト目を待っている段階  */
-                mouse_dbuf[0] = i;
-                mouse_phase = 2;
-            } else if (mouse_phase == 2) {
-                /*  マウスの２バイト目を待っている段階  */
-                mouse_dbuf[1] = i;
-                mouse_phase = 3;
-            } else {
-                /*  マウスの３バイト目を待っている段階  */
-                mouse_dbuf[2] = i;
-                mouse_phase = 1;
+            if (mouse_decode(&mdec, i) != 0) {
                 /*  データが揃ったので表示  */
                 snprintf(
                         s, sizeof(s), "%02x %02x %02x",
-                        mouse_dbuf[0], mouse_dbuf[1], mouse_dbuf[2]);
+                        mdec.buf[0], mdec.buf[1], mdec.buf[2]);
                 boxfill8(binfo->vram, binfo->scrnx, COL8_008484,
                          32, 16, 32 + 8 * 8 - 1, 31);
                 putfonts8_asc(binfo->vram, binfo->scrnx,
@@ -99,12 +82,47 @@ void init_keyboard(void)
     return;
 }
 
-void enable_mouse(void)
+void enable_mouse(struct MOUSE_DEC *mdec)
 {
     /*  マウス有効  */
     wait_KBC_sendready();
     io_out8(PORT_KEYCMD, KEYCMD_SENDTO_MOUSE);
     wait_KBC_sendready();
     io_out8(PORT_KEYDAT, MOUSECMD_ENABLE);
+
+    /*  うまくいくと ACK(0xfa)  が送信されてくる。  */
+    mdec->phase = 0;    /*  マウスの 0xfa を待っている段階  */
+
     return;
+}
+
+int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat)
+{
+    if (mdec->phase == 0) {
+        /*  マウスの 0xfa を待っている段階  */
+        if (dat == 0xfa) {
+            mdec->phase = 1;
+        }
+        return ( 0 );
+    }
+    if (mdec->phase == 1) {
+        /*  マウスの 1バイト目を待っている段階  */
+        mdec->buf[0] = dat;
+        mdec->phase = 2;
+        return ( 0 );
+    }
+    if (mdec->phase == 2) {
+        /*  マウスの 2バイト目を待っている段階  */
+        mdec->buf[1] = dat;
+        mdec->phase = 3;
+        return ( 0 );
+    }
+    if (mdec->phase == 3) {
+        /*  マウスの 3バイト目を待っている段階  */
+        mdec->buf[2] = dat;
+        mdec->phase = 1;
+        return ( 1 );
+    }
+    /*  ここにくることはないはず。  */
+    return ( -1 );
 }
