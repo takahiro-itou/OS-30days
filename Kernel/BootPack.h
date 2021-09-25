@@ -99,7 +99,7 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd,
 /*  Int.c   */
 struct KEYBUF {
     unsigned char data[32];
-    int next;
+    int next_r, next_w, len;
 };
 
 extern struct KEYBUF keybuf;
