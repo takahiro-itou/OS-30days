@@ -132,6 +132,7 @@ void inthandler2c(int *esp);
 #define PIC1_ICW4       0x00a1
 
 extern struct FIFO8 keyfifo;
+extern struct FIFO8 mousefifo;
 
 /*  BootPack.c  */
 
