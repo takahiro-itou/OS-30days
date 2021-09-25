@@ -1,6 +1,8 @@
 /*  割り込み関係。  */
 
 #include "BootPack.h"
+#include "../Common/stdio.h"
+
 
 void init_pic(void)
 {
@@ -27,12 +29,16 @@ void init_pic(void)
 void inthandler21(int *esp)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(ADR_BOOTINFO);
-    boxfill8(binfo->vram, binfo->scrnx, COL8_000000, 0, 0, 32 * 8 - 1, 15);
-    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF,
-                 "INT 21 (IRQ-1) : PS/2 keyboard");
-    for (;;) {
-        io_hlt();
-    }
+    unsigned char data, s[4];
+
+    io_out8(PIC0_OCW2, 0x61);   /*  IRQ-01 受付完了を PIC に通知。  */
+    data = io_in8(PORT_KEYDAT);
+
+    snprintf(s, sizeof(s), "%02x", data);
+    boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 0, 16, 15, 31);
+    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
+
+    return;
 }
 
 /*  PS/2  マウスからの割り込み  */

@@ -5,7 +5,7 @@
 
 int int2asc(char *s, int value, int radix, int width, char fill) {
     int len, cnt;
-    char buf[32];
+    char buf[MAX_WIDTH];
 
     if (width >= MAX_WIDTH) {
         width = MAX_WIDTH;
