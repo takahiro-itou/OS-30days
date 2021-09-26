@@ -41,7 +41,7 @@ void HariMain(void)
         } else if (fifo8_status(&keyfifo) != 0) {
             i = fifo8_get(&keyfifo);
             io_sti();
-            snprintf(s, sizeof(s), "%02x", i);
+            snprintf(s, sizeof(s), "%02X", i);
             boxfill8(binfo->vram, binfo->scrnx, COL8_008484, 0, 16, 15, 31);
             putfonts8_asc(binfo->vram, binfo->scrnx, 0, 16, COL8_FFFFFF, s);
         } else if (fifo8_status(&mousefifo) != 0) {

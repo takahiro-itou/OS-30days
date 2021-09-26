@@ -3,19 +3,27 @@
 
 #define     MAX_WIDTH   32
 
-int int2asc(char *s, int value, int radix, int width, char fill) {
+int int2asc(char *s, int value, int radix, int width, char fill,
+            const char *radix_chars)
+{
     int len, cnt;
+    unsigned int uvalue;
     char buf[MAX_WIDTH];
 
     if (width >= MAX_WIDTH) {
-        width = MAX_WIDTH;
+        width = MAX_WIDTH - 1;
     }
-    while (value) {
-        buf[len++] = (value % radix);
-        value /= radix;
-    }
+    uvalue = ((value < 0) ? (- value) : (value));
+    do {
+        buf[len++] = (uvalue % radix);
+        uvalue /= radix;
+    } while (uvalue);
 
     cnt = len;
+    if (value < 0) {
+        *(s ++) = '-';
+        ++ cnt;
+    }
     while (cnt < width) {
         *(s ++) = fill;
         ++ cnt;
@@ -23,7 +31,7 @@ int int2asc(char *s, int value, int radix, int width, char fill) {
 
     while (len > 0) {
         int tmp = buf[--len];
-        *(s ++) = ((tmp < 10) ? (tmp + '0') : (tmp + 0x37));
+        *(s ++) = ((tmp < radix) ? (radix_chars[tmp]) : tmp);
     }
     return ( cnt );
 }
@@ -31,7 +39,8 @@ int int2asc(char *s, int value, int radix, int width, char fill) {
 int vsnprintf(char *s, int n, const char *format, va_list arg)
 {
     const char *p = format;
-    int cnt, len;
+    int cnt, len, sdata;
+    unsigned int udata;
     char buf[32];
 
     for (cnt = 0; (cnt < n); ++ p) {
@@ -53,10 +62,16 @@ int vsnprintf(char *s, int n, const char *format, va_list arg)
             }
             switch (fmt) {
             case 'd':
-                len = int2asc(buf, va_arg(arg, int), 10, width, fill);
+                sdata = va_arg(arg, int);
+                len = int2asc(buf, sdata, 10, width, fill, "0123456789");
                 break;
             case 'x':
-                len = int2asc(buf, va_arg(arg, int), 16, width, fill);
+                udata = va_arg(arg, unsigned int);
+                len = int2asc(buf, udata, 16, width, fill, "0123456789abcdef");
+                break;
+            case 'X':
+                udata = va_arg(arg, unsigned int);
+                len = int2asc(buf, udata, 16, width, fill, "0123456789ABCDEF");
                 break;
             }
             for (int i = 0; (i < len) && (cnt < n); ++ cnt, ++ i ) {
