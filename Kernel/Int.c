@@ -1,10 +1,6 @@
 /*  割り込み関係。  */
 
 #include "BootPack.h"
-#include "../Common/stdio.h"
-
-struct FIFO8 keyfifo;
-struct FIFO8 mousefifo;
 
 void init_pic(void)
 {
@@ -27,30 +23,6 @@ void init_pic(void)
     return;
 }
 
-/*  PS/2  キーボードからの割り込み  */
-void inthandler21(int *esp)
-{
-    unsigned char data;
-
-    io_out8(PIC0_OCW2, 0x61);   /*  IRQ-01 受付完了を PIC に通知。  */
-    data = io_in8(PORT_KEYDAT);
-    fifo8_put(&keyfifo, data);
-
-    return;
-}
-
-/*  PS/2  マウスからの割り込み  */
-void inthandler2c(int *esp)
-{
-    unsigned char data;
-
-    io_out8(PIC1_OCW2, 0x64);   /*  IRQ-12 受付完了を PIC に通知。  */
-    io_out8(PIC0_OCW2, 0x62);   /*  IRQ-02 受付完了を PIC に通知。  */
-    data = io_in8(PORT_KEYDAT);
-    fifo8_put(&mousefifo, data);
-
-    return;
-}
 
 /*  PIC0  からの不完全割り込み対策  */
 void inthandler27(int *esp)

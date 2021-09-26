@@ -4,7 +4,8 @@
 ##
 
 BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj    \
-                       DscTbl.obj Fifo.obj Graphic.obj Int.obj  \
+                       DscTbl.obj Fifo.obj Graphic.obj          \
+                       Int.obj KeyBoard.obj Mouse.obj           \
                        ../Common/stdio.obj
 KERNEL_IMAGE        =  haribote.sys
 
@@ -87,3 +88,5 @@ DscTbl.obj      :  Makefile BootPack.h
 Fifo.obj        :  Makefile BootPack.h
 Graphic.obj     :  Makefile BootPack.h
 Int.obj         :  Makefile BootPack.h
+KeyBoard.obj    :  Makefile BootPack.h
+Mouse.obj       :  Makefile BootPack.h

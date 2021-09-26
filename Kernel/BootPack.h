@@ -13,6 +13,30 @@ struct BOOTINFO
 
 #define ADR_BOOTINFO    0x00000ff0
 
+
+/*  BootPack.c  */
+
+struct MOUSE_DEC {
+    unsigned char buf[3], phase;
+    int x, y, btn;
+};
+
+void init_keyboard(void);
+void enable_mouse(struct MOUSE_DEC *mdec);
+int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
+
+#define PORT_KEYDAT             0x0060
+#define PORT_KEYSTA             0x0064
+#define PORT_KEYCMD             0x0064
+
+#define KEYSTA_SEND_NOTREADY    0x02
+#define KEYCMD_WRITE_MODE       0x60
+#define KBC_MODE                0x47
+
+#define KEYCMD_SENDTO_MOUSE     0xd4
+#define MOUSECMD_ENABLE         0xf4
+
+
 /*  Func.s  */
 
 void io_hlt(void);
@@ -113,9 +137,8 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd,
 /*  Int.c   */
 
 void init_pic(void);
-void inthandler21(int *esp);
 void inthandler27(int *esp);
-void inthandler2c(int *esp);
+
 
 #define PIC0_ICW1       0x0020
 #define PIC0_OCW2       0x0020
@@ -134,24 +157,15 @@ void inthandler2c(int *esp);
 extern struct FIFO8 keyfifo;
 extern struct FIFO8 mousefifo;
 
-/*  BootPack.c  */
 
-struct MOUSE_DEC {
-    unsigned char buf[3], phase;
-    int x, y, btn;
-};
+/*  KeyBoard.c  */
 
+void inthandler21(int *esp);
+
+void wait_KBC_sendready(void);
 void init_keyboard(void);
-void enable_mouse(struct MOUSE_DEC *mdec);
-int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 
-#define PORT_KEYDAT             0x0060
-#define PORT_KEYSTA             0x0064
-#define PORT_KEYCMD             0x0064
 
-#define KEYSTA_SEND_NOTREADY    0x02
-#define KEYCMD_WRITE_MODE       0x60
-#define KBC_MODE                0x47
+/*  Mouse.c     */
 
-#define KEYCMD_SENDTO_MOUSE     0xd4
-#define MOUSECMD_ENABLE         0xf4
+void inthandler2c(int *esp);
