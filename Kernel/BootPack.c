@@ -29,7 +29,7 @@ void HariMain(void)
     init_mouse_cursor8(mcursor, COL8_008484);
     putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
 
-    snprintf(s, sizeof(s) - 1, "(%d, %d)", mx, my);
+    snprintf(s, sizeof(s) - 1, "(%d, %d)  %02X", mx, my, 123);
     putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
     enable_mouse(&mdec);
