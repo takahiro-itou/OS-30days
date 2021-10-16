@@ -27,12 +27,18 @@ SECTIONS {
         LONG(0x00313bf0);
     } > ROM
 
-    .text   : {
+    .text       : {
         *(.text)
         _size_of_text = .;
     } > ROM
 
-   .data  . + 0x00280000 : {
+    .rodata     . + (BOOT_PACK_BASE - DATA_SEGMENT_BASE) :
+    {
+        *(.rodata);
+    } > RAM  AT > ROM
+
+    .data       . : {
         *(.data)
     } > RAM  AT > ROM
+
 }
