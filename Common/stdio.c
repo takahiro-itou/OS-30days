@@ -12,6 +12,7 @@ int int2asc(char *s, unsigned int value, int sign, int radix, int width,
     if (width >= MAX_WIDTH) {
         width = MAX_WIDTH - 1;
     }
+    len = 0;
     do {
         buf[len++] = (value % radix);
         value /= radix;
