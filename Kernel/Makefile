@@ -46,7 +46,7 @@ cleanobj :
 ##
 
 ASFLAGS     =  -march=i386  --32
-CFLAGS      =  -march=i386  -m32  -fno-pie  -nostdlib
+CFLAGS      =  -march=i386  -m32  -fno-pie  -nostdlib  -O0
 CCVERBOSE   =
 
 ##
@@ -73,10 +73,14 @@ FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
 ##
 
 .s.obj  :
-	${AS}  -o $@  -a=${@:%.obj=%.lst}  ${ASFLAGS}  $<
+	${AS}  -o $@  \
+        -a=${@:%.obj=%.lst}         \
+        ${ASFLAGS}  $<
 
 .c.obj  :
-	${CC}  -o $@  ${CCVERBOSE}  ${CFLAGS}  -c  $<
+	${CC}  -o $@  \
+        -Wa,-a=${@:%.obj=%.lst}     \
+        ${CCVERBOSE}  ${CFLAGS}  -c  $<
 
 ##
 ##    Dependencies
