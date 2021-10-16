@@ -4,11 +4,17 @@ OUTPUT_ARCH(i386)
 
 ENTRY(HariMain)
 
-BOOT_PACK_BASE  = 0x00280000;
-SEGMENT_BASE    = 0x00280000;
+BOOT_PACK_BASE      = 0x00280000;
+CODE_SEGMENT_BASE   = 0x00280000;
+DATA_SEGMENT_BASE   = 0x00000000;
+
+MEMORY {
+    ROM(rx)  : ORIGIN = 0x00000000, LENGTH = 512K
+    RAM(rwx) : ORIGIN = 0x00280000, LENGTH = 512K
+};
 
 SECTIONS {
-    .  =  BOOT_PACK_BASE - SEGMENT_BASE;
+    .  =  ORIGIN(ROM);
     .header : {
         LONG(0x00314000);
         LONG(0x69726148);
@@ -19,7 +25,14 @@ SECTIONS {
         LONG(0xe9000000);
         LONG(HariMain - . - 4);
         LONG(0x00313bf0);
-    }
-    .text       : { *(.text) }
-    .data       : { *(.data) }
+    } > ROM
+
+    .text   : {
+        *(.text)
+        _size_of_text = .;
+    } > ROM
+
+   .data  . + 0x00280000 : {
+        *(.data)
+    } > RAM  AT > ROM
 }
