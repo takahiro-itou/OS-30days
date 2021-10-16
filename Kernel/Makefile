@@ -39,7 +39,7 @@ cleanobj :
 	${RM}  -f  AsmHead.bin              \
         AsmHead.obj AsmHead.lst         \
         ${BOOTPACK_OBJS}                \
-        Func.obj Func.lst
+        *.lst  *.map
 
 ##
 ##    Compile and Link Flags.
