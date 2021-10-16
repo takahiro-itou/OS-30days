@@ -61,6 +61,7 @@ AsmHead.bin     :  AsmHead.obj
 
 BootPack.hrb    :  ${BOOTPACK_OBJS}
 	${LD}  -T ${@:%.hrb=%.ls}  -o $@    \
+        -Map=${@:%.hrb=%.map}           \
         ${BOOTPACK_OBJS}
 
 FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
