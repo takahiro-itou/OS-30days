@@ -16,14 +16,8 @@ struct BOOTINFO
 
 /*  BootPack.c  */
 
-struct MOUSE_DEC {
-    unsigned char buf[3], phase;
-    int x, y, btn;
-};
-
-void init_keyboard(void);
-void enable_mouse(struct MOUSE_DEC *mdec);
-int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
+unsigned int memtest(unsigned int start, unsigned end);
+unsigned int memtest_sub(unsigned int start, unsigned int end);
 
 #define PORT_KEYDAT             0x0060
 #define PORT_KEYSTA             0x0064
@@ -35,7 +29,6 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
-
 
 /*  Func.s  */
 
@@ -52,6 +45,9 @@ void io_store_eflags(int eflas);
 
 void load_gdtr(int limit, int addr);
 void load_idtr(int limit, int addr);
+
+int load_cr0(void);
+void store_cr0(int cr0);
 
 void asm_inthandler21(void);
 void asm_inthandler27(void);
@@ -168,4 +164,12 @@ void init_keyboard(void);
 
 /*  Mouse.c     */
 
+struct MOUSE_DEC {
+    unsigned char buf[3], phase;
+    int x, y, btn;
+};
+
 void inthandler2c(int *esp);
+
+void enable_mouse(struct MOUSE_DEC *mdec);
+int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);

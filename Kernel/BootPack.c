@@ -20,6 +20,7 @@ void HariMain(void)
     io_out8(PIC1_IMR, 0xef);    /*  マウスを許可            */
 
     init_keyboard();
+    enable_mouse(&mdec);
 
     init_palette();
     init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
@@ -32,7 +33,9 @@ void HariMain(void)
     snprintf(s, sizeof(s) - 1, "(%3d, %3d)", mx, my);
     putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, s);
 
-    enable_mouse(&mdec);
+    i = memtest(0x00400000, 0xbfffffff) / (1024 * 1024);
+    snprintf(s, sizeof(s) - 1, "memory %dMB", i);
+    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 32, COL8_FFFFFF, s);
 
     for (;;) {
         io_cli();
@@ -88,4 +91,63 @@ void HariMain(void)
             }
         }
     }
+}
+
+#define EFLAGS_AC_BIT       0x00040000
+#define CR0_CACHE_DISABLE   0x60000000
+
+unsigned int memtest(unsigned int start, unsigned int end)
+{
+    char flg486 = 0;
+    unsigned int eflg, cr0, i;
+
+    /*  386か 486 以降なのかの確認  */
+    eflg = io_load_eflags();
+    eflg |= EFLAGS_AC_BIT;
+    io_store_eflags(eflg);
+
+    eflg = io_load_eflags();
+    if ((eflg & EFLAGS_AC_BIT) != 0) {
+        flg486 = 1;
+    }
+    eflg &= ~EFLAGS_AC_BIT;
+    io_store_eflags(eflg);
+
+    if (flg486 != 0) {
+        cr0 = load_cr0();
+        cr0 |= CR0_CACHE_DISABLE;   /*  キャッシュ禁止  */
+        store_cr0(cr0);
+    }
+
+    i = memtest_sub(start, end);
+
+    if (flg486 != 0) {
+        cr0 = load_cr0();
+        cr0 &= ~CR0_CACHE_DISABLE;  /*  キャッシュ許可  */
+        store_cr0(cr0);
+    }
+
+    return i;
+}
+
+unsigned int memtest_sub(unsigned int start, unsigned int end)
+{
+    unsigned int i, *p, old, pat0 = 0xaa55aa55, pat1 = 0x55aa55aa;
+    for (i = start; i <= end; i += 0x1000) {
+        p = (unsigned int *)(i + 0x0ffc);
+        old = *p;           /*  いじる前の値を覚えておく。  */
+        *p = pat0;          /*  ためしに書いてみる。        */
+        *p ^= 0xffffffff;   /*  そしてそれを反転してみる。  */
+        if (*p != pat1) {
+not_memory:
+            *p = old;
+            break;
+        }
+        *p ^= 0xffffffff;   /*  もう一度反転してみる。      */
+        if (*p != pat0) {
+            goto not_memory;
+        }
+        *p = old;           /*  いじった値を元に戻す。      */
+    }
+    return i;
 }

@@ -6,6 +6,7 @@
 .globl      io_out8, io_out16, io_out32
 .globl      io_load_eflags, io_store_eflags
 .globl      load_gdtr, load_idtr
+.globl      load_cr0, store_cr0
 .globl      asm_inthandler21
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
@@ -87,6 +88,17 @@ load_idtr:          # void load_idtr(int limit, int addr)
     MOVW    %AX,    6(%ESP)
     LIDT    6(%ESP)
     RET
+
+
+load_cr0:           # int load_cr0(void)
+    MOV     %CR0,   %EAX
+    RET
+
+store_cr0:          # void store_cr0(int cr0)
+    MOVL    4(%ESP),    %EAX
+    MOVL    %EAX,       %CR0
+    RET
+
 
 asm_inthandler21:
     PUSHW   %ES
