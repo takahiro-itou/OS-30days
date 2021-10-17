@@ -16,9 +16,6 @@ struct BOOTINFO
 
 /*  BootPack.c  */
 
-unsigned int memtest(unsigned int start, unsigned end);
-unsigned int memtest_sub(unsigned int start, unsigned int end);
-
 #define PORT_KEYDAT             0x0060
 #define PORT_KEYSTA             0x0064
 #define PORT_KEYCMD             0x0064
@@ -29,25 +26,6 @@ unsigned int memtest_sub(unsigned int start, unsigned int end);
 
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
-
-#define MEMMAN_FREES    4090    /*  これで約 32 KB  */
-#define MEMMAN_ADDR     0x003c0000
-
-/*  あき情報。  */
-struct FREEINFO {
-    unsigned int addr, size;
-};
-
-/*  メモリ管理。    */
-struct MEMMAN {
-    int frees, maxfrees, lostsize, losts;
-    struct FREEINFO free[MEMMAN_FREES];
-};
-
-void memman_init(struct MEMMAN *man);
-unsigned int memman_total(struct MEMMAN *man);
-unsigned int memman_alloc(struct MEMMAN *man, unsigned int size);
-int memman_free(struct MEMMAN *man, unsigned int addr, unsigned int size);
 
 
 /*  Func.s  */
@@ -72,6 +50,8 @@ void store_cr0(int cr0);
 void asm_inthandler21(void);
 void asm_inthandler27(void);
 void asm_inthandler2c(void);
+
+unsigned int memtest_sub(unsigned int start, unsigned int end);
 
 
 /*  Fifo.c  */
@@ -180,6 +160,30 @@ void inthandler21(int *esp);
 
 void wait_KBC_sendready(void);
 void init_keyboard(void);
+
+
+/*  Memory.c    */
+
+#define MEMMAN_FREES    4090    /*  これで約 32 KB  */
+#define MEMMAN_ADDR     0x003c0000
+
+/*  あき情報。  */
+struct FREEINFO {
+    unsigned int addr, size;
+};
+
+/*  メモリ管理。    */
+struct MEMMAN {
+    int frees, maxfrees, lostsize, losts;
+    struct FREEINFO free[MEMMAN_FREES];
+};
+
+unsigned int memtest(unsigned int start, unsigned end);
+
+void memman_init(struct MEMMAN *man);
+unsigned int memman_total(struct MEMMAN *man);
+unsigned int memman_alloc(struct MEMMAN *man, unsigned int size);
+int memman_free(struct MEMMAN *man, unsigned int addr, unsigned int size);
 
 
 /*  Mouse.c     */
