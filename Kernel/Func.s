@@ -10,6 +10,7 @@
 .globl      asm_inthandler21
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
+.globl      memtest_sub
 .extern     inthandler21, inthandler27, inthandler2c
 
 .text
@@ -147,3 +148,37 @@ asm_inthandler2c:
     POPW    %DS
     POPW    %ES
     IRET
+
+
+memtest_sub:
+    PUSHL   %EDI
+    PUSHL   %ESI
+    PUSHL   %EBX
+    MOVL    $0xaa55aa55,    %ESI    # pat0 = 0xaa55aa55
+    MOVL    $0x55aa55aa,    %EDI    # pat1 = 0x55aa55aa
+    MOVL    16(%ESP),  %EAX         # i = start
+mts_loop:
+    MOVL    %EAX,   %EBX
+    ADDL    $0xffc,  %EBX           # p = i + 0xffc
+    MOVL    (%EBX), %EDX            # old = *p
+    MOVL    %ESI,   (%EBX)          # *p = pat0
+    XORL    $0xffffffff,    (%EBX)  # *p ^= 0xffffffff
+    CMPL    (%EBX), %EDI            # if (*p != pat1) goto fin
+    JNE     mts_fin
+    XORL    $0xffffffff,    (%EBX)  # *p ^= 0xffffffff
+    CMPL    (%EBX), %ESI            # if (*p != pat0) goto fin
+    JNE     mts_fin
+    MOVL    %EDX,   (%EBX)          # *p = old
+    ADDL    $0x1000, %EAX           # i += 0x1000
+    CMPL    20(%ESP),  %EAX         # if (i <= end) goto mts_loop
+    JBE     mts_loop
+    POPL    %EBX
+    POPL    %ESI
+    POPL    %EDI
+    RET
+mts_fin:
+    MOVL    %EDX,   (%EBX)      # *p = old
+    POPL    %EBX
+    POPL    %ESI
+    POPL    %EDI
+    RET
