@@ -33,14 +33,17 @@ SECTIONS {
         _size_of_text = .;
     } > ROM
 
-    .rodata     . + (BOOT_PACK_BASE - DATA_SEGMENT_BASE) :
+    .data       . + (BOOT_PACK_BASE - DATA_SEGMENT_BASE) :
     {
-        *(.rodata);
+        *(.data)
+        *(.data.*)
         . = ALIGN(16);
     } > RAM  AT > ROM
 
-    .data       . : {
-        *(.data)
+    .rodata     . : {
+        *(.rodata);
+        *(.rodata.*);
+        . = ALIGN(16);
     } > RAM  AT > ROM
 
 }
