@@ -6,7 +6,7 @@
 BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj    \
                        DscTbl.obj Fifo.obj Graphic.obj          \
                        Int.obj KeyBoard.obj Memory.obj          \
-                       Mouse.obj                                \
+                       Mouse.obj  Sheet.obj                     \
                        ../Common/stdio.obj
 KERNEL_IMAGE        =  haribote.sys
 
