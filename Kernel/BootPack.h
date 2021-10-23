@@ -27,6 +27,8 @@ struct BOOTINFO
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
 
+void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
+
 
 /*  Func.s  */
 
