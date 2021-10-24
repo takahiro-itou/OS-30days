@@ -12,7 +12,7 @@ void HariMain(void)
     char s[40];
     int fifobuf[128];
     struct TIMER *timer, *timer2, *timer3;
-    int mx, my, i, count = 0;
+    int mx, my, i;
     unsigned int memtotal;
 
     struct MOUSE_DEC mdec;
@@ -65,7 +65,7 @@ void HariMain(void)
 
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
     init_mouse_cursor8(buf_mouse, 99);
-    make_window8(buf_win, 160, 52, "counter");
+    make_window8(buf_win, 160, 52, "window");
 
     sheet_slide(sht_back, 0, 0);
     mx = (binfo->scrnx - 16) / 2;
@@ -85,11 +85,9 @@ void HariMain(void)
     putfonts8_asc_sht(sht_back, 0, 32, COL8_FFFFFF, COL8_008484, s, 40);
 
     for (;;) {
-        ++ count;
-
         io_cli();
         if (fifo32_status(&fifo) == 0) {
-            io_sti();
+            io_stihlt();
         } else {
             i = fifo32_get(&fifo);
             io_sti();
@@ -98,6 +96,10 @@ void HariMain(void)
                 snprintf(s, sizeof(s), "%02X", i - 256);
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
                                   COL8_008484, s, 2);
+                if (i == 0x1e + 256) {
+                    putfonts8_asc_sht(sht_win, 40, 28, COL8_000000,
+                                      COL8_C6C6C6, "A", 1);
+                }
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
@@ -137,13 +139,9 @@ void HariMain(void)
             } else if (i == 10) {
                 putfonts8_asc_sht(sht_back, 0, 64, COL8_FFFFFF,
                                   COL8_008484, "10[sec]", 7);
-                snprintf(s, sizeof(s), "%012d", count);
-                putfonts8_asc_sht(sht_win, 40, 28, COL8_000000,
-                                  COL8_C6C6C6, s, 12);
             } else if (i == 3) {
                 putfonts8_asc_sht(sht_back, 0, 80, COL8_FFFFFF,
                                   COL8_008484, "3[sec]", 6);
-                count = 0;
             } else if (i == 1) {
                 timer_init(timer3, &fifo, 0);
                 boxfill8(buf_back, binfo->scrnx, COL8_FFFFFF,
