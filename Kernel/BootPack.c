@@ -22,7 +22,8 @@ void HariMain(void)
 
     fifo8_init(&keyfifo, sizeof(keybuf), keybuf);
     fifo8_init(&mousefifo, sizeof(mousebuf), mousebuf);
-    io_out8(PIC0_IMR, 0xf9);    /*  PIC1とキーボードを許可  */
+    init_pit();
+    io_out8(PIC0_IMR, 0xf8);    /*  PIT と PIC1 とキーボードを許可  */
     io_out8(PIC1_IMR, 0xef);    /*  マウスを許可            */
 
     init_keyboard();

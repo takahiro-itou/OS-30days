@@ -7,11 +7,12 @@
 .globl      io_load_eflags, io_store_eflags
 .globl      load_gdtr, load_idtr
 .globl      load_cr0, store_cr0
+.globl      asm_inthandler20
 .globl      asm_inthandler21
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
 .globl      memtest_sub
-.extern     inthandler21, inthandler27, inthandler2c
+.extern     inthandler20, inthandler21, inthandler27, inthandler2c
 
 .text
 
@@ -100,6 +101,22 @@ store_cr0:          # void store_cr0(int cr0)
     MOVL    %EAX,       %CR0
     RET
 
+
+asm_inthandler20:
+    PUSHW   %ES
+    PUSHW   %DS
+    PUSHA
+    MOVL    %ESP,   %EAX
+    PUSHL   %EAX
+    MOVW    %SS,    %AX
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    CALL    inthandler20
+    POP     %EAX
+    POPA
+    POPW    %DS
+    POPW    %ES
+    IRET
 
 asm_inthandler21:
     PUSHW   %ES
