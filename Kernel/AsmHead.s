@@ -15,14 +15,14 @@
 .text
 
     /*  画面モードを設定。  */
-    MOVB    $0x13,  %AL     /*  VGA グラフィックス、320x00x8bit カラー  */
-    MOVB    $0x00,  %AH
+    MOVW    $0x4105,    %BX     /*  VBE の 640x480x8bit カラー  */
+    MOVW    $0x4f02,    %AX
     INT     $0x10
 
     MOVB    $8,     (VMODE)     /*  画面モードをメモする。  */
-    MOVW    $320,   (SCRNX)
-    MOVW    $200,   (SCRNY)
-    MOVL    $0x000a0000,    (VRAM)
+    MOVW    $1024,  (SCRNX)
+    MOVW    $768,   (SCRNY)
+    MOVL    $0xe0000000,    (VRAM)
 
     /*  キーボードの LED  状態を BIOS に教えてもらう。  */
     MOVB    $0x02,  %AH
