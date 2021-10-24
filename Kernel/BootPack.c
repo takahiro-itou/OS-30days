@@ -49,7 +49,7 @@ void HariMain(void)
 
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
     init_mouse_cursor8(buf_mouse, 99);
-    make_window8(buf_win, 160, 68, "counter");
+    make_window8(buf_win, 160, 52, "counter");
 
     sheet_slide(sht_back, 0, 0);
     mx = (binfo->scrnx - 16) / 2;
