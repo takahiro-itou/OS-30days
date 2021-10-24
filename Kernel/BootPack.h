@@ -16,6 +16,8 @@ struct BOOTINFO
 
 /*  BootPack.c  */
 
+struct SHEET;
+
 #define PORT_KEYDAT             0x0060
 #define PORT_KEYSTA             0x0064
 #define PORT_KEYCMD             0x0064
@@ -28,7 +30,8 @@ struct BOOTINFO
 #define MOUSECMD_ENABLE         0xf4
 
 void make_window8(unsigned char *buf, int xsize, int ysize, char *title);
-
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
+                       const char *s, int l);
 
 /*  Func.s  */
 
