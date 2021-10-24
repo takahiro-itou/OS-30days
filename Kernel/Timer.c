@@ -64,17 +64,17 @@ void timer_settime(struct TIMER *timer, unsigned int timeout)
     ++ timerctl.using;
     if (timerctl.using == 1) {
         /*  動作中のタイマはこれ１つになる場合  */
-        timerctl.timers[0] = timer;
+        timerctl.t0 = timer;
         timer->next = 0;    /*  次はない。  */
         timerctl.next = timer->timeout;
         io_store_eflags(e);
         return;
     }
 
-    t = timerctl.timers[0];
+    t = timerctl.t0;
     if (timer->timeout <= t->timeout) {
         /*  先頭に入れる場合。  */
-        timerctl.timers[0] = timer;
+        timerctl.t0 = timer;
         timer->next = t;
         timerctl.next = timer->timeout;
         io_store_eflags(e);
@@ -116,7 +116,7 @@ void inthandler20(int *esp)
         return;
     }
 
-    timer = timerctl.timers[0];
+    timer = timerctl.t0;
     for (i = 0; i < timerctl.using; ++ i) {
         if (timer->timeout > timerctl.count) {
             break;
@@ -129,9 +129,9 @@ void inthandler20(int *esp)
 
     /*  ちょうど i個のタイマがタイムアウトした  */
     timerctl.using -= i;
-    timerctl.timers[0] = timer;
+    timerctl.t0 = timer;
     if (timerctl.using > 0) {
-        timerctl.next = timerctl.timers[0]->timeout;
+        timerctl.next = timerctl.t0->timeout;
     } else {
         timerctl.next = 0xffffffff;
     }

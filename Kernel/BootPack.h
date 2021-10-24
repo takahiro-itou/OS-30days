@@ -251,7 +251,7 @@ struct TIMER {
 
 struct TIMERCTL {
     unsigned int count, next, using;
-    struct TIMER *timers[MAX_TIMER];
+    struct TIMER *t0;
     struct TIMER timers0[MAX_TIMER];
 };
 
