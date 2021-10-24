@@ -27,7 +27,6 @@ void init_pit(void)
     t->next     = 0;        /*  一番うしろ  */
     timerctl.t0     = t;    /*  今は番兵しかいないので先頭でもある  */
     timerctl.next   = 0xffffffff;   /*  番兵しかいないので番兵の時刻。  */
-    timerctl.using  = 1;
 
     return;
 }
@@ -68,7 +67,6 @@ void timer_settime(struct TIMER *timer, unsigned int timeout)
     e = io_load_eflags();
     io_cli();
 
-    ++ timerctl.using;
     t = timerctl.t0;
     if (timer->timeout <= t->timeout) {
         /*  先頭に入れる場合。  */
@@ -108,7 +106,7 @@ void inthandler20(int *esp)
     }
 
     timer = timerctl.t0;
-    for (i = 0; i < timerctl.using; ++ i) {
+    for (;;) {
         if (timer->timeout > timerctl.count) {
             break;
         }
@@ -119,7 +117,6 @@ void inthandler20(int *esp)
     }
 
     /*  ちょうど i個のタイマがタイムアウトした  */
-    timerctl.using -= i;
     timerctl.t0 = timer;
     timerctl.next = timerctl.t0->timeout;
 
