@@ -125,8 +125,8 @@ void sheet_updown(struct SHEET *sht, int height)
             /*  表示中の下じきが１つ減るので、一番上の高さが減る。  */
             -- ctl->top;
         }
-        sheet_refresh(sht, sht->vx0, sht->vy0,
-                      sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
+        sheet_refreshsub(ctl, sht->vx0, sht->vy0,
+                         sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
     } else if (old < height) {  /*  以前よりも高くなる  */
         if (old >= 0) {
             /*  間のものを押し下げる。  */
@@ -145,8 +145,8 @@ void sheet_updown(struct SHEET *sht, int height)
             /*  表示中の下じきが１つ増えるので、一番上の高さが増える。  */
             ++ ctl->top;
         }
-        sheet_refresh(sht, sht->vx0, sht->vy0,
-                      sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
+        sheet_refreshsub(ctl, sht->vx0, sht->vy0,
+                         sht->vx0 + sht->bxsize, sht->vy0 + sht->bysize);
     }
     return;
 }
