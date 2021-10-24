@@ -243,6 +243,7 @@ void sheet_free(struct SHEET *sht);
 #define TIMER_FLAGS_USING   2   /*  タイマ作動中。  */
 
 struct TIMER {
+    struct TIMER *next;
     unsigned int timeout, flags;
     struct FIFO32 * fifo;
     int data;
