@@ -1,4 +1,13 @@
 
+.equ    VBEMODE,    0x105           /*  1024x768x8bit カラー。  */
+/*  画面モード一覧
+**  0x100 :  640 x  400 x 8 bit
+**  0x101 :  640 x  480 x 8 bit
+**  0x103 :  800 x  600 x 8 bit
+**  0x105 : 1024 x  768 x 8 bit
+**  0x107 : 1280 x 1024 x 8 bit
+**/
+
 .equ    BOTPAK,     0x00280000      /*  bootpackのロード先  */
 .equ    DSKCAC,     0x00100000      /*  ディスクキャッシュの場所    */
 .equ    DSKCAC0,    0x00008000      /*  ディスクキャッシュ(リアルモード)  */
@@ -14,16 +23,61 @@
 .code16
 .text
 
-    /*  画面モードを設定。  */
-    MOVW    $0x4105,    %BX     /*  VBE の 640x480x8bit カラー  */
+    /*  VBE 存在確認    */
+    MOVW    $0x9000,    %AX
+    MOVW    %AX,    %ES
+    MOVW    $0,     %DI
+    MOVW    $0x4f00,    %AX
+    INT     $0x10
+    CMPW    $0x004f,    %AX
+    JNE     scrn320
+
+    /*  VBE のバージョンチェック。  */
+    MOVW    %ES:4(%DI), %AX
+    CMPW    $0x0200,    %AX
+    JB      scrn320
+
+    /*  画面モード情報を得る。  */
+    MOVW    $VBEMODE,   %CX
+    MOVW    $0x4f01,    %AX
+    INT     $0x10
+    CMPW    $0x004f,    %AX
+    JNE     scrn320
+
+    /*  画面モード情報の確認。  */
+    CMPB    $8, %ES:0x19(%DI)
+    JNE     scrn320
+    CMPB    $4, %ES:0x1b(%DI)
+    JNE     scrn320
+    MOVW    %ES:0x00(%DI),  %AX
+    AND     $0x0080,    %AX
+    JZ      scrn320
+
+    /*  画面モードの切り替え。  */
+    MOVW    $VBEMODE+0x4000,    %BX
     MOVW    $0x4f02,    %AX
+    INT     $0x10
+    MOVB    $8,     (VMODE)
+    MOVW    %ES:0x12(%DI),  %AX
+    MOVW    %AX,    (SCRNX)
+    MOVW    %ES:0x14(%DI),  %AX
+    MOVW    %AX,    (SCRNY)
+    MOVL    %ES:0x28(%DI),  %EAX
+    MOVL    %EAX,   (VRAM)
+    JMP     keystatus
+
+scrn320:
+    /*  画面モードを設定。  */
+    MOVB    $0x13,  %AL     /*  VGA グラフィックス、320x00x8bit カラー  */
+    MOVB    $0x00,  %AH
     INT     $0x10
 
     MOVB    $8,     (VMODE)     /*  画面モードをメモする。  */
-    MOVW    $1024,  (SCRNX)
-    MOVW    $768,   (SCRNY)
-    MOVL    $0xe0000000,    (VRAM)
+    MOVW    $320,   (SCRNX)
+    MOVW    $200,   (SCRNY)
+    MOVL    $0x000a0000,    (VRAM)
 
+keystatus:
     /*  キーボードの LED  状態を BIOS に教えてもらう。  */
     MOVB    $0x02,  %AH
     INT     $0x16
