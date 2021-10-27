@@ -7,11 +7,13 @@
 .globl      io_load_eflags, io_store_eflags
 .globl      load_gdtr, load_idtr
 .globl      load_cr0, store_cr0
+.globl      load_tr
 .globl      asm_inthandler20
 .globl      asm_inthandler21
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
 .globl      memtest_sub
+.globl      taskswitch4
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
 
 .text
@@ -101,6 +103,9 @@ store_cr0:          # void store_cr0(int cr0)
     MOVL    %EAX,       %CR0
     RET
 
+load_tr:            # void load_tr(int tr)
+    LTR     4(%ESP)
+    RET
 
 asm_inthandler20:
     PUSHW   %ES
@@ -198,4 +203,8 @@ mts_fin:
     POPL    %EBX
     POPL    %ESI
     POPL    %EDI
+    RET
+
+taskswitch4:
+    LJMPL   $4*8, $0
     RET

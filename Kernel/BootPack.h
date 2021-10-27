@@ -34,6 +34,13 @@ void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
                        const char *s, int l);
 
+struct TSS32 {
+    int backlink, esp0, ss0, esp1, ss1, esp2, ss2, cr3;
+    int eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    int es, cs, ss, ds, fs, gs;
+    int ldtr, iomap;
+};
+
 /*  Func.s  */
 
 void io_hlt(void);
@@ -52,6 +59,7 @@ void load_idtr(int limit, int addr);
 
 int load_cr0(void);
 void store_cr0(int cr0);
+void load_tr(int tr);
 
 void asm_inthandler20(void);
 void asm_inthandler21(void);
@@ -59,7 +67,7 @@ void asm_inthandler27(void);
 void asm_inthandler2c(void);
 
 unsigned int memtest_sub(unsigned int start, unsigned int end);
-
+void taskswitch4(void);
 
 /*  Fifo.c  */
 
@@ -133,8 +141,10 @@ void set_gatedesc(struct GATE_DESCRIPTOR *gd,
 #define LIMIT_GDT       0x0000ffff
 #define ADR_BOTPAK      0x00280000
 #define LIMIT_BOTPAK    0x007ffff
+
 #define AR_DATA32_RW    0x4092
 #define AR_CODE32_ER    0x409a
+#define AR_TSS32        0x0089
 #define AR_INTGATE32    0x008e
 
 /*  Int.c   */
