@@ -13,6 +13,7 @@
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
 .globl      memtest_sub
+.globl      taskswitch3
 .globl      taskswitch4
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
 
@@ -203,6 +204,10 @@ mts_fin:
     POPL    %EBX
     POPL    %ESI
     POPL    %EDI
+    RET
+
+taskswitch3:
+    LJMPL   $3*8, $0
     RET
 
 taskswitch4:
