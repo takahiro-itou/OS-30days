@@ -12,7 +12,7 @@ void HariMain(void)
 
     char s[40];
     int fifobuf[128];
-    struct TIMER *timer, *timer2, *timer3;
+    struct TIMER *timer, *timer2, *timer3, *timer_ts;
     int mx, my, i;
     int cursor_x, cursor_c, task_b_esp;
     unsigned int memtotal;
@@ -60,6 +60,10 @@ void HariMain(void)
     timer3 = timer_alloc();
     timer_init(timer3, &fifo, 1);
     timer_settime(timer3, 50);
+
+    timer_ts = timer_alloc();
+    timer_init(timer_ts, &fifo, 2);
+    timer_settime(timer_ts, 2);
 
     memtotal = memtest(0x00400000, 0xbfffffff);
     memman_init(memman);
@@ -136,7 +140,10 @@ void HariMain(void)
         } else {
             i = fifo32_get(&fifo);
             io_sti();
-            if (256 <= i && i <= 511) {
+            if (i == 2) {
+                farjmp(0, 4 * 8);
+                timer_settime(timer_ts, 2);
+            } else if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
                 snprintf(s, sizeof(s), "%02X", i - 256);
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
@@ -203,7 +210,6 @@ void HariMain(void)
             } else if (i == 10) {
                 putfonts8_asc_sht(sht_back, 0, 64, COL8_FFFFFF,
                                   COL8_008484, "10[sec]", 7);
-                farjmp(0, 4 * 8);
             } else if (i == 3) {
                 putfonts8_asc_sht(sht_back, 0, 80, COL8_FFFFFF,
                                   COL8_008484, "3[sec]", 6);
@@ -303,13 +309,13 @@ void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
 void task_b_main(void)
 {
     struct FIFO32 fifo;
-    struct TIMER *timer;
+    struct TIMER *timer_ts;
     int i, fifobuf[128];
 
     fifo32_init(&fifo, 128, fifobuf);
-    timer = timer_alloc();
-    timer_init(timer, &fifo, 1);
-    timer_settime(timer, 500);
+    timer_ts = timer_alloc();
+    timer_init(timer_ts, &fifo, 1);
+    timer_settime(timer_ts, 2);
 
     for (;;) {
         io_cli();
@@ -319,7 +325,9 @@ void task_b_main(void)
             i = fifo32_get(&fifo);
             io_sti();
             if (i == 1) {
+                /*  タスクスイッチ  */
                 farjmp(0, 3 * 8);
+                timer_settime(timer_ts, 2);
             }
         }
     }
