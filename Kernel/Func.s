@@ -13,8 +13,7 @@
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
 .globl      memtest_sub
-.globl      taskswitch3
-.globl      taskswitch4
+.globl      farjmp
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
 
 .text
@@ -206,10 +205,6 @@ mts_fin:
     POPL    %EDI
     RET
 
-taskswitch3:
-    LJMPL   $3*8, $0
-    RET
-
-taskswitch4:
-    LJMPL   $4*8, $0
+farjmp:      # void farjmp(int eip, int cs) ;
+    LJMPL   * 4(%ESP)
     RET
