@@ -310,8 +310,8 @@ void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
 void task_b_main(struct SHEET *sht_back)
 {
     struct FIFO32 fifo;
-    struct TIMER *timer_ts, *timer_put;
-    int i, fifobuf[128], count = 0;
+    struct TIMER *timer_ts, *timer_put, *timer_1s;
+    int i, fifobuf[128], count = 0, count0 = 0;
     char s[16];
 
     fifo32_init(&fifo, 128, fifobuf);
@@ -323,6 +323,10 @@ void task_b_main(struct SHEET *sht_back)
     timer_init(timer_put, &fifo, 1);
     timer_settime(timer_put, 1);
 
+    timer_1s = timer_alloc();
+    timer_init(timer_1s, &fifo, 100);
+    timer_settime(timer_1s, 100);
+
     for (;;) {
         ++ count;
         io_cli();
@@ -332,7 +336,7 @@ void task_b_main(struct SHEET *sht_back)
             i = fifo32_get(&fifo);
             io_sti();
             if (i == 1) {
-                snprintf(s, sizeof(s), "%12d", count);
+                snprintf(s, sizeof(s) - 1, "%12d", count);
                 putfonts8_asc_sht(sht_back, 0, 144, COL8_FFFFFF,
                                   COL8_008484, s, 12);
                 timer_settime(timer_put, 1);
@@ -340,6 +344,12 @@ void task_b_main(struct SHEET *sht_back)
                 /*  タスクスイッチ  */
                 farjmp(0, 3 * 8);
                 timer_settime(timer_ts, 2);
+            } else if (i == 100) {
+                snprintf(s, sizeof(s) - 1, "%12d", count - count0);
+                putfonts8_asc_sht(sht_back, 0, 128, COL8_FFFFFF,
+                                  COL8_008484, s, 12);
+                count0 = count;
+                timer_settime(timer_1s, 100);
             }
         }
     }
