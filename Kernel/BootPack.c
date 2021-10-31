@@ -84,7 +84,7 @@ void HariMain(void)
         task_b[i]->tss.fs   = 1 * 8;
         task_b[i]->tss.gs   = 1 * 8;
         *((int *) (task_b[i]->tss.esp + 4)) = (int) sht_win_b[i];
-        task_run(task_b[i]);
+        task_run(task_b[i], i + 1);
     }
 
     /*  sht_win     */
@@ -142,7 +142,7 @@ void HariMain(void)
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
                                   COL8_008484, s, 2);
                 if (i < 0x54 + 256) {
-                    if (keytable[i - 256] != 0 && cursor_x < 144) {
+                    if (keytable[i - 256] != 0 && cursor_x < 128) {
                         /*  通常文字。  */
                         s[0] = keytable[i - 256];
                         s[1] = 0;
