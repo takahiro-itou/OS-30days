@@ -3,10 +3,10 @@
 ##    List of Files.
 ##
 
-BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj    \
-                       DscTbl.obj Fifo.obj Graphic.obj          \
-                       Int.obj KeyBoard.obj Memory.obj          \
-                       Mouse.obj  Sheet.obj  Timer.obj          \
+BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj        \
+                       DscTbl.obj Fifo.obj Graphic.obj Int.obj      \
+                       KeyBoard.obj Memory.obj Mouse.obj            \
+                       MultiTask.obj Sheet.obj Timer.obj            \
                        ../Common/stdio.obj
 KERNEL_IMAGE        =  haribote.sys
 
@@ -97,5 +97,6 @@ Int.obj         :  Makefile BootPack.h
 KeyBoard.obj    :  Makefile BootPack.h
 Memory.obj      :  Makefile BootPack.h
 Mouse.obj       :  Makefile BootPack.h
+MultiTask.obj   :  Makefile BootPack.h
 Sheet.obj       :  Makefile BootPack.h
 Timer.obj       :  Makefile BootPack.h

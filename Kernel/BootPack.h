@@ -220,6 +220,14 @@ void enable_mouse(struct FIFO32 *fifo, int data0, struct MOUSE_DEC *mdec);
 int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 
 
+/*  MultiTask.c */
+
+extern struct TIMER *mt_timer;
+
+void mt_init(void);
+void mt_taskswitch(void);
+
+
 /*  Sheet.c     */
 
 #define MAX_SHEETS  256
