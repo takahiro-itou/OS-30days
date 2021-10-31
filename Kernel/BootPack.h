@@ -34,12 +34,6 @@ void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
 void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
                        const char *s, int l);
 
-struct TSS32 {
-    int backlink, esp0, ss0, esp1, ss1, esp2, ss2, cr3;
-    int eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
-    int es, cs, ss, ds, fs, gs;
-    int ldtr, iomap;
-};
 
 /*  Func.s  */
 
@@ -222,10 +216,33 @@ int mouse_decode(struct MOUSE_DEC *mdec, unsigned char dat);
 
 /*  MultiTask.c */
 
-extern struct TIMER *mt_timer;
+#define MAX_TASKS   1000    /*  最大タスク数。  */
+#define TASK_GDT0   3       /*  TSSをGDTの何番から割り当てるのか。  */
 
-void mt_init(void);
-void mt_taskswitch(void);
+struct TSS32 {
+    int backlink, esp0, ss0, esp1, ss1, esp2, ss2, cr3;
+    int eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    int es, cs, ss, ds, fs, gs;
+    int ldtr, iomap;
+};
+
+struct TASK {
+    int sel, flags;
+    struct TSS32 tss;
+};
+
+struct TASKCTL {
+    int running;
+    int now;
+    struct TASK *tasks[MAX_TASKS];
+    struct TASK tasks0[MAX_TASKS];
+};
+
+extern struct TIMER *task_timer;
+struct TASK *task_init(struct MEMMAN *memman);
+struct TASK *task_alloc(void);
+void task_run(struct TASK *task);
+void task_switch(void);
 
 
 /*  Sheet.c     */
