@@ -33,6 +33,7 @@ void HariMain(void)
     struct SHEET *sht_back, *sht_mouse, *sht_win, *sht_cons;
     struct TASK *task_a, *task_cons;
     struct TIMER *timer;
+    int key_to = 0;
 
     init_gdtidt();
     init_pic();
@@ -148,6 +149,20 @@ void HariMain(void)
                                       COL8_000000, COL8_FFFFFF, " ", 1);
                     cursor_x -= 8;
                 }
+                if (i == 256 + 0x0f) {      /*  Tab */
+                    if (key_to == 0) {
+                        key_to = 1;
+                        make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  0);
+                        make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
+                    } else {
+                        key_to = 0;
+                        make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  1);
+                        make_wtitle8(buf_cons, sht_cons->bxsize, "console", 0);
+                    }
+                    sheet_refresh(sht_win,  0, 0, sht_win->bxsize,  21);
+                    sheet_refresh(sht_cons, 0, 0, sht_cons->bxsize, 21);
+                }
+                /*  カーソルの再表示。  */
                 boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
                          cursor_x, 28, cursor_x + 7, 43);
                 sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
@@ -271,6 +286,7 @@ void make_window8(unsigned char *buf, int xsize, int ysize,
     boxfill8(buf, xsize, COL8_C6C6C6, 2, 2,         xsize - 3, ysize - 3);
     boxfill8(buf, xsize, COL8_848484, 1, ysize - 2, xsize - 2, ysize - 2);
     boxfill8(buf, xsize, COL8_000000, 0, ysize - 1, xsize - 1, ysize - 1);
+    make_wtitle8(buf, xsize, title, act);
     return;
 }
 
