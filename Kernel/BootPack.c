@@ -142,13 +142,6 @@ void HariMain(void)
     sheet_updown(sht_win,   2);
     sheet_updown(sht_mouse, 3);
 
-    snprintf(s, sizeof(s) - 1, "(%3d, %3d)", mx, my);
-    putfonts8_asc_sht(sht_back, 0, 0, COL8_FFFFFF, COL8_008484, s, 10);
-
-    snprintf(s, sizeof(s) - 1, "memory %dMB   free : %dKB",
-             memtotal / (1024 * 1024), memman_total(memman) / 1024);
-    putfonts8_asc_sht(sht_back, 0, 48, COL8_FFFFFF, COL8_008484, s, 40);
-
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
     fifo32_put(&keycmd, key_leds);
@@ -174,6 +167,7 @@ void HariMain(void)
             io_sti();
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
+#if 0
                 snprintf(s, sizeof(s), "%02X", i - 256);
                 for (int j = 17; j >= 3; -- j) {
                     keyseq[j] = keyseq[j - 3];
@@ -184,6 +178,7 @@ void HariMain(void)
                 keyseq[17] = 0;
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
                                   COL8_008484, keyseq, 17);
+# endif
                 if (i < 0x80 + 256) {
                     /*  キーコードを文字コードに変換。  */
                     if (key_shift == 0) {
@@ -299,19 +294,6 @@ void HariMain(void)
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
-                    /*  データが揃ったので表示  */
-                    snprintf(s, sizeof(s), "[lcr %4d %4d]", mdec.x, mdec.y);
-                    if ((mdec.btn & 0x01) != 0) {
-                        s[1] = 'L';
-                    }
-                    if ((mdec.btn & 0x02) != 0) {
-                        s[3] = 'R';
-                    }
-                    if ((mdec.btn & 0x04) != 0) {
-                        s[2] = 'C';
-                    }
-                    putfonts8_asc_sht(sht_back, 32, 32, COL8_FFFFFF,
-                                      COL8_008484, s, 15);
                     /*  マウスカーソルの移動。  */
                     mx += mdec.x;
                     my += mdec.y;
@@ -327,9 +309,7 @@ void HariMain(void)
                     if (my > binfo->scrny - 1) {
                         my = binfo->scrny - 1;
                     }
-                    snprintf(s, sizeof(s) - 1, "(%03d, %03d)", mx, my);
-                    putfonts8_asc_sht(sht_back, 0, 0, COL8_FFFFFF,
-                                      COL8_008484, s, 10);
+
                     sheet_slide(sht_mouse, mx, my);
                     if ((mdec.btn & 0x01) != 0) {
                         /*  左ボタンを押していたら、sht_win を動かす。  */
