@@ -57,7 +57,7 @@ void HariMain(void)
         0  ,  0 ,  0 , '_',      0 ,  0 ,  0 ,  0,
         0  ,  0 ,  0 ,  0,       0 , '|',  0 ,  0
     };
-    int key_to = 0, key_shift = 0;
+    int key_to = 0, key_shift = 0, key_leds = (binfo->leds >> 4) & 7;
 
     init_gdtidt();
     init_pic();
@@ -158,6 +158,7 @@ void HariMain(void)
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
                                   COL8_008484, s, 2);
                 if (i < 0x80 + 256) {
+                    /*  キーコードを文字コードに変換。  */
                     if (key_shift == 0) {
                         s[0] = keytable0[i - 256];
                     } else {
@@ -165,6 +166,14 @@ void HariMain(void)
                     }
                 } else {
                     s[0] = 0;
+                }
+                if ('A' <= s[0] && s[0] <= 'Z') {
+                    /*  入力文字がアルファベット。  */
+                    if ( ((key_leds & 4) == 0 && key_shift == 0) ||
+                            ((key_leds & 4) != 0 && key_shift != 0) )
+                    {
+                        s[0] += 0x20;
+                    }
                 }
                 if (s[0] != 0) {
                     /*  通常文字。  */
