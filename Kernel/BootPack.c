@@ -2,6 +2,7 @@
 
 #include "BootPack.h"
 #include "../Common/stdio.h"
+#include "../Common/string.h"
 
 #define KEYCMD_LED      0xed
 
@@ -518,9 +519,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     cmdline[cursor_x / 8 - 2] = 0;
                     cursor_y = cons_newline(cursor_y, sheet);
                     /*  コマンド実行。  */
-                    if (cmdline[0] == 'm' && cmdline[1] == 'e' &&
-                            cmdline[2] == 'm' && cmdline[3] == 0)
-                    {
+                    if (strcmp(cmdline, "mem") == 0) {
                         /*  mem コマンド。  */
                         snprintf(s, sizeof(s), "total   %dMB",
                                  memtotal / (1024 * 1024));
@@ -533,6 +532,11 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                                           COL8_000000, s, 30);
                         cursor_y = cons_newline(cursor_y, sheet);
                         cursor_y = cons_newline(cursor_y, sheet);
+                    } else if (strcmp(cmdline, "cls") == 0) {
+                        boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
+                                 8, 28, 8 + 240 - 1, 28 + 128 - 1);
+                        sheet_refresh(sheet, 8, 28, 8 + 240, 28 + 128);
+                        cursor_y = 28;
                     } else if (cmdline[0] != 0) {
                         /*  コマンドではなく、さらに空行でもない。  */
                         putfonts8_asc_sht(sheet, 8, cursor_y, COL8_FFFFFF,
