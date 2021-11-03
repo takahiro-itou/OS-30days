@@ -454,7 +454,8 @@ void console_task(struct SHEET *sheet)
 {
     struct TIMER *timer;
     struct TASK *task = task_now();
-    int i, fifobuf[128], cursor_x = 16, cursor_y = 28, cursor_c = -1;
+    int i, x, y;
+    int fifobuf[128], cursor_x = 16, cursor_y = 28, cursor_c = -1;
     char s[2];
 
     fifo32_init(&task->fifo, sizeof(fifobuf), fifobuf, task);
@@ -507,16 +508,27 @@ void console_task(struct SHEET *sheet)
                     }
                 } else if (i == 10 + 256) {
                     /*  Enter.  */
+                    /*  カーソルをスペースで消す。  */
+                    putfonts8_asc_sht(sheet, cursor_x, cursor_y,
+                                      COL8_FFFFFF, COL8_000000, " ", 1);
                     if (cursor_y < 28 + 112) {
-                        /*  カーソルをスペースで消す。  */
-                        putfonts8_asc_sht(sheet, cursor_x, cursor_y,
-                                          COL8_FFFFFF, COL8_000000, " ", 1);
-                        cursor_y += 16;
-                        /*  プロンプト表示  */
-                        putfonts8_asc_sht(sheet, 8, cursor_y,
-                                          COL8_FFFFFF, COL8_000000, ">", 1);
-                        cursor_x = 16;
+                        cursor_y += 16;     /*  次の行へ。  */
+                    } else {
+                        /*  スクロール  */
+                        for (y = 28; y < 28 + 112; ++ y) {
+                            for (x = 8; x < 8 + 240; ++ x){
+                                sheet->buf[x + y*sheet->bxsize] =
+                                        sheet->buf[x + (y+16)*sheet->bxsize];
+                            }
+                        }
+                        boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
+                                 8, 28 + 112, 8 + 240 - 1, 28 + 128 - 1);
+                        sheet_refresh(sheet, 8, 28, 8 + 240, 28 + 128);
                     }
+                    /*  プロンプト表示  */
+                    putfonts8_asc_sht(sheet, 8, cursor_y,
+                                      COL8_FFFFFF, COL8_000000, ">", 1);
+                    cursor_x = 16;
                 } else {
                     if (cursor_x < 240) {
                         s[0] = i - 256;
