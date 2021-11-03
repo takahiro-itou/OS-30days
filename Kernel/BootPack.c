@@ -175,14 +175,15 @@ void HariMain(void)
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
                 snprintf(s, sizeof(s), "%02X", i - 256);
-                for (int j = 15; j >= 3; -- j) {
+                for (int j = 17; j >= 3; -- j) {
                     keyseq[j] = keyseq[j - 3];
                 }
                 keyseq[0] = s[0];
                 keyseq[1] = s[1];
                 keyseq[2] = ' ';
+                keyseq[17] = 0;
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
-                                  COL8_008484, keyseq, 16);
+                                  COL8_008484, keyseq, 17);
                 if (i < 0x80 + 256) {
                     /*  キーコードを文字コードに変換。  */
                     if (key_shift == 0) {
@@ -231,10 +232,14 @@ void HariMain(void)
                         key_to = 1;
                         make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  0);
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
+                        cursor_c = -1;      /*  カーソルを消す  */
+                        boxfill8(sht_win->buf, sht_win->bxsize, COL8_FFFFFF,
+                                 cursor_x, 28, cursor_x + 7, 43);
                     } else {
                         key_to = 0;
                         make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  1);
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 0);
+                        cursor_c = COL8_000000;     /*  カーソルを出す  */
                     }
                     sheet_refresh(sht_win,  0, 0, sht_win->bxsize,  21);
                     sheet_refresh(sht_cons, 0, 0, sht_cons->bxsize, 21);
@@ -277,8 +282,10 @@ void HariMain(void)
                     io_out8(PORT_KEYDAT, keycmd_wait);
                 }
                 /*  カーソルの再表示。  */
-                boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
-                         cursor_x, 28, cursor_x + 7, 43);
+                if (cursor_c >= 0) {
+                    boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
+                             cursor_x, 28, cursor_x + 7, 43);
+                }
                 sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
@@ -323,15 +330,21 @@ void HariMain(void)
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
                 if (i != 0) {
                     timer_init(timer, &fifo, 0);
-                    cursor_c = COL8_000000;
+                    if (cursor_c >= 0) {
+                        cursor_c = COL8_000000;
+                    }
                 } else {
                     timer_init(timer, &fifo, 1);
-                    cursor_c = COL8_FFFFFF;
+                    if (cursor_c >= 0) {
+                        cursor_c = COL8_FFFFFF;
+                    }
                 }
                 timer_settime(timer, 50);
-                boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
-                         cursor_x, 28, cursor_x + 7, 43);
-                sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
+                if (cursor_c >= 0) {
+                    boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
+                             cursor_x, 28, cursor_x + 7, 43);
+                    sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
+                }
             }
         }
     }
