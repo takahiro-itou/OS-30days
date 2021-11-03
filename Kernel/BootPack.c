@@ -11,7 +11,7 @@ void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(ADR_BOOTINFO);
     struct SHTCTL *shtctl;
-    char s[40];
+    char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
     int fifobuf[128], keycmd_buf[32];
     int mx, my, i, cursor_x, cursor_c;
@@ -133,8 +133,8 @@ void HariMain(void)
     my = (binfo->scrny - 28 - 16) / 2;
 
     sheet_slide(sht_back,   0,  0);
-    sheet_slide(sht_cons,  32,  4);
-    sheet_slide(sht_win,   64, 56);
+    sheet_slide(sht_cons,  32, 44);
+    sheet_slide(sht_win,   64, 96);
     sheet_slide(sht_mouse, mx, my);
 
     sheet_updown(sht_back,  0);
@@ -147,11 +147,16 @@ void HariMain(void)
 
     snprintf(s, sizeof(s) - 1, "memory %dMB   free : %dKB",
              memtotal / (1024 * 1024), memman_total(memman) / 1024);
-    putfonts8_asc_sht(sht_back, 0, 32, COL8_FFFFFF, COL8_008484, s, 40);
+    putfonts8_asc_sht(sht_back, 0, 48, COL8_FFFFFF, COL8_008484, s, 40);
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
     fifo32_put(&keycmd, key_leds);
+
+    for (i = 0; i < sizeof(keyseq); ++ i) {
+        keyseq[i] = ' ';
+    }
+    keyseq[sizeof(keyseq) - 1] = 0;
 
     for (;;) {
         if (fifo32_status(&keycmd) > 0 && keycmd_wait < 0) {
@@ -170,8 +175,14 @@ void HariMain(void)
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
                 snprintf(s, sizeof(s), "%02X", i - 256);
+                for (int j = 15; j >= 3; -- j) {
+                    keyseq[j] = keyseq[j - 3];
+                }
+                keyseq[0] = s[0];
+                keyseq[1] = s[1];
+                keyseq[2] = ' ';
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
-                                  COL8_008484, s, 2);
+                                  COL8_008484, keyseq, 16);
                 if (i < 0x80 + 256) {
                     /*  キーコードを文字コードに変換。  */
                     if (key_shift == 0) {
@@ -283,7 +294,7 @@ void HariMain(void)
                     if ((mdec.btn & 0x04) != 0) {
                         s[2] = 'C';
                     }
-                    putfonts8_asc_sht(sht_back, 32, 16, COL8_FFFFFF,
+                    putfonts8_asc_sht(sht_back, 32, 32, COL8_FFFFFF,
                                       COL8_008484, s, 15);
                     /*  マウスカーソルの移動。  */
                     mx += mdec.x;
