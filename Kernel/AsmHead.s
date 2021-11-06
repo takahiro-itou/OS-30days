@@ -131,6 +131,7 @@ pipelineflush:
     MOVL    $0x7c00,    %ESI
     MOVL    $DSKCAC,    %EDI
     MOVL    $512/4,     %ECX
+    CALL    memcpy
 
     MOVL    $DSKCAC0+512,   %ESI
     MOVL    $DSKCAC+512,    %EDI
