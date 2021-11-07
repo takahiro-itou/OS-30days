@@ -465,6 +465,26 @@ void file_readfat(int *fat, unsigned char *img)
     return;
 }
 
+void file_loadfile(int clustno, int size, char *buf, int *fat, char *img)
+{
+    int i;
+    for (;;) {
+        if (size <= 512) {
+            for (i = 0; i < size; ++ i) {
+                buf[i] = img[clustno * 512 + i];
+            }
+            break;
+        }
+        for (i = 0; i < 512; ++ i) {
+            buf[i] = img[clustno * 512 + i];
+        }
+        size -= 512;
+        buf  += 512;
+        clustno = fat[clustno];
+    }
+    return;
+}
+
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
     struct TIMER *timer;
