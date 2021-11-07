@@ -638,12 +638,13 @@ type_next_file:
 
                         if (x < 224 && finfo[x].name[0] != 0x00) {
                             /*  ファイルが見つかった場合。  */
-                            y = finfo[x].size;
-                            p = (char *) (finfo[x].clustno * 512
-                                          + 0x003e00 + ADR_DISKIMG);
+                            p = (char *) memman_alloc_4k(memman, finfo[x].size);
+                            file_loadfile(finfo[x].clustno, finfo[x].size,
+                                          p, fat,
+                                          (char *) (ADR_DISKIMG + 0x003e00));
                             cursor_x = 8;
-                            for (x = 0; x < y; ++ x) {
-                                s[0] = p[x];
+                            for (y = 0; y < finfo[x].size; ++ y) {
+                                s[0] = p[y];
                                 s[1] = 0;
                                 if (s[0] == 0x09) {
                                     for(;;) {
@@ -678,6 +679,7 @@ type_next_file:
                                     }
                                 }
                             }
+                            memman_free_4k(memman, (int)p, finfo[x].size);
                         } else {
                             /*  ファイルが見つからなかった場合  */
                             putfonts8_asc_sht(sheet, 8, cursor_y,
