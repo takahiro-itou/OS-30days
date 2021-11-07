@@ -37,13 +37,6 @@ struct FILEINFO {
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
 
-void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
-void make_window8(unsigned char *buf, int xsize, int ysize,
-                  char *title, char act);
-void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
-void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
-                       const char *s, int l);
-
 
 /*  Func.s  */
 
@@ -325,3 +318,12 @@ void timer_init(struct TIMER *timer, struct FIFO32 *fifo, int data);
 void timer_settime(struct TIMER *timer, unsigned int timeout);
 
 void inthandler20(int *esp);
+
+/*  Window.c    */
+
+void make_window8(unsigned char *buf, int xsize, int ysize,
+                  char *title, char act);
+void putfonts8_asc_sht(struct SHEET *sht, int x, int y, int c, int b,
+                       const char *s, int l);
+void make_textbox8(struct SHEET *sht, int x0, int y0, int sx, int sy, int c);
+void make_wtitle8(unsigned char *buf, int xsize, char *title, char act);
