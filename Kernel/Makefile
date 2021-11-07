@@ -4,7 +4,7 @@
 ##
 
 BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj        \
-                       Console.obj DscTbl.obj Fifo.obj              \
+                       Console.obj DscTbl.obj Fifo.obj File.obj     \
                        Graphic.obj Int.obj KeyBoard.obj             \
                        Memory.obj  Mouse.obj MultiTask.obj          \
                        Sheet.obj Timer.obj Window.obj               \
@@ -95,6 +95,7 @@ BootPack.obj    :  Makefile BootPack.h
 Console.obj     :  Makefile BootPack.h
 DscTbl.obj      :  Makefile BootPack.h
 Fifo.obj        :  Makefile BootPack.h
+File.obj        :  Makefile BootPack.h
 Graphic.obj     :  Makefile BootPack.h
 Int.obj         :  Makefile BootPack.h
 KeyBoard.obj    :  Makefile BootPack.h
