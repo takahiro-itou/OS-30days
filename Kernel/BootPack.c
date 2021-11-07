@@ -550,7 +550,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                                 snprintf(s, sizeof(s), "filename.ext   %7d",
                                          finfo[x].size);
                                 for (y = 0; y < 8; ++y) {
-                                    s[y] = finfo[x].name;
+                                    s[y] = finfo[x].name[y];
                                 }
                                 s[ 9] = finfo[x].ext[0];
                                 s[10] = finfo[x].ext[1];
