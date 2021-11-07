@@ -571,9 +571,10 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                         for (y = 0; y < 11; ++ y) {
                             s[y] = ' ';
                         }
+                        s[y] = 0;
                         y = 0;
                         for (x = 5; y < 11 && cmdline[x] != 0; ++ x) {
-                            if (cmdline[x] = '.' && y <= 8) {
+                            if (cmdline[x] == '.' && y <= 8) {
                                 y = 8;
                             } else {
                                 s[y] = cmdline[x];
@@ -589,16 +590,22 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                                 break;
                             }
                             if ((finfo[x].type & 0x18) == 0) {
-                                for (y = 0; y < 11; ++ y) {
+                                for (y = 0; y < 8; ++ y) {
                                     if (finfo[x].name[y] != s[y]) {
+                                        goto type_next_file;
+                                    }
+                                }
+                                for (y = 0; y < 3; ++ y) {
+                                    if (finfo[x].ext[y] != s[y + 8]) {
                                         goto type_next_file;
                                     }
                                 }
                                 break;
                             }
-                        type_next_file:
+type_next_file:
                             ++ x;
                         }
+
                         if (x < 224 && finfo[x].name[0] != 0x00) {
                             /*  ファイルが見つかった場合。  */
                             y = finfo[x].size;
