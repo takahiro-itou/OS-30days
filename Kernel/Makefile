@@ -4,7 +4,7 @@
 ##
 
 BOOTPACK_OBJS       =  BootPack.obj FontHankaku.obj Func.obj        \
-                       DscTbl.obj Fifo.obj                          \
+                       Console.obj DscTbl.obj Fifo.obj              \
                        Graphic.obj Int.obj KeyBoard.obj             \
                        Memory.obj  Mouse.obj MultiTask.obj          \
                        Sheet.obj Timer.obj Window.obj               \
@@ -92,6 +92,7 @@ FontHankaku.c   :  hankaku.txt GenerateFontDef.awk Makefile
 AsmHead.bin     :  Makefile AsmHead.ls
 BootPack.hrb    :  Makefile BootPack.ls
 BootPack.obj    :  Makefile BootPack.h
+Console.obj     :  Makefile BootPack.h
 DscTbl.obj      :  Makefile BootPack.h
 Fifo.obj        :  Makefile BootPack.h
 Graphic.obj     :  Makefile BootPack.h
