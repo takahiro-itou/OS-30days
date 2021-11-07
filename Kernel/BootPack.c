@@ -563,7 +563,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                             }
                         }
                         cursor_y = cons_newline(cursor_y, sheet);
-                    } else if (strncmp(cmdline, "type ", 5) == 0 {
+                    } else if (strncmp(cmdline, "type ", 5) == 0) {
                         /*  ファイル名を準備する。  */
                         for (y = 0; y < 11; ++ y) {
                             s[y] = ' ';
