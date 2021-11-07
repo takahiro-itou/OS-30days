@@ -454,6 +454,17 @@ int cons_newline(int cursor_y, struct SHEET *sheet)
 
 }
 
+void file_readfat(int *fat, unsigned char *img)
+{
+    int i, j = 0;
+    for (i = 0; i < 2880; i += 2) {
+        fat[i + 0] = (img[j + 0]      | img[j + 1] << 8) & 0xfff;
+        fat[i + 1] = (img[j + 1] >> 4 | img[j + 2] << 4) & 0xfff;
+        j += 3;
+    }
+    return;
+}
+
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
     struct TIMER *timer;
@@ -463,12 +474,14 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
     int x, y;
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
+    int *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
 
     fifo32_init(&task->fifo, sizeof(fifobuf), fifobuf, task);
 
     timer = timer_alloc();
     timer_init(timer, &task->fifo, 1);
     timer_settime(timer, 50);
+    file_readfat(fat, (unsigned char *)(ADR_DISKIMG + 0x000200));
 
     /*  プロンプト表示  */
     putfonts8_asc_sht(sheet, 8, 28, COL8_FFFFFF, COL8_000000, ">", 1);
