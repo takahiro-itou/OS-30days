@@ -1,8 +1,7 @@
 
 .code32
-    .globl      HariMain
 
-HariMain:
+    CLI
 fin:
     HLT
     JMP     fin
