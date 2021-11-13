@@ -46,6 +46,8 @@ CCVERBOSE   =
 ##    Build.
 ##
 
+hlt.hrb : hlt.obj  Makefile Raw.ls
+	${LD}  -T Raw.ls  -o $@  $<
 
 ##
 ##    Suffix Rules.
@@ -67,5 +69,3 @@ CCVERBOSE   =
 ##
 ##    Dependencies
 ##
-
-hlt.hrb         :  Makefile App.ls  hlt.obj
