@@ -3,7 +3,7 @@
 ##    List of Sub Directory.
 ##
 
-SUBDIRS  =  BootSector  Kernel
+SUBDIRS  =  BootSector  Kernel  App
 
 ##
 ##    List of Files.
