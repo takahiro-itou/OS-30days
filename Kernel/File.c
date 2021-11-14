@@ -48,7 +48,7 @@ struct FILEINFO *file_search(char *name, struct FILEINFO *finfo, int max)
         if (name[i] == '.' && j <= 8) {
             j = 8;
         } else {
-            s[j] == name[i];
+            s[j] = name[i];
             if ('a' <= s[j] && s[j] <= 'z') {
                 /*  小文字は大文字に直す。  */
                 s[j] -= 0x20;
