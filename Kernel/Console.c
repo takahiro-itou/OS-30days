@@ -78,25 +78,6 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     cmdline[cons.cur_x / 8 - 2] = 0;
                     cons_newline(&cons);
                     cons_runcmd(cmdline, &cons, fat, memtotal);
-
-                    /*  コマンド実行。  */
-                    if (strcmp(cmdline, "mem") == 0) {
-                        cmd_mem(&cons, memtotal);
-                    } else if (strcmp(cmdline, "cls") == 0) {
-                        cmd_cls(&cons);
-                    } else if (strcmp(cmdline, "dir") == 0) {
-                        cmd_dir(&cons);
-                    } else if (strncmp(cmdline, "type ", 5) == 0) {
-                        cmd_type(&cons, fat, cmdline);
-                    } else if (strcmp(cmdline, "hlt") == 0) {
-                        cmd_hlt(&cons, fat);
-                    } else if (cmdline[0] != 0) {
-                        /*  コマンドではなく、さらに空行でもない。  */
-                        putfonts8_asc_sht(sheet, 8, cons.cur_y, COL8_FFFFFF,
-                                          COL8_000000, "Bad command.", 12);
-                        cons_newline(&cons);
-                        cons_newline(&cons);
-                    }
                     /*  プロンプト表示  */
                     cons_putchar(&cons, '>', 1);
                 } else {
@@ -178,6 +159,25 @@ void cons_newline(struct CONSOLE *cons)
 void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
                   unsigned int memtotal)
 {
+    if (strcmp(cmdline, "mem") == 0) {
+        cmd_mem(cons, memtotal);
+    } else if (strcmp(cmdline, "cls") == 0) {
+        cmd_cls(cons);
+    } else if (strcmp(cmdline, "dir") == 0) {
+        cmd_dir(cons);
+    } else if (strncmp(cmdline, "type ", 5) == 0) {
+        cmd_type(cons, fat, cmdline);
+    } else if (strcmp(cmdline, "hlt") == 0) {
+        cmd_hlt(cons, fat);
+    } else if (cmdline[0] != 0) {
+        /*  コマンドではなく、さらに空行でもない。  */
+        putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
+                          COL8_000000, "Bad command.", 12);
+        cons_newline(cons);
+        cons_newline(cons);
+    }
+    cons->cur_x = 8;
+    return;
 }
 
 void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
