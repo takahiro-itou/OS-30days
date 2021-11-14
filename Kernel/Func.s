@@ -218,10 +218,12 @@ farcall:    # void farcall(int eip, int cs)
 
 asm_cons_putchar:
     STI
+    PUSHA
     PUSHL   $1
     ANDL    $0xff,  %EAX
     PUSHL   %EAX
     PUSHL   (0x0fec)
     CALL    cons_putchar
     ADDL    $12,    %ESP
+    POPA
     IRET
