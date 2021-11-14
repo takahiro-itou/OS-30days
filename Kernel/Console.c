@@ -87,96 +87,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     } else if (strcmp(cmdline, "dir") == 0) {
                         cmd_dir(&cons);
                     } else if (strncmp(cmdline, "type ", 5) == 0) {
-                        /*  ファイル名を準備する。  */
-                        for (y = 0; y < 11; ++ y) {
-                            s[y] = ' ';
-                        }
-                        s[y] = 0;
-                        y = 0;
-                        for (x = 5; y < 11 && cmdline[x] != 0; ++ x) {
-                            if (cmdline[x] == '.' && y <= 8) {
-                                y = 8;
-                            } else {
-                                s[y] = cmdline[x];
-                                if ('a' <= s[y] && s[y] <= 'z') {
-                                    s[y] -= 0x20;
-                                }
-                                ++ y;
-                            }
-                        }
-                        /*  ファイルを探す  */
-                        for (x = 0; x < 224; ) {
-                            if (finfo[x].name[0] == 0x00) {
-                                break;
-                            }
-                            if ((finfo[x].type & 0x18) == 0) {
-                                for (y = 0; y < 8; ++ y) {
-                                    if (finfo[x].name[y] != s[y]) {
-                                        goto type_next_file;
-                                    }
-                                }
-                                for (y = 0; y < 3; ++ y) {
-                                    if (finfo[x].ext[y] != s[y + 8]) {
-                                        goto type_next_file;
-                                    }
-                                }
-                                break;
-                            }
-type_next_file:
-                            ++ x;
-                        }
-
-                        if (x < 224 && finfo[x].name[0] != 0x00) {
-                            /*  ファイルが見つかった場合。  */
-                            p = (char *) memman_alloc_4k(memman, finfo[x].size);
-                            file_loadfile(finfo[x].clustno, finfo[x].size,
-                                          p, fat,
-                                          (char *) (ADR_DISKIMG + 0x003e00));
-                            cons.cur_x = 8;
-                            for (y = 0; y < finfo[x].size; ++ y) {
-                                s[0] = p[y];
-                                s[1] = 0;
-                                if (s[0] == 0x09) {
-                                    for(;;) {
-                                        putfonts8_asc_sht(sheet, cons.cur_x,
-                                                          cons.cur_y,
-                                                          COL8_FFFFFF,
-                                                          COL8_000000,
-                                                          " ", 1);
-                                        cons.cur_x += 8;
-                                        if (cons.cur_x == 8 + 240) {
-                                            cons.cur_x = 8;
-                                            cons_newline(&cons);
-                                        }
-                                        if (((cons.cur_x - 8) & 0x1f) == 0) {
-                                            break;
-                                        }
-                                    }
-                                } else if (s[0]== 0x0a) {
-                                    cons.cur_x = 8;
-                                    cons_newline(&cons);
-                                } else if (s[0] == 0x0d) {
-                                } else {
-                                    putfonts8_asc_sht(sheet,
-                                                  cons.cur_x, cons.cur_y,
-                                                  COL8_FFFFFF, COL8_000000,
-                                                  s, 1);
-                                    cons.cur_x += 8;
-                                    if (cons.cur_x == 8 + 240) {
-                                        cons.cur_x = 8;
-                                        cons_newline(&cons);
-                                    }
-                                }
-                            }
-                            memman_free_4k(memman, (int)p, finfo[x].size);
-                        } else {
-                            /*  ファイルが見つからなかった場合  */
-                            putfonts8_asc_sht(sheet, 8, cons.cur_y,
-                                              COL8_FFFFFF, COL8_000000,
-                                              "File not found.", 15);
-                            cons_newline(&cons);
-                        }
-                        cons_newline(&cons);
+                        cmd_type(&cons, fat, cmdline);
                     } else if (strcmp(cmdline, "hlt") == 0) {
                         cmd_hlt(&cons, fat);
                     } else if (cmdline[0] != 0) {
@@ -328,8 +239,33 @@ void cmd_dir(struct CONSOLE *cons)
     return;
 }
 
-void cmd_type(struct CONSOLE *cons, int *fat, char cmdline)
+void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
 {
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    struct FILEINFO *finfo;
+    char *p;
+    int i;
+
+    finfo = file_search("HLT.HRB",
+                        (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
+
+    if (finfo != 0) {
+        /*  ファイルが見つかった場合。  */
+        p = (char *) memman_alloc_4k(memman, finfo->size);
+        file_loadfile(finfo->clustno, finfo->size, p, fat,
+                      (char *) (ADR_DISKIMG + 0x003e00));
+        for (i = 0; i < finfo->size; ++ i) {
+            cons_putchar(cons, p[i], 1);
+            memman_free_4k(memman, (int)p, finfo->size);
+        }
+    } else {
+        /*  ファイルが見つからなかった場合  */
+        putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000,
+                          "File not found.", 15);
+        cons_newline(cons);
+    }
+    cons_newline(cons);
+    return;
 }
 
 void cmd_hlt(struct CONSOLE *cons, int *fat)
@@ -337,10 +273,10 @@ void cmd_hlt(struct CONSOLE *cons, int *fat)
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
     struct FILEINFO *finfo;
     struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) ADR_GDT;
+    char *p;
 
     finfo = file_search("HLT.HRB",
                         (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
-    char *p;
 
     if (finfo != 0) {
         /*  ファイルが見つかった場合。  */
