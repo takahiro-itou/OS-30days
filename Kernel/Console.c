@@ -157,6 +157,23 @@ void cons_newline(struct CONSOLE *cons)
     return;
 }
 
+void cons_putstr0(struct CONSOLE *cons, char *s)
+{
+    for (; *s != 0; ++ s) {
+        cons_putchar(cons, *s, 1);
+    }
+    return;
+}
+
+void cons_putstr1(struct CONSOLE *cons, char *s, int l)
+{
+    int i;
+    for (i = 0; i < l; ++ i) {
+        cons_putchar(cons, s[i], 1);
+    }
+    return;
+}
+
 void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
                   unsigned int memtotal)
 {
