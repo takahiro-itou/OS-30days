@@ -188,10 +188,7 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
     } else if (cmdline[0] != 0) {
         if (cmd_app(cons, fat, cmdline) == 0) {
             /*  コマンドではなく、アプリでもなく、さらに空行でもない。  */
-            putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
-                              COL8_000000, "Bad command.", 12);
-            cons_newline(cons);
-            cons_newline(cons);
+            cons_putstr0(cons, "Bad command.\n\n");
         }
     }
     return;
@@ -200,18 +197,11 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
 void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
 {
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
-    char s[30];
+    char s[60];
 
-    /*  mem コマンド。  */
-    snprintf(s, sizeof(s), "total   %dMB",  memtotal / (1024 * 1024));
-    putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
-                      COL8_000000, s, 30);
-    cons_newline(cons);
-    snprintf(s, sizeof(s), "free %dKB",  memman_total(memman) / 1024);
-    putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
-                      COL8_000000, s, 30);
-    cons_newline(cons);
-    cons_newline(cons);
+    snprintf(s, sizeof(s), "total   %dMB\nfree %dKB\n\n",
+             memtotal / (1024 * 1024), memman_total(memman) / 1024);
+    cons_putstr0(cons, s);
     return;
 }
 
