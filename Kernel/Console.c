@@ -82,18 +82,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
 
                     /*  コマンド実行。  */
                     if (strcmp(cmdline, "mem") == 0) {
-                        /*  mem コマンド。  */
-                        snprintf(s, sizeof(s), "total   %dMB",
-                                 memtotal / (1024 * 1024));
-                        putfonts8_asc_sht(sheet, 8, cons.cur_y, COL8_FFFFFF,
-                                          COL8_000000, s, 30);
-                        cons_newline(&cons);
-                        snprintf(s, sizeof(s), "free %dKB",
-                                 memman_total(memman) / 1024);
-                        putfonts8_asc_sht(sheet, 8, cons.cur_y, COL8_FFFFFF,
-                                          COL8_000000, s, 30);
-                        cons_newline(&cons);
-                        cons_newline(&cons);
+                        cmd_mem(&cons, memtotal);
                     } else if (strcmp(cmdline, "cls") == 0) {
                         boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
                                  8, 28, 8 + 240 - 1, 28 + 128 - 1);
@@ -347,4 +336,43 @@ void cons_newline(struct CONSOLE *cons)
     }
     cons->cur_x = 8;
     return;
+}
+
+void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
+                  unsigned int memtotal)
+{
+}
+
+void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
+{
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    char s[30];
+
+    /*  mem コマンド。  */
+    snprintf(s, sizeof(s), "total   %dMB",  memtotal / (1024 * 1024));
+    putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
+                      COL8_000000, s, 30);
+    cons_newline(cons);
+    snprintf(s, sizeof(s), "free %dKB",  memman_total(memman) / 1024);
+    putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
+                      COL8_000000, s, 30);
+    cons_newline(cons);
+    cons_newline(cons);
+    return;
+}
+
+void cmd_cls(struct CONSOLE *cons)
+{
+}
+
+void cmd_dir(struct CONSOLE *cons)
+{
+}
+
+void cmd_type(struct CONSOLE *cons, int *fat, char cmdline)
+{
+}
+
+void cmd_hlt(struct CONSOLE *cons, int *fat)
+{
 }
