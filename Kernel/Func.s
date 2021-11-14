@@ -15,9 +15,9 @@
 .globl      memtest_sub
 .globl      farjmp
 .globl      farcall
-.globl      asm_cons_putchar
+.globl      asm_hrb_api
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
-.extern     cons_putchar
+.extern     hrb_api
 
 .text
 
@@ -216,14 +216,11 @@ farcall:    # void farcall(int eip, int cs)
     LCALLL  * 4(%ESP)
     RET
 
-asm_cons_putchar:
+asm_hrb_api:
     STI
-    PUSHA
-    PUSHL   $1
-    ANDL    $0xff,  %EAX
-    PUSHL   %EAX
-    PUSHL   (0x0fec)
-    CALL    cons_putchar
-    ADDL    $12,    %ESP
+    PUSHA   /*  保存のための PUSH           */
+    PUSHA   /*  hrb_api に渡すための PUSH   */
+    CALL    hrb_api
+    ADDL    $32,    %ESP
     POPA
     IRET

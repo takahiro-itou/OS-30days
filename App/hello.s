@@ -2,6 +2,7 @@
 .code32
 
     MOVL    $msg,   %ECX
+    MOVL    $1,     %EDX
 putloop:
     MOVB    %CS:(%ECX), %AL
     CMPB    $0,     %AL
