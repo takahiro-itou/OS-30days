@@ -3,7 +3,7 @@
 ##    List of Files.
 ##
 
-APPLICATIONS        =  hello.hrb
+APPLICATIONS        =  hello.hrb hello2.hrb
 
 ##
 ##    Commands.
@@ -46,7 +46,10 @@ CCVERBOSE   =
 ##    Build.
 ##
 
-hello.hrb : hello.obj  Makefile Raw.ls
+hello.hrb   : hello.obj  Makefile Raw.ls
+	${LD}  -T Raw.ls  -o $@  $<
+
+hello2.hrb  : hello2.obj  Makefile Raw.ls
 	${LD}  -T Raw.ls  -o $@  $<
 
 ##
