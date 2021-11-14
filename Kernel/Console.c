@@ -84,10 +84,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     if (strcmp(cmdline, "mem") == 0) {
                         cmd_mem(&cons, memtotal);
                     } else if (strcmp(cmdline, "cls") == 0) {
-                        boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
-                                 8, 28, 8 + 240 - 1, 28 + 128 - 1);
-                        sheet_refresh(sheet, 8, 28, 8 + 240, 28 + 128);
-                        cons.cur_y = 28;
+                        cmd_cls(&cons);
                     } else if (strcmp(cmdline, "dir") == 0) {
                         for (x = 0; x < 224; ++ x) {
                             if (finfo[x].name[0] == 0x00) {
@@ -363,6 +360,13 @@ void cmd_mem(struct CONSOLE *cons, unsigned int memtotal)
 
 void cmd_cls(struct CONSOLE *cons)
 {
+    struct SHEET *sheet = cons->sht;
+
+    boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
+             8, 28, 8 + 240 - 1, 28 + 128 - 1);
+    sheet_refresh(sheet, 8, 28, 8 + 240, 28 + 128);
+    cons->cur_y = 28;
+    return;
 }
 
 void cmd_dir(struct CONSOLE *cons)
