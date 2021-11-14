@@ -1,15 +1,17 @@
 
 .code32
 
-    MOVB    $'h',   %AL
+    MOVL    $msg,   %ECX
+putloop:
+    MOVB    %CS:(%ECX), %AL
+    CMPB    $0,     %AL
+    JE      fin
     INT     $0x40
-    MOVB    $'e',   %Al
-    INT     $0x40
-    MOVB    $'l',   %Al
-    INT     $0x40
-    MOVB    $'l',   %Al
-    INT     $0x40
-    MOVB    $'o',   %Al
-    INT     $0x40
-
+    ADDL    $1,     %ECX
+    JMP     putloop
+fin:
     LRET
+
+msg:
+    .ascii  "hello"
+    .byte   0
