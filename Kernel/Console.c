@@ -16,7 +16,6 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     char s[30], cmdline[30], *p;
     int x, y;
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
-    struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) ADR_GDT;
 
     cons.sht = sheet;
     cons.cur_x =  8;
@@ -179,54 +178,7 @@ type_next_file:
                         }
                         cons_newline(&cons);
                     } else if (strcmp(cmdline, "hlt") == 0) {
-                        /*  hlt.hrb アプリケーションを起動  */
-                        for (y = 0; y < 11; ++ y) {
-                            s[y] = ' ';
-                        }
-                        s[0] = 'H';
-                        s[1] = 'L';
-                        s[2] = 'T';
-                        s[8] = 'H';
-                        s[9] = 'R';
-                        s[10] = 'B';
-                        for (x = 0; x < 224; ) {
-                            if (finfo[x].name[0] == 0x00) {
-                                break;
-                            }
-                            if ((finfo[x].type & 0x18) == 0) {
-                                for (y = 0; y < 8; ++ y) {
-                                    if (finfo[x].name[y] != s[y]) {
-                                        goto hlt_next_file;
-                                    }
-                                }
-                                for (y = 0; y < 3; ++ y) {
-                                    if (finfo[x].ext[y] != s[y + 8]) {
-                                        goto hlt_next_file;
-                                    }
-                                }
-                                break;
-                            }
-hlt_next_file:
-                            ++ x;
-                        }
-                        if (x < 224 && finfo[x].name[0] != 0x00) {
-                            /*  ファイルが見つかった場合。  */
-                            p = (char *) memman_alloc_4k(memman, finfo[x].size);
-                            file_loadfile(finfo[x].clustno, finfo[x].size,
-                                          p, fat,
-                                          (char *)(ADR_DISKIMG + 0x003e00));
-                            set_segmdesc(gdt + 1003, finfo[x].size - 1,
-                                         (int) p, AR_CODE32_ER);
-                            farjmp(0, 1003 * 8);
-                            memman_free_4k(memman, (int) p, finfo[x].size);
-                        } else {
-                            /*  ファイルが見つからなかった場合  */
-                            putfonts8_asc_sht(sheet, 8, cons.cur_y,
-                                              COL8_FFFFFF, COL8_000000,
-                                              "File not found.", 15);
-                            cons_newline(&cons);
-                        }
-                        cons_newline(&cons);
+                        cmd_hlt(&cons, fat);
                     } else if (cmdline[0] != 0) {
                         /*  コマンドではなく、さらに空行でもない。  */
                         putfonts8_asc_sht(sheet, 8, cons.cur_y, COL8_FFFFFF,
@@ -382,4 +334,28 @@ void cmd_type(struct CONSOLE *cons, int *fat, char cmdline)
 
 void cmd_hlt(struct CONSOLE *cons, int *fat)
 {
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    struct FILEINFO *finfo;
+    struct SEGMENT_DESCRIPTOR *gdt = (struct SEGMENT_DESCRIPTOR *) ADR_GDT;
+
+    finfo = file_search("HLT.HRB",
+                        (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
+    char *p;
+
+    if (finfo != 0) {
+        /*  ファイルが見つかった場合。  */
+        p = (char *) memman_alloc_4k(memman, finfo->size);
+        file_loadfile(finfo->clustno, finfo->size, p, fat,
+                      (char *)(ADR_DISKIMG + 0x003e00));
+        set_segmdesc(gdt + 1003, finfo->size - 1, (int) p, AR_CODE32_ER);
+        farjmp(0, 1003 * 8);
+        memman_free_4k(memman, (int) p, finfo->size);
+    } else {
+        /*  ファイルが見つからなかった場合  */
+        putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000,
+                          "File not found.", 15);
+        cons_newline(cons);
+    }
+    cons_newline(cons);
+    return;
 }
