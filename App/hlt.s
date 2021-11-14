@@ -2,13 +2,14 @@
 .code32
 
     MOVB    $'h',   %AL
-    LCALLL  $2*8, $0x0bbd
+    INT     $0x40
     MOVB    $'e',   %Al
-    LCALLL  $2*8, $0x0bbd
+    INT     $0x40
     MOVB    $'l',   %Al
-    LCALLL  $2*8, $0x0bbd
+    INT     $0x40
     MOVB    $'l',   %Al
-    LCALLL  $2*8, $0x0bbd
+    INT     $0x40
     MOVB    $'o',   %Al
-    LCALLL  $2*8, $0x0bbd
+    INT     $0x40
+
     LRET
