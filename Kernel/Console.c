@@ -86,30 +86,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     } else if (strcmp(cmdline, "cls") == 0) {
                         cmd_cls(&cons);
                     } else if (strcmp(cmdline, "dir") == 0) {
-                        for (x = 0; x < 224; ++ x) {
-                            if (finfo[x].name[0] == 0x00) {
-                                break;
-                            }
-                            if (finfo[x].name[0] == 0xe5) {
-                                continue;
-                            }
-                            if((finfo[x].type & 0x18) == 0) {
-                                snprintf(s, sizeof(s), "filename.ext   %7d",
-                                         finfo[x].size);
-                                for (y = 0; y < 8; ++y) {
-                                    s[y] = finfo[x].name[y];
-                                }
-                                s[ 9] = finfo[x].ext[0];
-                                s[10] = finfo[x].ext[1];
-                                s[11] = finfo[x].ext[2];
-                                putfonts8_asc_sht(sheet, 8, cons.cur_y,
-                                                  COL8_FFFFFF,
-                                                  COL8_000000,
-                                                  s, 30);
-                                cons_newline(&cons);
-                            }
-                        }
-                        cons_newline(&cons);
+                        cmd_dir(&cons);
                     } else if (strncmp(cmdline, "type ", 5) == 0) {
                         /*  ファイル名を準備する。  */
                         for (y = 0; y < 11; ++ y) {
@@ -371,6 +348,32 @@ void cmd_cls(struct CONSOLE *cons)
 
 void cmd_dir(struct CONSOLE *cons)
 {
+    struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
+    int i, j;
+    char s[30];
+
+    for (i = 0; i < 224; ++ i) {
+        if (finfo[i].name[0] == 0x00) {
+            break;
+        }
+        if (finfo[i].name[0] == 0xe5) {
+            continue;
+        }
+        if((finfo[i].type & 0x18) == 0) {
+            snprintf(s, sizeof(s), "filename.ext   %7d", finfo[i].size);
+            for (j = 0; j < 8; ++ j) {
+                s[j] = finfo[i].name[j];
+            }
+            s[ 9] = finfo[i].ext[0];
+            s[10] = finfo[i].ext[1];
+            s[11] = finfo[i].ext[2];
+            putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
+                              COL8_000000, s, 30);
+            cons_newline(cons);
+        }
+    }
+    cons_newline(cons);
+    return;
 }
 
 void cmd_type(struct CONSOLE *cons, int *fat, char cmdline)
