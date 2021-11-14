@@ -14,6 +14,7 @@
 .globl      asm_inthandler2c
 .globl      memtest_sub
 .globl      farjmp
+.globl      farcall
 .globl      asm_cons_putchar
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
 .extern     cons_putchar
@@ -207,8 +208,12 @@ mts_fin:
     POPL    %EDI
     RET
 
-farjmp:      # void farjmp(int eip, int cs) ;
+farjmp:     # void farjmp(int eip, int cs)
     LJMPL   * 4(%ESP)
+    RET
+
+farcall:    # void farcall(int eip, int cs)
+    LCALLL  * 4(%ESP)
     RET
 
 asm_cons_putchar:
