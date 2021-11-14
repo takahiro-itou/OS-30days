@@ -12,7 +12,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     int i, fifobuf[128];
     int *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
     struct CONSOLE cons;
-    //int cursor_x = 16, cursor_y = 28, cursor_c = -1;
+
     char s[30], cmdline[30], *p;
     int x, y;
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
@@ -31,7 +31,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     file_readfat(fat, (unsigned char *)(ADR_DISKIMG + 0x000200));
 
     /*  プロンプト表示  */
-    putfonts8_asc_sht(sheet, 8, 28, COL8_FFFFFF, COL8_000000, ">", 1);
+    cons_putchar(&cons, '>', 1);
 
     for (;;) {
         io_cli();
@@ -69,17 +69,16 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                 if (i == 8 + 256) {
                     /*  バックスペース  */
                     if (cons.cur_x > 16) {
-                        putfonts8_asc_sht(sheet, cons.cur_x, cons.cur_y,
-                                          COL8_FFFFFF, COL8_000000, " ", 1);
+                        cons_putchar(&cons, ' ', 0);
                         cons.cur_x -= 8;
                     }
                 } else if (i == 10 + 256) {
                     /*  Enter.  */
-                    /*  カーソルをスペースで消す。  */
-                    putfonts8_asc_sht(sheet, cons.cur_x, cons.cur_y,
-                                      COL8_FFFFFF, COL8_000000, " ", 1);
+                    /*  カーソルをスペースで消してから改行する  */
+                    cons_putchar(&cons, ' ', 0);
                     cmdline[cons.cur_x / 8 - 2] = 0;
                     cons_newline(&cons);
+                    cons_runcmd(cmdline, &cons, fat, memtotal);
 
                     /*  コマンド実行。  */
                     if (strcmp(cmdline, "mem") == 0) {
@@ -273,28 +272,60 @@ hlt_next_file:
                         cons_newline(&cons);
                     }
                     /*  プロンプト表示  */
-                    putfonts8_asc_sht(sheet, 8, cons.cur_y,
-                                      COL8_FFFFFF, COL8_000000, ">", 1);
-                    cons.cur_x = 16;
+                    cons_putchar(&cons, '>', 1);
                 } else {
                     if (cons.cur_x < 240) {
-                        s[0] = i - 256;
-                        s[1] = 0;
                         cmdline[cons.cur_x / 8 - 2] = i - 256;
-                        putfonts8_asc_sht(sheet, cons.cur_x, cons.cur_y,
-                                          COL8_FFFFFF, COL8_000000, s, 1);
-                        cons.cur_x += 8;
+                        cons_putchar(&cons, i - 256, i);
                     }
                 }
             }
             /*  カーソル再表示  */
-            boxfill8(sheet->buf, sheet->bxsize, cons.cur_c,
-                     cons.cur_x, cons.cur_y, cons.cur_x + 7, cons.cur_y + 15);
+            if (cons.cur_c >= 0) {
+                boxfill8(sheet->buf, sheet->bxsize, cons.cur_c,
+                         cons.cur_x, cons.cur_y,
+                         cons.cur_x + 7, cons.cur_y + 15);
+            }
             sheet_refresh(sheet, cons.cur_x, cons.cur_y,
                           cons.cur_x + 8, cons.cur_y + 16);
         }
     }
 }
+
+void cons_putchar(struct CONSOLE *cons, int chr, char move)
+{
+    char s[2];
+    s[0] = chr;
+    s[1] = 0;
+    if (s[0] == 0x09) {
+        for (;;) {
+            putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
+                              COL8_FFFFFF, COL8_000000, " ", 1);
+            cons->cur_x += 8;
+            if (cons->cur_x == 8 + 240) {
+                cons_newline(cons);
+            }
+            if (((cons->cur_x - 8) & 0x1f) == 0) {
+                break;
+            }
+        }
+    } else if (s[0] == 0x0a) {
+        cons_newline(cons);
+    } else if (s[0] == 0x0d) {
+    } else {
+        /*  普通の文字  */
+        putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
+                          COL8_FFFFFF, COL8_000000, s, 1);
+        if (move != 0) {
+            cons->cur_x += 8;
+            if (cons->cur_x == 8 + 240) {
+                cons_newline(cons);
+            }
+        }
+    }
+    return;
+}
+
 
 void cons_newline(struct CONSOLE *cons)
 {
