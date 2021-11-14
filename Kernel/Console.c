@@ -230,16 +230,14 @@ void cmd_dir(struct CONSOLE *cons)
             continue;
         }
         if((finfo[i].type & 0x18) == 0) {
-            snprintf(s, sizeof(s), "filename.ext   %7d", finfo[i].size);
+            snprintf(s, sizeof(s), "filename.ext   %7d\n", finfo[i].size);
             for (j = 0; j < 8; ++ j) {
                 s[j] = finfo[i].name[j];
             }
             s[ 9] = finfo[i].ext[0];
             s[10] = finfo[i].ext[1];
             s[11] = finfo[i].ext[2];
-            putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF,
-                              COL8_000000, s, 30);
-            cons_newline(cons);
+            cons_putstr0(cons, s);
         }
     }
     cons_newline(cons);
@@ -253,7 +251,7 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
     char *p;
     int i;
 
-    finfo = file_search("HLT.HRB",
+    finfo = file_search(cmdline + 5,
                         (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
 
     if (finfo != 0) {
@@ -261,15 +259,11 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
         p = (char *) memman_alloc_4k(memman, finfo->size);
         file_loadfile(finfo->clustno, finfo->size, p, fat,
                       (char *) (ADR_DISKIMG + 0x003e00));
-        for (i = 0; i < finfo->size; ++ i) {
-            cons_putchar(cons, p[i], 1);
-            memman_free_4k(memman, (int)p, finfo->size);
-        }
+        cons_putstr1(cons, p, finfo->size);
+        memman_free_4k(memman, (int)p, finfo->size);
     } else {
         /*  ファイルが見つからなかった場合  */
-        putfonts8_asc_sht(cons->sht, 8, cons->cur_y, COL8_FFFFFF, COL8_000000,
-                          "File not found.", 15);
-        cons_newline(cons);
+        cons_putstr0(cons, "File not found.\n");
     }
     cons_newline(cons);
     return;
