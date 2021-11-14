@@ -218,4 +218,4 @@ asm_cons_putchar:
     PUSHL   (0x0fec)
     CALL    cons_putchar
     ADDL    $12,    %ESP
-    RET
+    LRET
