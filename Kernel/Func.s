@@ -111,67 +111,178 @@ load_tr:            # void load_tr(int tr)
     RET
 
 asm_inthandler20:
-    PUSHW   %ES
-    PUSHW   %DS
+    PUSH    %ES
+    PUSH    %DS
     PUSHA
+    MOVW    %SS,    %AX
+    CMPW    $1*8,   %AX
+    JNE     .from_app_20
+
+    /*  OSが動いている時に割り込まれたのでほぼ今までどおり  */
     MOVL    %ESP,   %EAX
+    PUSHL   %SS
     PUSHL   %EAX
     MOVW    %SS,    %AX
     MOVW    %AX,    %DS
     MOVW    %AX,    %ES
     CALL    inthandler20
-    POP     %EAX
+    ADDL    $8,     %ESP
     POPA
-    POPW    %DS
-    POPW    %ES
+    POP     %DS
+    POP     %ES
     IRET
 
+.from_app_20:
+    /*  アプリが動いているときに割り込まれた。  */
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %DS
+    MOVL    (0xfe4),    %ECX
+    ADDL    $-8,    %ECX
+    MOVW    %SS,    4(%ECX)
+    MOVL    %ESP,    (%ECX)
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %ES
+    MOVL    %ECX,   %ESP
+    CALL    inthandler20
+    POPL    %ECX
+    POPL    %EAX
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
+    POPA
+    POP     %DS
+    POP     %ES
+    IRET
+
+
 asm_inthandler21:
-    PUSHW   %ES
-    PUSHW   %DS
+    PUSH    %ES
+    PUSH    %DS
     PUSHA
+    MOVW    %SS,    %AX
+    CMPW    $1*8,   %AX
+    JNE     .from_app_21
+
+    /*  OSが動いている時に割り込まれたのでほぼ今までどおり  */
     MOVL    %ESP,   %EAX
+    PUSHL   %SS
     PUSHL   %EAX
     MOVW    %SS,    %AX
     MOVW    %AX,    %DS
     MOVW    %AX,    %ES
     CALL    inthandler21
-    POP     %EAX
+    ADDL    $8,     %ESP
     POPA
-    POPW    %DS
-    POPW    %ES
+    POP     %DS
+    POP     %ES
     IRET
 
+.from_app_21:
+    /*  アプリが動いているときに割り込まれた。  */
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %DS
+    MOVL    (0xfe4),    %ECX
+    ADDL    $-8,    %ECX
+    MOVW    %SS,    4(%ECX)
+    MOVL    %ESP,    (%ECX)
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %ES
+    MOVL    %ECX,   %ESP
+    CALL    inthandler20
+    POPL    %ECX
+    POPL    %EAX
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
+    POPA
+    POP     %DS
+    POP     %ES
+    IRET
+
+
 asm_inthandler27:
-    PUSHW   %ES
-    PUSHW   %DS
+    PUSH    %ES
+    PUSH    %DS
     PUSHA
+    MOVW    %SS,    %AX
+    CMPW    $1*8,   %AX
+    JNE     .from_app_27
+
+    /*  OSが動いている時に割り込まれたのでほぼ今までどおり  */
     MOVL    %ESP,   %EAX
+    PUSHL   %SS
     PUSHL   %EAX
     MOVW    %SS,    %AX
     MOVW    %AX,    %DS
     MOVW    %AX,    %ES
     CALL    inthandler27
-    POP     %EAX
+    ADDL    $8,     %ESP
     POPA
-    POPW    %DS
-    POPW    %ES
+    POP     %DS
+    POP     %ES
     IRET
 
+.from_app_27:
+    /*  アプリが動いているときに割り込まれた。  */
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %DS
+    MOVL    (0xfe4),    %ECX
+    ADDL    $-8,    %ECX
+    MOVW    %SS,    4(%ECX)
+    MOVL    %ESP,    (%ECX)
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %ES
+    MOVL    %ECX,   %ESP
+    CALL    inthandler20
+    POPL    %ECX
+    POPL    %EAX
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
+    POPA
+    POP     %DS
+    POP     %ES
+    IRET
+
+
 asm_inthandler2c:
-    PUSHW   %ES
-    PUSHW   %DS
+    PUSH    %ES
+    PUSH    %DS
     PUSHA
+    MOVW    %SS,    %AX
+    CMPW    $1*8,   %AX
+    JNE     .from_app_2c
+
+    /*  OSが動いている時に割り込まれたのでほぼ今までどおり  */
     MOVL    %ESP,   %EAX
+    PUSHL   %SS
     PUSHL   %EAX
     MOVW    %SS,    %AX
     MOVW    %AX,    %DS
     MOVW    %AX,    %ES
     CALL    inthandler2c
-    POP     %EAX
+    ADDL    $8,     %ESP
     POPA
-    POPW    %DS
-    POPW    %ES
+    POP     %DS
+    POP     %ES
+    IRET
+
+.from_app_2c:
+    /*  アプリが動いているときに割り込まれた。  */
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %DS
+    MOVL    (0xfe4),    %ECX
+    ADDL    $-8,    %ECX
+    MOVW    %SS,    4(%ECX)
+    MOVL    %ESP,    (%ECX)
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %ES
+    MOVL    %ECX,   %ESP
+    CALL    inthandler2c
+    POPL    %ECX
+    POPL    %EAX
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
+    POPA
+    POP     %DS
+    POP     %ES
     IRET
 
 
