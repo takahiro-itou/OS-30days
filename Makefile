@@ -61,7 +61,7 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
 	${DD}  if=${IPLBIN_IMAGE}  bs=512  count=1  of=$@  conv=notrunc
 	mcopy  -i $@  ${KERNEL_IMAGE}  ::
 	mcopy  -i $@  App/hello.hrb App/hello2.hrb App/a.hrb    \
-            App/hello3.hrb                                  \
+            App/hello3.hrb App/crack1.hrb                   \
             ::
 
 ##

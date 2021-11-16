@@ -3,7 +3,8 @@
 ##    List of Files.
 ##
 
-APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb
+APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
+                       crack1.hrb
 API_OBJS            =  a_as.obj
 
 ##
@@ -75,5 +76,6 @@ hello2.hrb  : hello2.obj  Makefile Raw.ls
 ##    Dependencies
 ##
 
-a.hrb       : a.obj      Makefile App.ls  ${API_OBJS}
-hello3.hrb  : hello.obj  Makefile App.ls  ${API_OBJS}
+a.hrb       : a.obj       Makefile App.ls  ${API_OBJS}
+hello3.hrb  : hello3.obj  Makefile App.ls  ${API_OBJS}
+crack1.hrb  : crack1.obj  Makefile App.ls  ${API_OBJS}
