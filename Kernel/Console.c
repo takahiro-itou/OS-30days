@@ -343,3 +343,11 @@ void hrb_api(int edi, int esi, int ebp, int esp,
     }
     return;
 }
+
+int inthandler0d(int *esp)
+{
+    struct CONSOLE *cons = (struct CONSOLE *) *((int *) 0x0fec);
+    cons_putstr0(cons, "\nINT 0D :\n General Protected Exception.\n");
+    return 1;   /*  異常終了させる  */
+}
+

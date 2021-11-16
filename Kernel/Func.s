@@ -12,11 +12,13 @@
 .globl      asm_inthandler21
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
+.globl      asm_inthandler0d
 .globl      memtest_sub
 .globl      farjmp
 .globl      farcall
 .globl      asm_hrb_api, start_app
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
+.extern     inthandler0d
 .extern     hrb_api
 
 .text
@@ -284,6 +286,71 @@ asm_inthandler2c:
     POP     %DS
     POP     %ES
     IRET
+
+
+asm_inthandler0d:
+    STI
+    PUSH    %ES
+    PUSH    %DS
+    PUSHA
+    MOVW    %SS,    %AX
+    CMPW    $1*8,   %AX
+    JNE     .from_app_0d
+
+    /*  OSが動いている時に割り込まれたのでほぼ今までどおり  */
+    MOVL    %ESP,   %EAX
+    PUSHL   %SS
+    PUSHL   %EAX
+    MOVW    %SS,    %AX
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    CALL    inthandler0d
+    ADDL    $8,     %ESP
+    POPA
+    POP     %DS
+    POP     %ES
+    ADDL    $4,     %ESP    #  INT 0x0d ではこれが必要
+    IRET
+
+.from_app_0d:
+    /*  アプリが動いているときに割り込まれた。  */
+    CLI
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %DS
+    MOVL    (0xfe4),    %ECX
+    ADDL    $-8,    %ECX
+    MOVW    %SS,    4(%ECX)
+    MOVL    %ESP,    (%ECX)
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %ES
+    MOVL    %ECX,   %ESP
+    STI
+    CALL    inthandler0d
+    CLI
+    CMPL    $0,     %EAX
+    JNE     .kill
+    POPL    %ECX
+    POPL    %EAX
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
+    POPA
+    POP     %DS
+    POP     %ES
+    ADDL    $4,     %ESP    #  INT 0x0d ではこれが必要
+    IRET
+
+.kill:
+    /*  アプリを異常終了させることにした。  */
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %ES
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %FS
+    MOVW    %AX,    %GS
+    MOVL    (0xfe4),    %ESP
+    STI
+    POPA
+    RET
 
 
 memtest_sub:
