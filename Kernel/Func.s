@@ -15,7 +15,7 @@
 .globl      memtest_sub
 .globl      farjmp
 .globl      farcall
-.globl      asm_hrb_api
+.globl      asm_hrb_api, start_app
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
 .extern     hrb_api
 
@@ -224,3 +224,35 @@ asm_hrb_api:
     ADDL    $32,    %ESP
     POPA
     IRET
+
+start_app:      # void start_app(int eip, int cs, int esp, int ds)
+    PUSHA   /*  レジスタを全部保存しておく  */
+    MOVL    36(%ESP),   %EAX    /*  アプリ用の EIP  */
+    MOVL    40(%ESP),   %ECX    /*  アプリ用の CS   */
+    MOVL    44(%ESP),   %EDX    /*  アプリ用の ESP  */
+    MOVL    48(%ESP),   %EBX    /*  アプリ用の DS   */
+    MOVL    %ESP,   (0xfe4)     /*  OS用の ESP      */
+    CLI
+    MOVW    %BX,    %ES
+    MOVW    %BX,    %SS
+    MOVW    %BX,    %DS
+    MOVW    %BX,    %FS
+    MOVW    %BX,    %GS
+    MOVL    %EDX,   %ESP
+    STI
+    PUSHL   %ECX
+    PUSH    %EAX
+    LCALLL  * (%ESP)
+
+    /*  アプリが終了するとここに帰ってくる  */
+    MOVL    $1*8,   %EAX
+    CLI
+    MOVW    %AX,    %ES
+    MOVW    %AX,    %SS
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %FS
+    MOVW    %AX,    %GS
+    MOVL    (0xfe4),    %ESP
+    STI
+    POPA
+    RET
