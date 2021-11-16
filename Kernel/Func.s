@@ -217,12 +217,52 @@ farcall:    # void farcall(int eip, int cs)
     RET
 
 asm_hrb_api:
-    STI
+    /*  都合のいいことに最初から割り込み禁止になっている。  */
+    PUSHW   %DS
+    PUSHW   %ES
     PUSHA   /*  保存のための PUSH           */
-    PUSHA   /*  hrb_api に渡すための PUSH   */
+    MOVL    $1*8,   %EAX
+    MOVW    %AX,    %DS
+    MOVL    (0xfe4),    %ECX
+    ADDL    $-40,       %ECX
+    MOVL    %ESP,   32(%ECX)
+    MOVW    %SS,    36(%ECX)
+
+    MOVL    (%ESP),     %EDX
+    MOVL     4(%ESP),   %EBX
+    MOVL    %EDX,     (%ECX)
+    MOVL    %EBX,    4(%ECX)
+
+    MOVL     8(%ESP),   %EDX
+    MOVL    12(%ESP),   %EBX
+    MOVL    %EDX,    8(%ECX)
+    MOVL    %EBX,   12(%ECX)
+
+    MOVL    16(%ESP),   %EDX
+    MOVL    20(%ESP),   %EBX
+    MOVL    %EDX,   16(%ECX)
+    MOVL    %EBX,   20(%ECX)
+
+    MOVL    24(%ESP),   %EDX
+    MOVL    28(%ESP),   %EBX
+    MOVL    %EDX,   24(%ECX)
+    MOVL    %EBX,   28(%ECX)
+
+    MOVW    %AX,    %ES
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
+
+    STI
     CALL    hrb_api
-    ADDL    $32,    %ESP
+
+    MOVL    32(%ESP),   %ECX
+    MOVL    36(%ESP),   %EAX
+    CLI
+    MOVW    %AX,    %SS
+    MOVL    %ECX,   %ESP
     POPA
+    POPW    %ES
+    POPW    %DS
     IRET
 
 start_app:      # void start_app(int eip, int cs, int esp, int ds)
