@@ -15,15 +15,15 @@ MEMORY {
 SECTIONS {
     .  =  ORIGIN(ROM);
     .header : {
-        LONG(0x00314000);
+        LONG(0x00010000);
         LONG(0x69726148);
         LONG(0x00000000);
-        LONG(0x00310000);
-        LONG(0x000011a8);
-        LONG(0x000010c8);
+        LONG(0x00010000);
+        LONG(_END_DATA - _START_DATA);
+        LONG(_START_DATA);
         LONG(0xe9000000);
         LONG(HariMain - . - 4);
-        LONG(0x00313bf0);
+        LONG(0x00000000);
     } > ROM
 
     .text       : {
@@ -34,6 +34,7 @@ SECTIONS {
 
     .data       . + (CODE_SEGMENT_BASE - DATA_SEGMENT_BASE) :
     {
+        _START_DATA = .;
         *(.data)
         *(.data.*)
         . = ALIGN(16);
@@ -43,6 +44,7 @@ SECTIONS {
         *(.rodata);
         *(.rodata.*);
         . = ALIGN(16);
+        _END_DATA   = .;
     } > RAM  AT > ROM
 
 }

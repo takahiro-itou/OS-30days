@@ -3,7 +3,8 @@
 ##    List of Files.
 ##
 
-APPLICATIONS        =  hello.hrb hello2.hrb
+APPLICATIONS        =  hello.hrb hello2.hrb a.hrb
+API_OBJS            =  a_as.obj
 
 ##
 ##    Commands.
@@ -32,6 +33,7 @@ cleanall :  clean
 cleanobj :
 	${RM}  -f                           \
         ${APPLICATIONS:%.hrb=%.obj}     \
+        ${API_OBJS}                     \
         *.lst  *.map
 
 ##
@@ -57,7 +59,7 @@ hello2.hrb  : hello2.obj  Makefile Raw.ls
 ##
 
 .obj.hrb    :
-	${LD}  -T App.ls  -o $@  $<
+	${LD}  -T App.ls  -o $@  $<  ${API_OBJS}
 
 .s.obj  :
 	${AS}  -o $@  \
@@ -72,3 +74,5 @@ hello2.hrb  : hello2.obj  Makefile Raw.ls
 ##
 ##    Dependencies
 ##
+
+a.hrb   : a.obj  Makefile App.ls  ${API_OBJS}
