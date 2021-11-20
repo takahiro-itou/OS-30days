@@ -4,7 +4,8 @@
 ##
 
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
-                       crack1.hrb crack2.hrb crack3.hrb
+                       crack1.hrb crack2.hrb crack3.hrb         \
+                       crack4.hrb
 API_OBJS            =  a_as.obj
 
 ##
@@ -59,6 +60,9 @@ crack2.hrb  : crack2.obj  Makefile Raw.ls
 	${LD}  -T Raw.ls  -o $@  $<
 
 crack3.hrb  : crack3.obj  Makefile Raw.ls
+	${LD}  -T Raw.ls  -o $@  $<
+
+crack4.hrb  : crack4.obj  Makefile Raw.ls
 	${LD}  -T Raw.ls  -o $@  $<
 
 ##
