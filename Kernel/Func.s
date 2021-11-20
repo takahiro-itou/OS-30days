@@ -449,28 +449,18 @@ start_app:      # void start_app(int eip, int cs, int esp, int ds)
     MOVL    40(%ESP),   %ECX    /*  アプリ用の CS   */
     MOVL    44(%ESP),   %EDX    /*  アプリ用の ESP  */
     MOVL    48(%ESP),   %EBX    /*  アプリ用の DS   */
-    MOVL    %ESP,   (0xfe4)     /*  OS用の ESP      */
-    CLI
+    MOVL    52(%ESP),   %EBX    /*  tss.esp0の番地  */
+    MOVL    %ESP,   (%EBP)      /*  OS 用の ESP を保存  */
+    MOVW    %SS,    4(%EBP)     /*  OS 用の SS  を保存  */
     MOVW    %BX,    %ES
-    MOVW    %BX,    %SS
     MOVW    %BX,    %DS
     MOVW    %BX,    %FS
     MOVW    %BX,    %GS
-    MOVL    %EDX,   %ESP
-    STI
-    PUSHL   %ECX
-    PUSH    %EAX
-    LCALLL  * (%ESP)
-
-    /*  アプリが終了するとここに帰ってくる  */
-    MOVL    $1*8,   %EAX
-    CLI
-    MOVW    %AX,    %ES
-    MOVW    %AX,    %SS
-    MOVW    %AX,    %DS
-    MOVW    %AX,    %FS
-    MOVW    %AX,    %GS
-    MOVL    (0xfe4),    %ESP
-    STI
-    POPA
-    RET
+    /*  以下は RETF でアプリに行かせるためのスタック調整。  */
+    ORL     $3,     %ECX
+    ORL     $3,     %EBX
+    PUSHL   %EBX                /*  アプリの SS     */
+    PUSHL   %EDX                /*  アプリの ESP    */
+    PUSHL   %ECX                /*  アプリの CS     */
+    PUSHL   %EAX                /*  アプリの EIP    */
+    LRET
