@@ -330,10 +330,11 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
     return 0;
 }
 
-void hrb_api(int edi, int esi, int ebp, int esp,
+int *hrb_api(int edi, int esi, int ebp, int esp,
              int ebx, int edx, int ecx, int eax)
 {
     int cs_base = *((int *) 0xfe8);
+    struct TASK *task = task_now();
     struct CONSOLE *cons = (struct CONSOLE *) *((int *) 0x0fec);
     if (edx == 1) {
         cons_putchar(cons, eax & 0xff, 1);
@@ -341,8 +342,10 @@ void hrb_api(int edi, int esi, int ebp, int esp,
         cons_putstr0(cons, (char *) ebx + cs_base);
     } else if (edx == 3) {
         cons_putstr1(cons, (char *) ebx + cs_base, ecx);
+    } else if (edx == 4) {
+        return &(task->tss.esp0);
     }
-    return;
+    return 0;
 }
 
 int inthandler0d(int *esp)
