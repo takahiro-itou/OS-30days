@@ -272,7 +272,7 @@ start_app:      # void start_app(int eip, int cs, int esp, int ds)
     MOVL    40(%ESP),   %ECX    /*  アプリ用の CS   */
     MOVL    44(%ESP),   %EDX    /*  アプリ用の ESP  */
     MOVL    48(%ESP),   %EBX    /*  アプリ用の DS   */
-    MOVL    52(%ESP),   %EBX    /*  tss.esp0の番地  */
+    MOVL    52(%ESP),   %EBP    /*  tss.esp0の番地  */
     MOVL    %ESP,   (%EBP)      /*  OS 用の ESP を保存  */
     MOVW    %SS,    4(%EBP)     /*  OS 用の SS  を保存  */
     MOVW    %BX,    %ES
