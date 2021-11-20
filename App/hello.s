@@ -11,7 +11,8 @@ putloop:
     ADDL    $1,     %ECX
     JMP     putloop
 fin:
-    LRET
+    MOVL    $4,     %EDX
+    INT     $0x40
 
 msg:
     .ascii  "hello"
