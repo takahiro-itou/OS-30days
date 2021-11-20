@@ -62,6 +62,7 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
 	mcopy  -i $@  ${KERNEL_IMAGE}  ::
 	mcopy  -i $@  App/hello.hrb App/hello2.hrb App/a.hrb    \
             App/hello3.hrb App/crack1.hrb App/crack2.hrb    \
+            App/crack3.hrb                                  \
             ::
 
 ##
