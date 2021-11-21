@@ -18,7 +18,7 @@ SECTIONS {
         LONG(0x00010000);
         LONG(0x69726148);
         LONG(0x00000000);
-        LONG(0x00010000);
+        LONG(0x00004000);
         LONG(_END_DATA - _START_DATA);
         LONG(_START_DATA);
         LONG(0xe9000000);
