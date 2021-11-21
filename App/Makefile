@@ -60,7 +60,7 @@ hello2.hrb  : hello2.obj  Makefile Raw.ls
 ##
 
 .obj.hrb    :
-	${LD}  -T App.ls  -o $@  $<  ${API_OBJS}
+	${LD}  -T App.ls  -o $@  -Map=${@:%.hrb=%.map}  $<  ${API_OBJS}
 
 .s.obj  :
 	${AS}  -o $@  \
