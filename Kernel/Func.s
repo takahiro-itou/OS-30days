@@ -17,7 +17,7 @@
 .globl      memtest_sub
 .globl      farjmp
 .globl      farcall
-.globl      asm_hrb_api, start_app
+.globl      asm_hrb_api, asm_end_app, start_app
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
 .extern     inthandler0c, inthandler0d
 .extern     hrb_api
@@ -193,7 +193,7 @@ asm_inthandler0c:
     MOVW    %AX,    %ES
     CALL    inthandler0c
     CMPL    $0,     %EAX
-    JNE     end_app
+    JNE     asm_end_app
     POPL    %EAX
     POPA
     POP     %DS
@@ -213,7 +213,7 @@ asm_inthandler0d:
     MOVW    %AX,    %ES
     CALL    inthandler0d
     CMPL    $0,     %EAX
-    JNE     end_app
+    JNE     asm_end_app
     POPL    %EAX
     POPA
     POP     %DS
@@ -274,18 +274,18 @@ asm_hrb_api:
     MOVW    %AX,    %ES
     CALL    hrb_api
     CMPL    $0,     %EAX
-    JNE     end_app
+    JNE     asm_end_app
     ADDL    $32,    %ESP
     POPA
     POPL    %ES
     POPL    %DS
     IRET
-end_app:
+asm_end_app:
     /*  EAX は tss.esp0 の番地  */
     MOVL    (%EAX), %ESP
+    MOVL    $0,    4(%EAX)
     POPA
     RET     /*  cmd_app へ帰る  */
-
 
 start_app:      # void start_app(int eip, int cs, int esp, int ds)
     PUSHA   /*  レジスタを全部保存しておく  */
