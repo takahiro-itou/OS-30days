@@ -5,7 +5,7 @@
 
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        bug1.hrb bug2.hrb bug3.hrb hello4.hrb    \
-                       hello5.hrb
+                       hello5.hrb winhello.hrb
 API_OBJS            =  a_as.obj
 
 ##
@@ -71,13 +71,14 @@ CCVERBOSE   =
 ##    Dependencies
 ##
 
-hello.hrb   : hello.obj   Makefile App.ls  ${API_OBJS}
-hello2.hrb  : hello2.obj  Makefile App.ls  ${API_OBJS}
+hello.hrb     : hello.obj     Makefile App.ls  ${API_OBJS}
+hello2.hrb    : hello2.obj    Makefile App.ls  ${API_OBJS}
 
-a.hrb       : a.obj       Makefile App.ls  ${API_OBJS}
-hello3.hrb  : hello3.obj  Makefile App.ls  ${API_OBJS}
-bug1.hrb    : bug1.obj    Makefile App.ls  ${API_OBJS}
-bug2.hrb    : bug2.obj    Makefile App.ls  ${API_OBJS}
-bug3.hrb    : bug3.obj    Makefile App.ls  ${API_OBJS}
-hello4.hrb  : hello4.obj  Makefile App.ls  ${API_OBJS}
-hello5.hrb  : hello5.obj  Makefile App.ls  ${API_OBJS}
+a.hrb         : a.obj         Makefile App.ls  ${API_OBJS}
+hello3.hrb    : hello3.obj    Makefile App.ls  ${API_OBJS}
+bug1.hrb      : bug1.obj      Makefile App.ls  ${API_OBJS}
+bug2.hrb      : bug2.obj      Makefile App.ls  ${API_OBJS}
+bug3.hrb      : bug3.obj      Makefile App.ls  ${API_OBJS}
+hello4.hrb    : hello4.obj    Makefile App.ls  ${API_OBJS}
+hello5.hrb    : hello5.obj    Makefile App.ls  ${API_OBJS}
+winhello.hrb  : winhello.obj  Makefile App.ls  ${API_OBJS}
