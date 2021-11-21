@@ -41,3 +41,41 @@ api_openwin:    # int api_openwin(char *buf, int xsiz, int ysiz,
     POPL    %ESI
     POPL    %EDI
     RET
+
+api_putstrwin:
+    PUSHL   %EDI
+    PUSHL   %ESI
+    PUSHL   %EBP
+    PUSHL   %EBX
+    MOVL    $6,     %EDX
+    MOVL    20(%ESP),   %EBX    # win
+    MOVL    24(%ESP),   %ESI    # x
+    MOVL    28(%ESP),   %EDI    # y
+    MOVL    32(%ESP),   %EAX    # col
+    MOVL    36(%ESP),   %ECX    # len
+    MOVL    40(%ESP),   %EBP    # str
+    INT     $0x40
+    POPL    %EBX
+    POPL    %EBP
+    POPL    %ESI
+    POPL    %EDI
+    RET
+
+api_boxfillwin:
+    PUSHL   %EDI
+    PUSHL   %ESI
+    PUSHL   %EBP
+    PUSHL   %EBX
+    MOVL    $7,     %EDX
+    MOVL    20(%ESP),   %EBX    # win
+    MOVL    24(%ESP),   %EAX    # x0
+    MOVL    28(%ESP),   %ECX    # y0
+    MOVL    32(%ESP),   %ESI    # x1
+    MOVL    36(%ESP),   %EDI    # y1
+    MOVL    40(%ESP),   %EBP    # col
+    INT     $0x40
+    POPL    %EBX
+    POPL    %EBP
+    POPL    %ESI
+    POPL    %EDI
+    RET
