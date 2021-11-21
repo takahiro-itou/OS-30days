@@ -1,6 +1,10 @@
 
 .code32
+.globl      HariMain
 
+.text
+
+HariMain:
     MOVL    $msg,   %ECX
     MOVL    $1,     %EDX
 putloop:
