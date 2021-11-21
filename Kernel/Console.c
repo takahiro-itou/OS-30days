@@ -153,7 +153,7 @@ void cons_newline(struct CONSOLE *cons)
 {
     int x, y;
     struct SHEET *sheet = cons->sht;
-    if (cons->cur_y < CONSOLE_SIZE_Y) {
+    if (cons->cur_y < CONSOLE_SIZE_Y - CURSOR_HEIGHT) {
         cons->cur_y += CURSOR_HEIGHT;       /*  次の行へ。  */
     } else {
         /*  スクロール  */
