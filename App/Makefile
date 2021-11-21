@@ -5,7 +5,7 @@
 
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        bug1.hrb bug2.hrb bug3.hrb hello4.hrb    \
-                       hello5.hrb winhelo.hrb
+                       hello5.hrb winhelo.hrb winhelo2.hrb
 API_OBJS            =  a_as.obj
 
 ##
@@ -82,3 +82,4 @@ bug3.hrb      : bug3.obj      Makefile App.ls  ${API_OBJS}
 hello4.hrb    : hello4.obj    Makefile App.ls  ${API_OBJS}
 hello5.hrb    : hello5.obj    Makefile App.ls  ${API_OBJS}
 winhelo.hrb   : winhelo.obj   Makefile App.ls  ${API_OBJS}
+winhelo2.hrb  : winhelo2.obj  Makefile App.ls  ${API_OBJS}

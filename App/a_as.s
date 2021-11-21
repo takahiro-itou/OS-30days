@@ -4,6 +4,8 @@
 .globl      api_putstr0
 .globl      api_end
 .globl      api_openwin
+.globl      api_putstrwin
+.globl      api_boxfilwin
 
 .text
 
@@ -61,7 +63,7 @@ api_putstrwin:
     POPL    %EDI
     RET
 
-api_boxfillwin:
+api_boxfilwin:
     PUSHL   %EDI
     PUSHL   %ESI
     PUSHL   %EBP
