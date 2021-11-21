@@ -356,3 +356,10 @@ int *inthandler0d(int *esp)
     return &(task->tss.esp0);   /*  異常終了させる  */
 }
 
+int *inthandler0c(int *esp)
+{
+    struct CONSOLE *cons = (struct CONSOLE *) *((int *) 0x0fec);
+    struct TASK *task = task_now();
+    cons_putstr0(cons, "\nINT 0C :\n Stack Exception.\n");
+    return &(task->tss.esp0);   /*  異常終了させる  */
+}

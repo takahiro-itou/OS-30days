@@ -12,13 +12,14 @@
 .globl      asm_inthandler21
 .globl      asm_inthandler27
 .globl      asm_inthandler2c
+.globl      asm_inthandler0c
 .globl      asm_inthandler0d
 .globl      memtest_sub
 .globl      farjmp
 .globl      farcall
 .globl      asm_hrb_api, start_app
 .extern     inthandler20, inthandler21, inthandler27, inthandler2c
-.extern     inthandler0d
+.extern     inthandler0c, inthandler0d
 .extern     hrb_api
 
 .text
@@ -179,6 +180,26 @@ asm_inthandler2c:
     POP     %ES
     IRET
 
+
+asm_inthandler0c:
+    STI
+    PUSH    %ES
+    PUSH    %DS
+    PUSHA
+    MOVL    %ESP,   %EAX
+    PUSHL   %EAX
+    MOVW    %SS,    %AX
+    MOVW    %AX,    %DS
+    MOVW    %AX,    %ES
+    CALL    inthandler0c
+    CMPL    $0,     %EAX
+    JNE     end_app
+    POPL    %EAX
+    POPA
+    POP     %DS
+    POP     %ES
+    ADDL    $4,     %ESP    #  INT 0x0c でもこれが必要
+    IRET
 
 asm_inthandler0d:
     STI
