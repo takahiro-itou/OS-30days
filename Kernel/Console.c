@@ -352,7 +352,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct CONSOLE *cons = (struct CONSOLE *) *((int *) 0x0fec);
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
     struct SHEET *sht;
-    int *reg = &eax + 1;
+    volatile int *reg = &eax + 1;
 
     if (edx == 1) {
         cons_putchar(cons, eax & 0xff, 1);
