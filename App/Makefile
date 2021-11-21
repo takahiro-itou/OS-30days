@@ -4,7 +4,7 @@
 ##
 
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
-                       bug1.hrb bug2.hrb
+                       bug1.hrb bug2.hrb bug3.hrb
 API_OBJS            =  a_as.obj
 
 ##
@@ -80,3 +80,4 @@ a.hrb       : a.obj       Makefile App.ls  ${API_OBJS}
 hello3.hrb  : hello3.obj  Makefile App.ls  ${API_OBJS}
 bug1.hrb    : bug1.obj    Makefile App.ls  ${API_OBJS}
 bug2.hrb    : bug2.obj    Makefile App.ls  ${API_OBJS}
+bug3.hrb    : bug3.obj    Makefile App.ls  ${API_OBJS}
