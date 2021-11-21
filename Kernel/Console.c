@@ -4,16 +4,6 @@
 #include "../Common/stdio.h"
 #include "../Common/string.h"
 
-#define CURSOR_WIDTH    8
-#define CURSOR_HEIGHT   16
-#define CURSOR_LEFT     8
-#define CURSOR_TOP      28
-
-#define CONSOLE_COLS    30
-#define CONSOLE_ROWS    8
-
-#define CONSOLE_SIZE_X  (CONSOLE_COLS * CURSOR_WIDTH + CURSOR_LEFT)
-#define CONSOLE_SIZE_Y  (CONSOLE_ROWS * CURSOR_HEIGHT + CURSOR_TOP)
 
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
