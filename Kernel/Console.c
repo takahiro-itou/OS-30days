@@ -4,6 +4,17 @@
 #include "../Common/stdio.h"
 #include "../Common/string.h"
 
+#define CURSOR_WIDTH    8
+#define CURSOR_HEIGHT   16
+#define CURSOR_LEFT     8
+#define CURSOR_TOP      28
+
+#define CONSOLE_COLS    30
+#define CONSOLE_ROWS    8
+
+#define CONSOLE_SIZE_X  (CONSOLE_COLS * CURSOR_WIDTH + CURSOR_LEFT)
+#define CONSOLE_SIZE_Y  (CONSOLE_ROWS * CURSOR_HEIGHT + CURSOR_TOP)
+
 void console_task(struct SHEET *sheet, unsigned int memtotal)
 {
     struct TIMER *timer;
@@ -18,8 +29,8 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
 
     cons.sht = sheet;
-    cons.cur_x =  8;
-    cons.cur_y = 28;
+    cons.cur_x = CURSOR_LEFT;
+    cons.cur_y = CURSOR_TOP;
     cons.cur_c = -1;
     *((int *) 0x0fec) = (int) &cons;
 
@@ -61,7 +72,8 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
             if (i == 3) {       /*  カーソル OFF    */
                 boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
                          cons.cur_x, cons.cur_y,
-                         cons.cur_x + 7, cons.cur_y + 15);
+                         cons.cur_x + CURSOR_WIDTH  - 1,
+                         cons.cur_y + CURSOR_HEIGHT - 1);
                 cons.cur_c = -1;
             }
             if (256 <= i && i <= 511) {
@@ -70,20 +82,20 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     /*  バックスペース  */
                     if (cons.cur_x > 16) {
                         cons_putchar(&cons, ' ', 0);
-                        cons.cur_x -= 8;
+                        cons.cur_x -= CURSOR_WIDTH;
                     }
                 } else if (i == 10 + 256) {
                     /*  Enter.  */
                     /*  カーソルをスペースで消してから改行する  */
                     cons_putchar(&cons, ' ', 0);
-                    cmdline[cons.cur_x / 8 - 2] = 0;
+                    cmdline[cons.cur_x / CURSOR_WIDTH - 2] = 0;
                     cons_newline(&cons);
                     cons_runcmd(cmdline, &cons, fat, memtotal);
                     /*  プロンプト表示  */
                     cons_putchar(&cons, '>', 1);
                 } else {
-                    if (cons.cur_x < 240) {
-                        cmdline[cons.cur_x / 8 - 2] = i - 256;
+                    if (cons.cur_x < CONSOLE_SIZE_X - CURSOR_WIDTH) {
+                        cmdline[cons.cur_x / CURSOR_WIDTH - 2] = i - 256;
                         cons_putchar(&cons, i - 256, i);
                     }
                 }
@@ -92,10 +104,12 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
             if (cons.cur_c >= 0) {
                 boxfill8(sheet->buf, sheet->bxsize, cons.cur_c,
                          cons.cur_x, cons.cur_y,
-                         cons.cur_x + 7, cons.cur_y + 15);
+                         cons.cur_x + CURSOR_WIDTH  - 1,
+                         cons.cur_y + CURSOR_HEIGHT - 1);
             }
             sheet_refresh(sheet, cons.cur_x, cons.cur_y,
-                          cons.cur_x + 8, cons.cur_y + 16);
+                          cons.cur_x + CURSOR_WIDTH,
+                          cons.cur_y + CURSOR_HEIGHT);
         }
     }
 }
@@ -109,11 +123,11 @@ void cons_putchar(struct CONSOLE *cons, int chr, char move)
         for (;;) {
             putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
                               COL8_FFFFFF, COL8_000000, " ", 1);
-            cons->cur_x += 8;
-            if (cons->cur_x == 8 + 240) {
+            cons->cur_x += CURSOR_WIDTH;
+            if (cons->cur_x == CONSOLE_SIZE_X) {
                 cons_newline(cons);
             }
-            if (((cons->cur_x - 8) & 0x1f) == 0) {
+            if (((cons->cur_x - CURSOR_WIDTH) & 0x1f) == 0) {
                 break;
             }
         }
@@ -125,8 +139,8 @@ void cons_putchar(struct CONSOLE *cons, int chr, char move)
         putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
                           COL8_FFFFFF, COL8_000000, s, 1);
         if (move != 0) {
-            cons->cur_x += 8;
-            if (cons->cur_x == 8 + 240) {
+            cons->cur_x += CURSOR_WIDTH;
+            if (cons->cur_x == CONSOLE_SIZE_X) {
                 cons_newline(cons);
             }
         }
@@ -139,21 +153,23 @@ void cons_newline(struct CONSOLE *cons)
 {
     int x, y;
     struct SHEET *sheet = cons->sht;
-    if (cons->cur_y < 28 + 112) {
-        cons->cur_y += 16;      /*  次の行へ。  */
+    if (cons->cur_y < CONSOLE_SIZE_Y) {
+        cons->cur_y += CURSOR_HEIGHT;       /*  次の行へ。  */
     } else {
         /*  スクロール  */
-        for (y = 28; y < 28 + 112; ++ y) {
-            for (x = 8; x < 8 + 240; ++ x){
+        for (y = CURSOR_TOP; y < CONSOLE_SIZE_Y - CURSOR_HEIGHT; ++ y) {
+            for (x = CURSOR_LEFT; x < CONSOLE_SIZE_X; ++ x){
                 sheet->buf[x + y * sheet->bxsize] =
-                        sheet->buf[x + (y + 16) * sheet->bxsize];
+                        sheet->buf[x + (y + CURSOR_HEIGHT) * sheet->bxsize];
             }
         }
         boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
-                 8, 28 + 112, 8 + 240 - 1, 28 + 128 - 1);
-        sheet_refresh(sheet, 8, 28, 8 + 240, 28 + 128);
+                 CURSOR_LEFT, CONSOLE_SIZE_Y - CURSOR_HEIGHT,
+                 CONSOLE_SIZE_X - 1, CONSOLE_SIZE_Y - 1);
+        sheet_refresh(sheet, CURSOR_LEFT, CURSOR_TOP,
+                      CONSOLE_SIZE_X, CONSOLE_SIZE_Y);
     }
-    cons->cur_x = 8;
+    cons->cur_x = CURSOR_LEFT;
     return;
 }
 
@@ -210,9 +226,11 @@ void cmd_cls(struct CONSOLE *cons)
     struct SHEET *sheet = cons->sht;
 
     boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
-             8, 28, 8 + 240 - 1, 28 + 128 - 1);
-    sheet_refresh(sheet, 8, 28, 8 + 240, 28 + 128);
-    cons->cur_y = 28;
+             CURSOR_LEFT, CURSOR_TOP,
+             CONSOLE_SIZE_X - 1, CONSOLE_SIZE_Y - 1);
+    sheet_refresh(sheet, CURSOR_LEFT, CURSOR_TOP,
+                  CONSOLE_SIZE_X, CONSOLE_SIZE_Y);
+    cons->cur_y = CURSOR_TOP;
     return;
 }
 
