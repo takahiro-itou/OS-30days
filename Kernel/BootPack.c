@@ -284,7 +284,7 @@ void HariMain(void)
                     cons = (struct CONSOLE *) *((int *) 0x0fec);
                     cons_putstr0(cons, "\nBreak(key) :\n");
                     io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
-                    task_cons->tss.eax = (int) &(task->tss.esp0);
+                    task_cons->tss.eax = (int) &(task_cons->tss.esp0);
                     task_cons->tss.eip = (int) asm_end_app;
                     io_sti();
                 }
