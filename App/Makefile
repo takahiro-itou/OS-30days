@@ -3,9 +3,7 @@
 ##    List of Files.
 ##
 
-APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
-                       crack1.hrb crack2.hrb crack3.hrb         \
-                       crack4.hrb crack5.hrb
+APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb
 API_OBJS            =  a_as.obj
 
 ##
@@ -56,18 +54,6 @@ hello.hrb   : hello.obj  Makefile Raw.ls
 hello2.hrb  : hello2.obj  Makefile Raw.ls
 	${LD}  -T Raw.ls  -o $@  $<
 
-crack2.hrb  : crack2.obj  Makefile Raw.ls
-	${LD}  -T Raw.ls  -o $@  $<
-
-crack3.hrb  : crack3.obj  Makefile Raw.ls
-	${LD}  -T Raw.ls  -o $@  $<
-
-crack4.hrb  : crack4.obj  Makefile Raw.ls
-	${LD}  -T Raw.ls  -o $@  $<
-
-crack5.hrb  : crack5.obj  Makefile Raw.ls
-	${LD}  -T Raw.ls  -o $@  $<
-
 ##
 ##    Suffix Rules.
 ##
@@ -91,4 +77,3 @@ crack5.hrb  : crack5.obj  Makefile Raw.ls
 
 a.hrb       : a.obj       Makefile App.ls  ${API_OBJS}
 hello3.hrb  : hello3.obj  Makefile App.ls  ${API_OBJS}
-crack1.hrb  : crack1.obj  Makefile App.ls  ${API_OBJS}
