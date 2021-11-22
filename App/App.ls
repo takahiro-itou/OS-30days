@@ -6,7 +6,9 @@ ENTRY(HariMain)
 
 CODE_SEGMENT_BASE   = 0x00000000;
 DATA_SEGMENT_BASE   = 0x00004000;
-DATA_SEGMENT_SIZE   = 65536;
+SIZE_FOR_MALLOC     = 0x00008000;
+BASE_FOR_MALLOC     = 0x00008000;
+DATA_SEGMENT_SIZE   = (BASE_FOR_MALLOC + SIZE_FOR_MALLOC);
 
 MEMORY {
     ROM(rx)  : ORIGIN = CODE_SEGMENT_BASE, LENGTH = 16K
@@ -24,7 +26,7 @@ SECTIONS {
         LONG(_OFFSET_DATA);
         LONG(0xe9000000);
         LONG(HariMain - . - 4);
-        LONG(0x00000000);
+        LONG(BASE_FOR_MALLOC);
     } > ROM
 
     .text       : {
@@ -46,6 +48,13 @@ SECTIONS {
         *(.rodata);
         *(.rodata.*);
         . = ALIGN(16);
+    } > RAM  AT > ROM
+
+    .bss       . : {
+        *(.bss);
+        *(.bss.*);
+        . = ALIGN(16);
+        LONG(0);
         _END_DATA   = .;
     } > RAM  AT > ROM
 
