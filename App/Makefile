@@ -16,7 +16,7 @@ AS      =  /usr/bin/as
 CAT     =  /bin/cat
 CP      =  /bin/cp
 DD      =  /bin/dd
-LD      =  /usr/bin/ld
+OBJ2HRB =  ../Tools/obj2hrb
 
 ##
 ##    Targets.
@@ -35,6 +35,7 @@ cleanall :  clean
 cleanobj :
 	${RM}  -f                           \
         ${APPLICATIONS:%.hrb=%.obj}     \
+        ${APPLICATIONS:%.hrb=%.ls}      \
         ${API_OBJS}                     \
         *.lst  *.map
 
@@ -46,6 +47,10 @@ ASFLAGS     =  -march=i386  --32
 CFLAGS      =  -march=i386  -m32  -fno-pie  -nostdlib  -O2
 CCVERBOSE   =
 
+MALLOC_SIZE     = 0x00010000
+STACK_SIZE      = 0x00004000
+DATSEG_SIZE     = 0x00004000
+
 ##
 ##    Build.
 ##
@@ -55,7 +60,7 @@ CCVERBOSE   =
 ##
 
 .obj.hrb    :
-	${LD}  -T App.ls  -o $@  -Map=${@:%.hrb=%.map}  $<  ${API_OBJS}
+	${OBJ2HRB}  $@  ${MALLOC_SIZE} ${STACK_SIZE} ${DATSEG_SIZE}  $^
 
 .s.obj  :
 	${AS}  -o $@  \
@@ -71,12 +76,12 @@ CCVERBOSE   =
 ##    Dependencies
 ##
 
-hello.hrb     : hello.obj     Makefile App.ls  ${API_OBJS}
-hello2.hrb    : hello2.obj    Makefile App.ls  ${API_OBJS}
+hello.hrb     : hello.obj     ${API_OBJS}
+hello2.hrb    : hello2.obj    ${API_OBJS}
 
-a.hrb         : a.obj         Makefile App.ls  ${API_OBJS}
-hello3.hrb    : hello3.obj    Makefile App.ls  ${API_OBJS}
-hello4.hrb    : hello4.obj    Makefile App.ls  ${API_OBJS}
-hello5.hrb    : hello5.obj    Makefile App.ls  ${API_OBJS}
-winhelo.hrb   : winhelo.obj   Makefile App.ls  ${API_OBJS}
-winhelo2.hrb  : winhelo2.obj  Makefile App.ls  ${API_OBJS}
+a.hrb         : a.obj         ${API_OBJS}
+hello3.hrb    : hello3.obj    ${API_OBJS}
+hello4.hrb    : hello4.obj    ${API_OBJS}
+hello5.hrb    : hello5.obj    ${API_OBJS}
+winhelo.hrb   : winhelo.obj   ${API_OBJS}
+winhelo2.hrb  : winhelo2.obj  ${API_OBJS}
