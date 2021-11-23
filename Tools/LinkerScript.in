@@ -53,6 +53,7 @@ SECTIONS {
     .bss       . : {
         *(.bss);
         *(.bss.*);
+        *(COMMON);
         . = ALIGN(16);
         LONG(0);
         _END_DATA   = .;
