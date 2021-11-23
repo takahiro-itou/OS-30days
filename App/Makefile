@@ -5,18 +5,18 @@
 
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        hello4.hrb hello5.hrb winhelo.hrb        \
-                       winhelo2.hrb
+                       winhelo2.hrb winhelo3.hrb
 API_OBJS            =  a_as.obj
 
 ##
 ##    Commands.
 ##
 
-AS      =  /usr/bin/as
-CAT     =  /bin/cat
-CP      =  /bin/cp
-DD      =  /bin/dd
-OBJ2HRB =  ../Tools/obj2hrb
+AS          =  /usr/bin/as
+CAT         =  /bin/cat
+CP          =  /bin/cp
+DD          =  /bin/dd
+OBJ2HRB     =  ../Tools/obj2hrb
 
 ##
 ##    Targets.
@@ -43,9 +43,9 @@ cleanobj :
 ##    Compile and Link Flags.
 ##
 
-ASFLAGS     =  -march=i386  --32
-CFLAGS      =  -march=i386  -m32  -fno-pie  -nostdlib  -O2
-CCVERBOSE   =
+ASFLAGS         =  -march=i386  --32
+CFLAGS          =  -march=i386  -m32  -fno-pie  -nostdlib  -O2
+CCVERBOSE       =
 
 MALLOC_SIZE     = 0x00010000
 STACK_SIZE      = 0x00004000
@@ -85,3 +85,4 @@ hello4.hrb    : hello4.obj    ${API_OBJS}
 hello5.hrb    : hello5.obj    ${API_OBJS}
 winhelo.hrb   : winhelo.obj   ${API_OBJS}
 winhelo2.hrb  : winhelo2.obj  ${API_OBJS}
+winhelo3.hrb  : winhelo3.obj  ${API_OBJS}

@@ -16,11 +16,12 @@ KERNEL_IMAGE        =  haribote.sys
 ##    Commands.
 ##
 
-AS      =  /usr/bin/as
-CAT     =  /bin/cat
-CP      =  /bin/cp
-DD      =  /bin/dd
-LD      =  /usr/bin/ld
+AS          =  /usr/bin/as
+CAT         =  /bin/cat
+CP          =  /bin/cp
+DD          =  /bin/dd
+LD          =  /usr/bin/ld
+OBJ2HRB     =  ../Tools/obj2hrb
 
 ##
 ##    Targets.
