@@ -1,0 +1,57 @@
+#!/bin/bash  -xue
+
+script_dir=$(dirname $0)
+linker_script_template=${script_dir}/LinkerScript.in
+
+if [[ $# -lt 1 ]] ; then
+    exit 2
+fi
+
+hrb_name=$1
+shift 1
+
+if [[ $# -ge 1 && "$1" != '--' ]] ; then
+    malloc_size=$1
+    shift 1
+else
+    malloc_size='0x00000000'
+fi
+
+if [[ $# -ge 1 && "$1" != '--' ]] ; then
+    stack_size=$1
+    shift 1
+else
+    stack_size='0x00004000'
+fi
+
+if [[ $# -ge 1 && "$1" != '--' ]] ; then
+    datas_size=$1
+    shift 1
+else
+    datas_size='0x00004000'
+fi
+
+if [[ $# -ge 1 && "$1" = '--' ]] ; then
+    shift 1
+fi
+
+malloc_size=$(( malloc_size ))
+
+if [[ ${malloc_size} -gt 0 ]] ; then
+    malloc_size=$(( malloc_size + 32768 ))
+    malloc_base=$(( ( datas_size + 4096 ) & ~4096 ))
+    datseg_size='(BASE_FOR_MALLOC + SIZE_FOR_MALLOC)'
+else
+    malloc_size=0x00000000;
+    malloc_base=0x00000000;
+    datseg_size=$(( stack_size + datas_size ))
+fi
+
+linker_script=${hrb_name%.*}.ls
+sed -e "s/@__DATSEG_BASE__@/${stack_size}/g"     \
+    -e "s/@__MALLOC_SIZE__@/${malloc_size}/g"    \
+    -e "s/@__MALLOC_BASE__@/${malloc_base}/g"    \
+    -e "s/@__DATSEG_SIZE__@/${datseg_size}/g"    \
+    ${linker_script_template} > ${linker_script}
+
+/usr/bin/ld  -T ${linker_script} -o ${hrb_name}  "$@"
