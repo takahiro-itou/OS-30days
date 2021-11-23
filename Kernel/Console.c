@@ -379,6 +379,10 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
         sht = (struct SHEET *) ebx;
         boxfill8(sht->buf, sht->bxsize, ebp, eax, ecx, esi, edi);
         sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
+    } else if (edx == 8) {
+        memman_init((struct MEMMAN *) (ebx + ds_base));
+        ecx &= 0xfffffff0;
+        memman_free((struct MEMMAN *) (ebx + ds_base), eax, ecx);
     }
     return 0;
 }
