@@ -6,6 +6,9 @@
 .globl      api_openwin
 .globl      api_putstrwin
 .globl      api_boxfilwin
+.globl      api_initmalloc
+.globl      api_malloc
+.globl      api_free
 
 .text
 
@@ -80,4 +83,16 @@ api_boxfilwin:
     POPL    %EBP
     POPL    %ESI
     POPL    %EDI
+    RET
+
+api_initmalloc:
+    PUSHL   %EBX
+    MOVL    $8,     %EDX
+    MOVL    %CS:(0x0020),   %EBX
+    MOVL    %EBX,   %EAX
+    ADDL    $32*1024,   %EAX
+    MOVL    %CS:(0x0000),   %ECX
+    SUBL    %EAX,   %ECX
+    INT     $0x40
+    POPL    %EBX
     RET
