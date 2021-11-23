@@ -11,6 +11,7 @@ syntax: regexp
 .*\.map
 .*\.obj
 .*\.sys
+^App/.*\.ls
 
 ^Kernel/FontHankaku.c
 

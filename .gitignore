@@ -8,4 +8,5 @@
 *.map
 *.obj
 *.sys
+/App/*.ls
 
