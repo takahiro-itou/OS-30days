@@ -386,6 +386,9 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     } else if (edx == 9) {
         ecx = (ecx + 0x0f) & 0xfffffff0;
         reg[7] = memman_alloc((struct MEMMAN *) (ebx + ds_base), ecx);
+    } else if (edx == 10) {
+        ecx = (ecx + 0x0f) & 0xfffffff0;
+        memman_free((struct MEMMAN *) (ebx + ds_base), eax, ecx);
     }
     return 0;
 }
