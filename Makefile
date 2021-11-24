@@ -64,6 +64,7 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
 	mcopy  -i $@  App/hello.hrb App/hello2.hrb App/a.hrb        \
             App/hello3.hrb App/hello4.hrb App/hello5.hrb        \
             App/winhelo.hrb App/winhelo2.hrb App/winhelo3.hrb   \
+            App/star1.hrb                                       \
             ::
 
 ##

@@ -5,7 +5,8 @@
 
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        hello4.hrb hello5.hrb winhelo.hrb        \
-                       winhelo2.hrb winhelo3.hrb
+                       winhelo2.hrb winhelo3.hrb star1.hrb
+
 API_OBJS            =  a_as.obj
 
 ##
@@ -86,3 +87,4 @@ hello5.hrb    : hello5.obj    ${API_OBJS}
 winhelo.hrb   : winhelo.obj   ${API_OBJS}
 winhelo2.hrb  : winhelo2.obj  ${API_OBJS}
 winhelo3.hrb  : winhelo3.obj  ${API_OBJS}
+star1.hrb     : star1.obj     ${API_OBJS}
