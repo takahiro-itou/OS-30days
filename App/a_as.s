@@ -9,6 +9,7 @@
 .globl      api_initmalloc
 .globl      api_malloc
 .globl      api_free
+.global     api_point
 
 .text
 
@@ -114,4 +115,19 @@ api_free:
     MOVL    12(%ESP),   %ECX
     INT     $0x40
     POPL    %EBX
+    RET
+
+api_point:
+    PUSHL   %EDI
+    PUSHL   %ESI
+    PUSHL   %EBX
+    MOVL    $11,    %EDX
+    MOVL    16(%ESP),   %EBX    # win
+    MOVL    20(%ESP),   %ESI    # x
+    MOVL    24(%ESP),   %EDI    # y
+    MOVL    28(%ESP),   %EAX    # col
+    INT     $0x40
+    POPL    %EBX
+    POPL    %ESI
+    POPL    %EDI
     RET
