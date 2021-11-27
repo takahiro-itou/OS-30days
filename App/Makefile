@@ -6,7 +6,8 @@
 APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        hello4.hrb hello5.hrb winhelo.hrb        \
                        winhelo2.hrb winhelo3.hrb star1.hrb      \
-                       stars.hrb stars2.hrb lines.hrb
+                       stars.hrb stars2.hrb lines.hrb           \
+                       walk.hrb                                 \
 
 API_OBJS            =  a_as.obj
 
@@ -92,3 +93,4 @@ star1.hrb     : star1.obj     ${API_OBJS}
 stars.hrb     : stars.obj     ${API_OBJS}  ../Common/stdlib.obj
 stars2.hrb    : stars2.obj    ${API_OBJS}  ../Common/stdlib.obj
 lines.hrb     : lines.obj     ${API_OBJS}
+walk.hrb      : walk.obj      ${API_OBJS}
