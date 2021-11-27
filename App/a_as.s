@@ -13,6 +13,7 @@
 .globl      api_refreshwin
 .globl      api_linewin
 .globl      api_closewin
+.globl      api_getkey
 
 .text
 
@@ -176,4 +177,10 @@ api_closewin:
     MOVL    8(%ESP),    %EBX    # win
     INT     $0x40
     POPL    %EBX
+    RET
+
+api_getkey:
+    MOVL    $15,    %EDX
+    MOVL    4(%ESP),    %EAX    # mode
+    INT     $0x40
     RET
