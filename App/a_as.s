@@ -12,6 +12,7 @@
 .globl      api_point
 .globl      api_refreshwin
 .globl      api_linewin
+.globl      api_closewin
 
 .text
 
@@ -167,4 +168,12 @@ api_linewin:
     POPL    %EBP
     POPL    %ESI
     POPL    %EDI
+    RET
+
+api_closewin:
+    PUSHL   %EBX
+    MOVL    $14,    %EDX
+    MOVL    8(%ESP),    %EBX    # win
+    INT     $0x40
+    POPL    %EBX
     RET
