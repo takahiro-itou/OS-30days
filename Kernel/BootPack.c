@@ -62,6 +62,8 @@ void HariMain(void)
     int key_leds = (binfo->leds >> 4) & 7;
     int keycmd_wait = -1;
     struct CONSOLE *cons;
+    int j, x, y;
+    struct SHEET *sht;
 
     init_gdtidt();
     init_pic();
@@ -335,8 +337,24 @@ void HariMain(void)
 
                     sheet_slide(sht_mouse, mx, my);
                     if ((mdec.btn & 0x01) != 0) {
-                        /*  左ボタンを押していたら、sht_win を動かす。  */
-                        sheet_slide(sht_win, mx - 80, my - 8);
+                        /*  左ボタンを押している。  */
+                        /*  上の下じきから順番にマウスが
+                        指している下じきを探す。    */
+                        for (j = shtctl->top - 1; j > 0; -- j) {
+                            sht = shtctl->sheets[j];
+                            x = mx - sht->vx0;
+                            y = my - sht->vy0;
+                            if (0 <= x && x < sht->bxsize && 0 <= y
+                                    && y < sht->bysize)
+                            {
+                                if (sht->buf[y * sht->bxsize + x]
+                                        != sht->col_inv)
+                                {
+                                    sheet_updown(sht, shtctl->top - 1);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
