@@ -16,6 +16,7 @@ struct BOOTINFO
 
 
 struct KERNELWORK {
+    int cursor_c;       /*  カーソルの色。  */
     int mx, my;         /*  マウスカーソルの座標。  */
     int mmx, mmy;       /*  マウスカーソル移動量。  */
     struct SHEET * selsht;      /*  選択中のシート  */

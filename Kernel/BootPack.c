@@ -21,7 +21,7 @@ void HariMain(void)
     char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
     int fifobuf[128], keycmd_buf[32];
-    int i, cursor_x, cursor_c;
+    int i, cursor_x;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
@@ -137,7 +137,7 @@ void HariMain(void)
     make_window8(buf_win, 144, 52, "task_a", 1);
     make_textbox8(sht_win, 8, 28, 128, 16, COL8_FFFFFF);
     cursor_x = 8;
-    cursor_c = COL8_FFFFFF;
+    kw.cursor_c = COL8_FFFFFF;
 
     timer = timer_alloc();
     timer_init(timer, &fifo, 1);
@@ -252,7 +252,7 @@ void HariMain(void)
                         key_to = 1;
                         make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  0);
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
-                        cursor_c = -1;      /*  カーソルを消す  */
+                        kw.cursor_c = -1;       /*  カーソルを消す  */
                         boxfill8(sht_win->buf, sht_win->bxsize, COL8_FFFFFF,
                                  cursor_x, 28, cursor_x + 7, 43);
                         /*  コンソールのカーソルON  */
@@ -261,7 +261,7 @@ void HariMain(void)
                         key_to = 0;
                         make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  1);
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 0);
-                        cursor_c = COL8_000000;     /*  カーソルを出す  */
+                        kw.cursor_c = COL8_000000;      /*  カーソルを出す  */
                         /*  コンソールのカーソル OFF    */
                         fifo32_put(&task_cons->fifo, 3);
                     }
@@ -320,8 +320,8 @@ void HariMain(void)
                     io_out8(PORT_KEYDAT, keycmd_wait);
                 }
                 /*  カーソルの再表示。  */
-                if (cursor_c >= 0) {
-                    boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
+                if (kw.cursor_c >= 0) {
+                    boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
                              cursor_x, 28, cursor_x + 7, 43);
                 }
                 sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
@@ -333,18 +333,18 @@ void HariMain(void)
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
                 if (i != 0) {
                     timer_init(timer, &fifo, 0);
-                    if (cursor_c >= 0) {
-                        cursor_c = COL8_000000;
+                    if (kw.cursor_c >= 0) {
+                        kw.cursor_c = COL8_000000;
                     }
                 } else {
                     timer_init(timer, &fifo, 1);
-                    if (cursor_c >= 0) {
-                        cursor_c = COL8_FFFFFF;
+                    if (kw.cursor_c >= 0) {
+                        kw.cursor_c = COL8_FFFFFF;
                     }
                 }
                 timer_settime(timer, 50);
-                if (cursor_c >= 0) {
-                    boxfill8(sht_win->buf, sht_win->bxsize, cursor_c,
+                if (kw.cursor_c >= 0) {
+                    boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
                              cursor_x, 28, cursor_x + 7, 43);
                     sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
                 }
