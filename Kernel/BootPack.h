@@ -29,7 +29,8 @@ struct MAIN_VARS {
     struct BOOTINFO *binfo;
     struct TASK *task_cons;
     struct SHTCTL *shtctl;
-    struct SHEET *sht_mouse;
+    unsigned char *buf_win, *buf_cons;
+    struct SHEET *sht_mouse, *sht_win, *sht_cons;
 };
 
 /*  BootPack.c  */
