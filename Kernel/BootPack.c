@@ -6,6 +6,11 @@
 #define KEYCMD_LED      0xed
 
 
+void process_mouse_data(
+        struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
+        struct BOOTINFO *binfo, struct SHTCTL *shtctl,
+        struct SHEET *sht_mouse);
+
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(ADR_BOOTINFO);
@@ -64,7 +69,6 @@ void HariMain(void)
     int key_leds = (binfo->leds >> 4) & 7;
     int keycmd_wait = -1;
     struct CONSOLE *cons;
-    int j, x, y;
     kw.selsht = 0;
 
     init_gdtidt();
@@ -323,62 +327,7 @@ void HariMain(void)
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
-                    /*  マウスカーソルの移動。  */
-                    kw.mx += mdec.x;
-                    kw.my += mdec.y;
-                    if (kw.mx < 0) {
-                        kw.mx = 0;
-                    }
-                    if (kw.my < 0) {
-                        kw.my = 0;
-                    }
-                    if (kw.mx > binfo->scrnx - 1) {
-                        kw.mx = binfo->scrnx - 1;
-                    }
-                    if (kw.my > binfo->scrny - 1) {
-                        kw.my = binfo->scrny - 1;
-                    }
-
-                    sheet_slide(sht_mouse, kw.mx, kw.my);
-                    if ((mdec.btn & 0x01) != 0) {
-                        /*  左ボタンを押している。  */
-                        if (kw.mmx < 0) {
-                            /*  通常モードの場合。  */
-                            /*  上の下じきから順番にマウスが
-                            指している下じきを探す。    */
-                            for (j = shtctl->top - 1; j > 0; -- j) {
-                                kw.selsht = shtctl->sheets[j];
-                                x = kw.mx - kw.selsht->vx0;
-                                y = kw.my - kw.selsht->vy0;
-                                if (0 <= x && x < kw.selsht->bxsize && 0 <= y
-                                        && y < kw.selsht->bysize)
-                                {
-                                    if (kw.selsht->buf[y * kw.selsht->bxsize + x]
-                                            != kw.selsht->col_inv)
-                                    {
-                                        sheet_updown(kw.selsht, shtctl->top - 1);
-                                        if (3 <= x && x < kw.selsht->bxsize
-                                                && 3 <= y  && y < 21)
-                                        {
-                                            kw.mmx = kw.mx;
-                                            kw.mmy = kw.my;
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                        } else {
-                            /*  ウィンドウ移動モードの場合  */
-                            x = kw.mx - kw.mmx;
-                            y = kw.my - kw.mmy;
-                            sheet_slide(kw.selsht, kw.selsht->vx0 + x, kw.selsht->vy0 + y);
-                            kw.mmx = kw.mx;
-                            kw.mmy = kw.my;
-                        }
-                    } else {
-                        /*  左ボタンを押していない  */
-                        kw.mmx = -1;    /*  通常モードへ。  */
-                    }
+                    process_mouse_data(&kw, mdec, binfo, shtctl, sht_mouse);
                 }
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
                 if (i != 0) {
@@ -401,4 +350,74 @@ void HariMain(void)
             }
         }
     }
+}
+
+
+void process_mouse_data(
+        struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
+        struct BOOTINFO *binfo, struct SHTCTL *shtctl,
+        struct SHEET *sht_mouse)
+{
+    struct KERNELWORK kw = (* pkw);
+    int j, x, y;
+
+    /*  マウスカーソルの移動。  */
+    kw.mx += mdec.x;
+    kw.my += mdec.y;
+    if (kw.mx < 0) {
+        kw.mx = 0;
+    }
+    if (kw.my < 0) {
+        kw.my = 0;
+    }
+    if (kw.mx > binfo->scrnx - 1) {
+        kw.mx = binfo->scrnx - 1;
+    }
+    if (kw.my > binfo->scrny - 1) {
+        kw.my = binfo->scrny - 1;
+    }
+
+    sheet_slide(sht_mouse, kw.mx, kw.my);
+    if ((mdec.btn & 0x01) != 0) {
+        /*  左ボタンを押している。  */
+        if (kw.mmx < 0) {
+            /*  通常モードの場合。  */
+            /*  上の下じきから順番にマウスが
+            指している下じきを探す。    */
+            for (j = shtctl->top - 1; j > 0; -- j) {
+                kw.selsht = shtctl->sheets[j];
+                x = kw.mx - kw.selsht->vx0;
+                y = kw.my - kw.selsht->vy0;
+                if (0 <= x && x < kw.selsht->bxsize && 0 <= y
+                        && y < kw.selsht->bysize)
+                {
+                    if (kw.selsht->buf[y * kw.selsht->bxsize + x]
+                            != kw.selsht->col_inv)
+                    {
+                        sheet_updown(kw.selsht, shtctl->top - 1);
+                        if (3 <= x && x < kw.selsht->bxsize
+                                && 3 <= y  && y < 21)
+                        {
+                            kw.mmx = kw.mx;
+                            kw.mmy = kw.my;
+                        }
+                        break;
+                    }
+                }
+            }
+        } else {
+            /*  ウィンドウ移動モードの場合  */
+            x = kw.mx - kw.mmx;
+            y = kw.my - kw.mmy;
+            sheet_slide(kw.selsht, kw.selsht->vx0 + x, kw.selsht->vy0 + y);
+            kw.mmx = kw.mx;
+            kw.mmy = kw.my;
+        }
+    } else {
+        /*  左ボタンを押していない  */
+        kw.mmx = -1;    /*  通常モードへ。  */
+    }
+
+    (* pkw) = kw;
+    return;
 }
