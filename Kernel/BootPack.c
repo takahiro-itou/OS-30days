@@ -9,11 +9,13 @@
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(ADR_BOOTINFO);
+    struct KERNELWORK kw;
+
     struct SHTCTL *shtctl;
     char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
     int fifobuf[128], keycmd_buf[32];
-    int mx, my, i, cursor_x, cursor_c;
+    int i, cursor_x, cursor_c;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
@@ -140,13 +142,13 @@ void HariMain(void)
     sht_mouse = sheet_alloc(shtctl);
     sheet_setbuf(sht_mouse, buf_mouse, 16, 16, 99);
     init_mouse_cursor8(buf_mouse, 99);
-    mx = (binfo->scrnx - 16) / 2;
-    my = (binfo->scrny - 28 - 16) / 2;
+    kw.mx = (binfo->scrnx - 16) / 2;
+    kw.my = (binfo->scrny - 28 - 16) / 2;
 
     sheet_slide(sht_back,   0,  0);
     sheet_slide(sht_cons,  32, 44);
     sheet_slide(sht_win,   64, 96);
-    sheet_slide(sht_mouse, mx, my);
+    sheet_slide(sht_mouse, kw.mx, kw.my);
 
     sheet_updown(sht_back,  0);
     sheet_updown(sht_cons,  1);
@@ -320,22 +322,22 @@ void HariMain(void)
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
                     /*  マウスカーソルの移動。  */
-                    mx += mdec.x;
-                    my += mdec.y;
-                    if (mx < 0) {
-                        mx = 0;
+                    kw.mx += mdec.x;
+                    kw.my += mdec.y;
+                    if (kw.mx < 0) {
+                        kw.mx = 0;
                     }
-                    if (my < 0) {
-                        my = 0;
+                    if (kw.my < 0) {
+                        kw.my = 0;
                     }
-                    if (mx > binfo->scrnx - 1) {
-                        mx = binfo->scrnx - 1;
+                    if (kw.mx > binfo->scrnx - 1) {
+                        kw.mx = binfo->scrnx - 1;
                     }
-                    if (my > binfo->scrny - 1) {
-                        my = binfo->scrny - 1;
+                    if (kw.my > binfo->scrny - 1) {
+                        kw.my = binfo->scrny - 1;
                     }
 
-                    sheet_slide(sht_mouse, mx, my);
+                    sheet_slide(sht_mouse, kw.mx, kw.my);
                     if ((mdec.btn & 0x01) != 0) {
                         /*  左ボタンを押している。  */
                         if (mmx < 0) {
@@ -344,8 +346,8 @@ void HariMain(void)
                             指している下じきを探す。    */
                             for (j = shtctl->top - 1; j > 0; -- j) {
                                 sht = shtctl->sheets[j];
-                                x = mx - sht->vx0;
-                                y = my - sht->vy0;
+                                x = kw.mx - sht->vx0;
+                                y = kw.my - sht->vy0;
                                 if (0 <= x && x < sht->bxsize && 0 <= y
                                         && y < sht->bysize)
                                 {
@@ -356,8 +358,8 @@ void HariMain(void)
                                         if (3 <= x && x < sht->bxsize
                                                 && 3 <= y  && y < 21)
                                         {
-                                            mmx = mx;
-                                            mmy = my;
+                                            mmx = kw.mx;
+                                            mmy = kw.my;
                                         }
                                         break;
                                     }
@@ -365,11 +367,11 @@ void HariMain(void)
                             }
                         } else {
                             /*  ウィンドウ移動モードの場合  */
-                            x = mx - mmx;
-                            y = my - mmy;
+                            x = kw.mx - mmx;
+                            y = kw.my - mmy;
                             sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
-                            mmx = mx;
-                            mmy = my;
+                            mmx = kw.mx;
+                            mmy = kw.my;
                         }
                     } else {
                         /*  左ボタンを押していない  */

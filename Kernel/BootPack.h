@@ -15,6 +15,10 @@ struct BOOTINFO
 #define ADR_DISKIMG     0x00100000
 
 
+struct KERNELWORK {
+    int mx, my;     /*  マウスカーソルの座標。  */
+};
+
 /*  BootPack.c  */
 
 struct SHEET;
