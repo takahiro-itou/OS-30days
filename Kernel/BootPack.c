@@ -65,7 +65,7 @@ void HariMain(void)
     int keycmd_wait = -1;
     struct CONSOLE *cons;
     int j, x, y;
-    struct SHEET *sht = 0;
+    kw.selsht = 0;
 
     init_gdtidt();
     init_pic();
@@ -347,17 +347,17 @@ void HariMain(void)
                             /*  上の下じきから順番にマウスが
                             指している下じきを探す。    */
                             for (j = shtctl->top - 1; j > 0; -- j) {
-                                sht = shtctl->sheets[j];
-                                x = kw.mx - sht->vx0;
-                                y = kw.my - sht->vy0;
-                                if (0 <= x && x < sht->bxsize && 0 <= y
-                                        && y < sht->bysize)
+                                kw.selsht = shtctl->sheets[j];
+                                x = kw.mx - kw.selsht->vx0;
+                                y = kw.my - kw.selsht->vy0;
+                                if (0 <= x && x < kw.selsht->bxsize && 0 <= y
+                                        && y < kw.selsht->bysize)
                                 {
-                                    if (sht->buf[y * sht->bxsize + x]
-                                            != sht->col_inv)
+                                    if (kw.selsht->buf[y * kw.selsht->bxsize + x]
+                                            != kw.selsht->col_inv)
                                     {
-                                        sheet_updown(sht, shtctl->top - 1);
-                                        if (3 <= x && x < sht->bxsize
+                                        sheet_updown(kw.selsht, shtctl->top - 1);
+                                        if (3 <= x && x < kw.selsht->bxsize
                                                 && 3 <= y  && y < 21)
                                         {
                                             kw.mmx = kw.mx;
@@ -371,7 +371,7 @@ void HariMain(void)
                             /*  ウィンドウ移動モードの場合  */
                             x = kw.mx - kw.mmx;
                             y = kw.my - kw.mmy;
-                            sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
+                            sheet_slide(kw.selsht, kw.selsht->vx0 + x, kw.selsht->vy0 + y);
                             kw.mmx = kw.mx;
                             kw.mmy = kw.my;
                         }
