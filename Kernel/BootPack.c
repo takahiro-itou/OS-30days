@@ -69,11 +69,12 @@ void HariMain(void)
         0  ,  0 ,  0 , '_',      0 ,  0 ,  0 ,  0,
         0  ,  0 ,  0 ,  0,       0 , '|',  0 ,  0
     };
-    int key_to = 0, key_shift = 0;
-    int key_leds = (binfo->leds >> 4) & 7;
-    int keycmd_wait = -1;
     struct CONSOLE *cons;
+    int key_to = 0, key_shift = 0;
+
     kw.selsht = 0;
+    kw.key_leds = (binfo->leds >> 4) & 7;
+    kw.keycmd_wait = -1;
 
     init_gdtidt();
     init_pic();
@@ -167,7 +168,7 @@ void HariMain(void)
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
-    fifo32_put(&keycmd, key_leds);
+    fifo32_put(&keycmd, kw.key_leds);
 
     for (i = 0; i < sizeof(keyseq); ++ i) {
         keyseq[i] = ' ';
@@ -175,11 +176,11 @@ void HariMain(void)
     keyseq[sizeof(keyseq) - 1] = 0;
 
     for (;;) {
-        if (fifo32_status(&keycmd) > 0 && keycmd_wait < 0) {
+        if (fifo32_status(&keycmd) > 0 && kw.keycmd_wait < 0) {
             /*  キーボードコントローラに送るデータがあれば、送る。  */
-            keycmd_wait = fifo32_get(&keycmd);
+            kw.keycmd_wait = fifo32_get(&keycmd);
             wait_KBC_sendready();
-            io_out8(PORT_KEYDAT, keycmd_wait);
+            io_out8(PORT_KEYDAT, kw.keycmd_wait);
         }
         io_cli();
         if (fifo32_status(&fifo) == 0) {
@@ -214,8 +215,8 @@ void HariMain(void)
                 }
                 if ('A' <= s[0] && s[0] <= 'Z') {
                     /*  入力文字がアルファベット。  */
-                    if ( ((key_leds & 4) == 0 && key_shift == 0) ||
-                            ((key_leds & 4) != 0 && key_shift != 0) )
+                    if ( ((kw.key_leds & 4) == 0 && key_shift == 0) ||
+                            ((kw.key_leds & 4) != 0 && key_shift != 0) )
                     {
                         s[0] += 0x20;
                     }
@@ -285,19 +286,19 @@ void HariMain(void)
                     key_shift &= ~2;
                 }
                 if (i == 256 + 0x3a) {  /*  CapsLock    */
-                    key_leds ^= 4;
+                    kw.key_leds ^= 4;
                     fifo32_put(&keycmd, KEYCMD_LED);
-                    fifo32_put(&keycmd, key_leds);
+                    fifo32_put(&keycmd, kw.key_leds);
                 }
                 if (i == 256 + 0x45) {  /*  NumLock     */
-                    key_leds ^= 2;
+                    kw.key_leds ^= 2;
                     fifo32_put(&keycmd, KEYCMD_LED);
-                    fifo32_put(&keycmd, key_leds);
+                    fifo32_put(&keycmd, kw.key_leds);
                 }
                 if (i == 256 + 0x46) {  /*  ScrollLock  */
-                    key_leds ^= 1;
+                    kw.key_leds ^= 1;
                     fifo32_put(&keycmd, KEYCMD_LED);
-                    fifo32_put(&keycmd, key_leds);
+                    fifo32_put(&keycmd, kw.key_leds);
                 }
                 if (i == 256 + 0x3b && key_shift != 0
                         && task_cons->tss.ss0 != 0)
@@ -315,12 +316,12 @@ void HariMain(void)
                 }
                 if (i == 256 + 0xfa) {
                     /*  キーボードがデータを無事に受け取った。  */
-                    keycmd_wait = -1;
+                    kw.keycmd_wait = -1;
                 }
                 if (i == 256 + 0xfe) {
                     /*  キーボードがデータを無事に受け取れなかった  */
                     wait_KBC_sendready();
-                    io_out8(PORT_KEYDAT, keycmd_wait);
+                    io_out8(PORT_KEYDAT, kw.keycmd_wait);
                 }
                 /*  カーソルの再表示。  */
                 if (kw.cursor_c >= 0) {
