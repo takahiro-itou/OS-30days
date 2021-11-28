@@ -64,7 +64,7 @@ void HariMain(void)
     int key_leds = (binfo->leds >> 4) & 7;
     int keycmd_wait = -1;
     struct CONSOLE *cons;
-    int j, x, y, mmx = -1, mmy = -1;
+    int j, x, y;
     struct SHEET *sht = 0;
 
     init_gdtidt();
@@ -144,6 +144,8 @@ void HariMain(void)
     init_mouse_cursor8(buf_mouse, 99);
     kw.mx = (binfo->scrnx - 16) / 2;
     kw.my = (binfo->scrny - 28 - 16) / 2;
+    kw.mmx = -1;
+    kw.mmy = -1;
 
     sheet_slide(sht_back,   0,  0);
     sheet_slide(sht_cons,  32, 44);
@@ -340,7 +342,7 @@ void HariMain(void)
                     sheet_slide(sht_mouse, kw.mx, kw.my);
                     if ((mdec.btn & 0x01) != 0) {
                         /*  左ボタンを押している。  */
-                        if (mmx < 0) {
+                        if (kw.mmx < 0) {
                             /*  通常モードの場合。  */
                             /*  上の下じきから順番にマウスが
                             指している下じきを探す。    */
@@ -358,8 +360,8 @@ void HariMain(void)
                                         if (3 <= x && x < sht->bxsize
                                                 && 3 <= y  && y < 21)
                                         {
-                                            mmx = kw.mx;
-                                            mmy = kw.my;
+                                            kw.mmx = kw.mx;
+                                            kw.mmy = kw.my;
                                         }
                                         break;
                                     }
@@ -367,15 +369,15 @@ void HariMain(void)
                             }
                         } else {
                             /*  ウィンドウ移動モードの場合  */
-                            x = kw.mx - mmx;
-                            y = kw.my - mmy;
+                            x = kw.mx - kw.mmx;
+                            y = kw.my - kw.mmy;
                             sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
-                            mmx = kw.mx;
-                            mmy = kw.my;
+                            kw.mmx = kw.mx;
+                            kw.mmy = kw.my;
                         }
                     } else {
                         /*  左ボタンを押していない  */
-                        mmx = -1;   /*  通常モードへ。  */
+                        kw.mmx = -1;    /*  通常モードへ。  */
                     }
                 }
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
