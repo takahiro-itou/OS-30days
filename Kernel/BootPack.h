@@ -25,6 +25,13 @@ struct KERNELWORK {
     int keycmd_wait;
 };
 
+struct MAIN_VARS {
+    struct BOOTINFO *binfo;
+    struct TASK *task_cons;
+    struct SHTCTL *shtctl;
+    struct SHEET *sht_mouse;
+};
+
 /*  BootPack.c  */
 
 struct SHEET;

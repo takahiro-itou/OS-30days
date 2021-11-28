@@ -7,20 +7,19 @@
 
 
 void process_key_data(
-        struct KERNELWORK *pkw, int i);
+        struct KERNELWORK *pkw, int code, struct MAIN_VARS *vars);
 
 void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
-        struct BOOTINFO *binfo, struct TASK *task_cons,
-        struct SHTCTL *shtctl, struct SHEET *sht_mouse);
-
+        struct MAIN_VARS *vars);
 
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(ADR_BOOTINFO);
     struct KERNELWORK kw;
+    struct MAIN_VARS kmv;
 
-    struct SHTCTL *shtctl;
+    //struct SHTCTL *shtctl;
     char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
     int fifobuf[128], keycmd_buf[32];
@@ -29,7 +28,7 @@ void HariMain(void)
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
     unsigned char *buf_back, buf_mouse[256], *buf_win, *buf_cons;
-    struct SHEET *sht_back, *sht_mouse, *sht_win, *sht_cons;
+    struct SHEET *sht_back, *sht_win, *sht_cons;
     struct TASK *task_a, *task_cons;
     struct TIMER *timer;
 
@@ -94,22 +93,22 @@ void HariMain(void)
     memman_free(memman, 0x00400000, memtotal - 0x00400000);
 
     init_palette();
-    shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
+    kmv.shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
 
     task_a = task_init(memman);
     fifo.task = task_a;
     task_run(task_a, 1, 2);
-    *((int *) 0x0fe4) = (int) shtctl;
+    *((int *) 0x0fe4) = (int) (kmv.shtctl);
 
     /*  sht_back    */
-    sht_back  = sheet_alloc(shtctl);
+    sht_back  = sheet_alloc(kmv.shtctl);
     buf_back  = (unsigned char *)memman_alloc_4k(
             memman, binfo->scrnx * binfo->scrny);
     sheet_setbuf(sht_back, buf_back, binfo->scrnx, binfo->scrny, -1);
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 
     /*  sht_cons    */
-    sht_cons = sheet_alloc(shtctl);
+    sht_cons = sheet_alloc(kmv.shtctl);
     buf_cons = (unsigned char *) memman_alloc_4k(
             memman, CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
     sheet_setbuf(sht_cons, buf_cons,
@@ -135,7 +134,7 @@ void HariMain(void)
     task_run(task_cons, 2, 2);
 
     /*  sht_win     */
-    sht_win   = sheet_alloc(shtctl);
+    sht_win   = sheet_alloc(kmv.shtctl);
     buf_win   = (unsigned char *)memman_alloc_4k(memman, 160 * 52);
     sheet_setbuf(sht_win, buf_win, 144, 52, -1);    /*  透明色なし  */
     make_window8(buf_win, 144, 52, "task_a", 1);
@@ -148,8 +147,8 @@ void HariMain(void)
     timer_settime(timer, 50);
 
     /*  sht_mouse   */
-    sht_mouse = sheet_alloc(shtctl);
-    sheet_setbuf(sht_mouse, buf_mouse, 16, 16, 99);
+    kmv.sht_mouse = sheet_alloc(kmv.shtctl);
+    sheet_setbuf(kmv.sht_mouse, buf_mouse, 16, 16, 99);
     init_mouse_cursor8(buf_mouse, 99);
     kw.mx = (binfo->scrnx - 16) / 2;
     kw.my = (binfo->scrny - 28 - 16) / 2;
@@ -159,12 +158,12 @@ void HariMain(void)
     sheet_slide(sht_back,   0,  0);
     sheet_slide(sht_cons,  32, 44);
     sheet_slide(sht_win,   64, 96);
-    sheet_slide(sht_mouse, kw.mx, kw.my);
+    sheet_slide(kmv.sht_mouse, kw.mx, kw.my);
 
     sheet_updown(sht_back,  0);
     sheet_updown(sht_cons,  1);
     sheet_updown(sht_win,   2);
-    sheet_updown(sht_mouse, 3);
+    sheet_updown(kmv.sht_mouse, 3);
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
@@ -311,8 +310,8 @@ void HariMain(void)
                     task_cons->tss.eip = (int) asm_end_app;
                     io_sti();
                 }
-                if (i == 256 + 0x57 && shtctl->top > 2) {   /*  F11 */
-                    sheet_updown(shtctl->sheets[1], shtctl->top - 1);
+                if (i == 256 + 0x57 && kmv.shtctl->top > 2) {   /*  F11 */
+                    sheet_updown(kmv.shtctl->sheets[1], kmv.shtctl->top - 1);
                 }
                 if (i == 256 + 0xfa) {
                     /*  キーボードがデータを無事に受け取った。  */
@@ -332,7 +331,7 @@ void HariMain(void)
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
-                    process_mouse_data(&kw, mdec, binfo, task_cons, shtctl, sht_mouse);
+                    process_mouse_data(&kw, mdec, &kmv);
                 }
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
                 if (i != 0) {
@@ -358,9 +357,8 @@ void HariMain(void)
     }
 }
 
-
 void process_key_data(
-        struct KERNELWORK *pkw, int i)
+        struct KERNELWORK *pkw, int code, struct MAIN_VARS *vars)
 {
     struct KERNELWORK kw = (* pkw);
 
@@ -371,13 +369,19 @@ void process_key_data(
 
 void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
-        struct BOOTINFO *binfo, struct TASK *task_cons,
-        struct SHTCTL *shtctl, struct SHEET *sht_mouse)
+        struct MAIN_VARS *vars)
 {
     struct KERNELWORK kw = (* pkw);
     struct SHEET * sht = pkw->selsht;
+
+    struct BOOTINFO *binfo = vars->binfo;
+    struct TASK *task_cons = vars->task_cons;
+    struct SHTCTL *shtctl = vars->shtctl;
+    struct SHEET *sht_mouse = vars->sht_mouse;
+
     struct CONSOLE *cons;
     int j, x, y;
+
 
     /*  マウスカーソルの移動。  */
     kw.mx += mdec.x;
