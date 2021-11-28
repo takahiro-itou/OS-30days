@@ -6,6 +6,9 @@
 #define KEYCMD_LED      0xed
 
 
+void process_key_data(
+        struct KERNELWORK *pkw, int i);
+
 void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
         struct BOOTINFO *binfo, struct TASK *task_cons,
@@ -21,7 +24,7 @@ void HariMain(void)
     char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
     int fifobuf[128], keycmd_buf[32];
-    int i, cursor_x;
+    int i;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
@@ -136,7 +139,7 @@ void HariMain(void)
     sheet_setbuf(sht_win, buf_win, 144, 52, -1);    /*  透明色なし  */
     make_window8(buf_win, 144, 52, "task_a", 1);
     make_textbox8(sht_win, 8, 28, 128, 16, COL8_FFFFFF);
-    cursor_x = 8;
+    kw.cursor_x = 8;
     kw.cursor_c = COL8_FFFFFF;
 
     timer = timer_alloc();
@@ -220,11 +223,11 @@ void HariMain(void)
                 if (s[0] != 0) {
                     /*  通常文字。  */
                     if (key_to == 0) {
-                        if (cursor_x < 128) {
+                        if (kw.cursor_x < 128) {
                             s[1] = 0;
-                            putfonts8_asc_sht(sht_win, cursor_x, 28,
+                            putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
                                               COL8_000000, COL8_FFFFFF, s, 1);
-                            cursor_x += 8;
+                            kw.cursor_x += 8;
                         }
                     } else {
                         fifo32_put(&task_cons->fifo, s[0] + 256);
@@ -233,10 +236,10 @@ void HariMain(void)
                 if (i == 256 + 0x0e) {
                     /*  バックスペース  */
                     if (key_to == 0) {
-                        if (cursor_x > 8) {
-                            putfonts8_asc_sht(sht_win, cursor_x, 28,
+                        if (kw.cursor_x > 8) {
+                            putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
                                               COL8_000000, COL8_FFFFFF, " ", 1);
-                            cursor_x -= 8;
+                            kw.cursor_x -= 8;
                         }
                     } else {
                         fifo32_put(&task_cons->fifo, 8 + 256);
@@ -254,7 +257,7 @@ void HariMain(void)
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
                         kw.cursor_c = -1;       /*  カーソルを消す  */
                         boxfill8(sht_win->buf, sht_win->bxsize, COL8_FFFFFF,
-                                 cursor_x, 28, cursor_x + 7, 43);
+                                 kw.cursor_x, 28, kw.cursor_x + 7, 43);
                         /*  コンソールのカーソルON  */
                         fifo32_put(&task_cons->fifo, 2);
                     } else {
@@ -322,9 +325,9 @@ void HariMain(void)
                 /*  カーソルの再表示。  */
                 if (kw.cursor_c >= 0) {
                     boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
-                             cursor_x, 28, cursor_x + 7, 43);
+                             kw.cursor_x, 28, kw.cursor_x + 7, 43);
                 }
-                sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
+                sheet_refresh(sht_win, kw.cursor_x, 28, kw.cursor_x + 8, 44);
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
@@ -345,12 +348,23 @@ void HariMain(void)
                 timer_settime(timer, 50);
                 if (kw.cursor_c >= 0) {
                     boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
-                             cursor_x, 28, cursor_x + 7, 43);
-                    sheet_refresh(sht_win, cursor_x, 28, cursor_x + 8, 44);
+                             kw.cursor_x, 28, kw.cursor_x + 7, 43);
+                    sheet_refresh(sht_win, kw.cursor_x, 28,
+                                  kw.cursor_x + 8, 44);
                 }
             }
         }
     }
+}
+
+
+void process_key_data(
+        struct KERNELWORK *pkw, int i)
+{
+    struct KERNELWORK kw = (* pkw);
+
+    (* pkw) = kw;
+    return;
 }
 
 
