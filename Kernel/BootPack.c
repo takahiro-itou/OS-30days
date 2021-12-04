@@ -69,7 +69,7 @@ void HariMain(void)
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
     unsigned char *buf_back, buf_mouse[256];
-    struct SHEET *sht_back, *sht_win, *sht_cons;
+    struct SHEET *sht_back, *sht_win;
     struct TASK *task_a, *task_cons;
     struct TIMER *timer;
     struct CONSOLE *cons;
@@ -181,9 +181,7 @@ void HariMain(void)
         keyseq[i] = ' ';
     }
     keyseq[sizeof(keyseq) - 1] = 0;
-
     sht_win = kmv.sht_win;
-    sht_cons = kmv.sht_cons;
 
     for (;;) {
         if (fifo32_status(&keycmd) > 0 && kw.keycmd_wait < 0) {
