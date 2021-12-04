@@ -68,12 +68,11 @@ void HariMain(void)
     struct SHEET *sht_back, *sht_win, *sht_cons;
     struct TASK *task_a, *task_cons;
     struct TIMER *timer;
-
     struct CONSOLE *cons;
-    int key_to = 0;
 
     kmv.binfo = binfo;
     kw.selsht = 0;
+    kw.key_to = 0;
     kw.key_shift = 0;
     kw.key_leds = (binfo->leds >> 4) & 7;
     kw.keycmd_wait = -1;
@@ -231,7 +230,7 @@ void HariMain(void)
                 }
                 if (s[0] != 0) {
                     /*  通常文字。  */
-                    if (key_to == 0) {
+                    if (kw.key_to == 0) {
                         if (kw.cursor_x < 128) {
                             s[1] = 0;
                             putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
@@ -244,7 +243,7 @@ void HariMain(void)
                 }
                 if (i == 256 + 0x0e) {
                     /*  バックスペース  */
-                    if (key_to == 0) {
+                    if (kw.key_to == 0) {
                         if (kw.cursor_x > 8) {
                             putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
                                               COL8_000000, COL8_FFFFFF, " ", 1);
@@ -255,13 +254,13 @@ void HariMain(void)
                     }
                 }
                 if (i == 256 + 0x1c) {      /*  Enter   */
-                    if (key_to != 0) {
+                    if (kw.key_to != 0) {
                         fifo32_put(&task_cons->fifo, 10 + 256);
                     }
                 }
                 if (i == 256 + 0x0f) {      /*  Tab */
-                    if (key_to == 0) {
-                        key_to = 1;
+                    if (kw.key_to == 0) {
+                        kw.key_to = 1;
                         make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  0);
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
                         kw.cursor_c = -1;       /*  カーソルを消す  */
@@ -270,7 +269,7 @@ void HariMain(void)
                         /*  コンソールのカーソルON  */
                         fifo32_put(&task_cons->fifo, 2);
                     } else {
-                        key_to = 0;
+                        kw.key_to = 0;
                         make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  1);
                         make_wtitle8(buf_cons, sht_cons->bxsize, "console", 0);
                         kw.cursor_c = COL8_000000;      /*  カーソルを出す  */
