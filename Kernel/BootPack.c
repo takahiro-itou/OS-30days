@@ -211,132 +211,7 @@ void HariMain(void)
                 putfonts8_asc_sht(sht_back, 0, 16, COL8_FFFFFF,
                                   COL8_008484, keyseq, 17);
 # endif
-                if (i < 0x80 + 256) {
-                    /*  キーコードを文字コードに変換。  */
-                    if (kw.key_shift == 0) {
-                        s[0] = keytable0[i - 256];
-                    } else {
-                        s[0] = keytable1[i - 256];
-                    }
-                } else {
-                    s[0] = 0;
-                }
-                if ('A' <= s[0] && s[0] <= 'Z') {
-                    /*  入力文字がアルファベット。  */
-                    if ( ((kw.key_leds & 4) == 0 && kw.key_shift == 0) ||
-                            ((kw.key_leds & 4) != 0 && kw.key_shift != 0) )
-                    {
-                        s[0] += 0x20;
-                    }
-                }
-                if (s[0] != 0) {
-                    /*  通常文字。  */
-                    if (kw.key_to == 0) {
-                        if (kw.cursor_x < 128) {
-                            s[1] = 0;
-                            putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
-                                              COL8_000000, COL8_FFFFFF, s, 1);
-                            kw.cursor_x += 8;
-                        }
-                    } else {
-                        fifo32_put(&task_cons->fifo, s[0] + 256);
-                    }
-                }
-                if (i == 256 + 0x0e) {
-                    /*  バックスペース  */
-                    if (kw.key_to == 0) {
-                        if (kw.cursor_x > 8) {
-                            putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
-                                              COL8_000000, COL8_FFFFFF, " ", 1);
-                            kw.cursor_x -= 8;
-                        }
-                    } else {
-                        fifo32_put(&task_cons->fifo, 8 + 256);
-                    }
-                }
-                if (i == 256 + 0x1c) {      /*  Enter   */
-                    if (kw.key_to != 0) {
-                        fifo32_put(&task_cons->fifo, 10 + 256);
-                    }
-                }
-                if (i == 256 + 0x0f) {      /*  Tab */
-                    if (kw.key_to == 0) {
-                        kw.key_to = 1;
-                        make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  0);
-                        make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
-                        kw.cursor_c = -1;       /*  カーソルを消す  */
-                        boxfill8(sht_win->buf, sht_win->bxsize, COL8_FFFFFF,
-                                 kw.cursor_x, 28, kw.cursor_x + 7, 43);
-                        /*  コンソールのカーソルON  */
-                        fifo32_put(&task_cons->fifo, 2);
-                    } else {
-                        kw.key_to = 0;
-                        make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  1);
-                        make_wtitle8(buf_cons, sht_cons->bxsize, "console", 0);
-                        kw.cursor_c = COL8_000000;      /*  カーソルを出す  */
-                        /*  コンソールのカーソル OFF    */
-                        fifo32_put(&task_cons->fifo, 3);
-                    }
-                    sheet_refresh(sht_win,  0, 0, sht_win->bxsize,  21);
-                    sheet_refresh(sht_cons, 0, 0, sht_cons->bxsize, 21);
-                }
-                /*  シフトキー  */
-                if (i == 256 + 0x2a) {
-                    kw.key_shift |= 1;
-                }
-                if (i == 256 + 0x36) {
-                    kw.key_shift |= 2;
-                }
-                if (i == 256 + 0xaa) {
-                    kw.key_shift &= ~1;
-                }
-                if (i == 256 + 0xb6) {
-                    kw.key_shift &= ~2;
-                }
-                if (i == 256 + 0x3a) {  /*  CapsLock    */
-                    kw.key_leds ^= 4;
-                    fifo32_put(&keycmd, KEYCMD_LED);
-                    fifo32_put(&keycmd, kw.key_leds);
-                }
-                if (i == 256 + 0x45) {  /*  NumLock     */
-                    kw.key_leds ^= 2;
-                    fifo32_put(&keycmd, KEYCMD_LED);
-                    fifo32_put(&keycmd, kw.key_leds);
-                }
-                if (i == 256 + 0x46) {  /*  ScrollLock  */
-                    kw.key_leds ^= 1;
-                    fifo32_put(&keycmd, KEYCMD_LED);
-                    fifo32_put(&keycmd, kw.key_leds);
-                }
-                if (i == 256 + 0x3b && kw.key_shift != 0
-                        && task_cons->tss.ss0 != 0)
-                {
-                    /*  Shift + F1  */
-                    cons = (struct CONSOLE *) *((int *) 0x0fec);
-                    cons_putstr0(cons, "\nBreak(key) :\n");
-                    io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
-                    task_cons->tss.eax = (int) &(task_cons->tss.esp0);
-                    task_cons->tss.eip = (int) asm_end_app;
-                    io_sti();
-                }
-                if (i == 256 + 0x57 && kmv.shtctl->top > 2) {   /*  F11 */
-                    sheet_updown(kmv.shtctl->sheets[1], kmv.shtctl->top - 1);
-                }
-                if (i == 256 + 0xfa) {
-                    /*  キーボードがデータを無事に受け取った。  */
-                    kw.keycmd_wait = -1;
-                }
-                if (i == 256 + 0xfe) {
-                    /*  キーボードがデータを無事に受け取れなかった  */
-                    wait_KBC_sendready();
-                    io_out8(PORT_KEYDAT, kw.keycmd_wait);
-                }
-                /*  カーソルの再表示。  */
-                if (kw.cursor_c >= 0) {
-                    boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
-                             kw.cursor_x, 28, kw.cursor_x + 7, 43);
-                }
-                sheet_refresh(sht_win, kw.cursor_x, 28, kw.cursor_x + 8, 44);
+                process_key_data(&kw, i - 256, &kmv);
             } else if (512 <= i && i <= 767) {
                 /*  マウスデータ。      */
                 if (mouse_decode(&mdec, i - 512) != 0) {
@@ -370,6 +245,146 @@ void process_key_data(
         struct KERNELWORK *pkw, int code, struct MAIN_VARS *vars)
 {
     struct KERNELWORK kw = (* pkw);
+    int i = code + 256;
+    struct TASK *task_cons = vars->task_cons;
+    struct SHTCTL *shtctl = vars->shtctl;
+    unsigned char *buf_win = vars->buf_win;
+    unsigned char *buf_cons = vars->buf_cons;
+    struct SHEET *sht_win = vars->sht_win;
+    struct SHEET *sht_cons = vars->sht_cons;
+    struct FIFO32 *pkeycmd = vars->keycmd;
+    struct CONSOLE *cons;
+    char s[40];
+
+    if (i < 0x80 + 256) {
+        /*  キーコードを文字コードに変換。  */
+        if (kw.key_shift == 0) {
+            s[0] = keytable0[i - 256];
+        } else {
+            s[0] = keytable1[i - 256];
+        }
+    } else {
+        s[0] = 0;
+    }
+
+    if ('A' <= s[0] && s[0] <= 'Z') {
+        /*  入力文字がアルファベット。  */
+        if ( ((kw.key_leds & 4) == 0 && kw.key_shift == 0) ||
+                ((kw.key_leds & 4) != 0 && kw.key_shift != 0) )
+        {
+            s[0] += 0x20;
+        }
+    }
+    if (s[0] != 0) {
+        /*  通常文字。  */
+        if (kw.key_to == 0) {
+            if (kw.cursor_x < 128) {
+                s[1] = 0;
+                putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
+                                  COL8_000000, COL8_FFFFFF, s, 1);
+                kw.cursor_x += 8;
+            }
+        } else {
+            fifo32_put(&task_cons->fifo, s[0] + 256);
+        }
+    }
+    if (i == 256 + 0x0e) {
+        /*  バックスペース  */
+        if (kw.key_to == 0) {
+            if (kw.cursor_x > 8) {
+                putfonts8_asc_sht(sht_win, kw.cursor_x, 28,
+                                  COL8_000000, COL8_FFFFFF, " ", 1);
+                kw.cursor_x -= 8;
+            }
+        } else {
+            fifo32_put(&task_cons->fifo, 8 + 256);
+        }
+    }
+    if (i == 256 + 0x1c) {      /*  Enter   */
+        if (kw.key_to != 0) {
+            fifo32_put(&task_cons->fifo, 10 + 256);
+        }
+    }
+    if (i == 256 + 0x0f) {      /*  Tab */
+        if (kw.key_to == 0) {
+            kw.key_to = 1;
+            make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  0);
+            make_wtitle8(buf_cons, sht_cons->bxsize, "console", 1);
+            kw.cursor_c = -1;       /*  カーソルを消す  */
+            boxfill8(sht_win->buf, sht_win->bxsize, COL8_FFFFFF,
+                     kw.cursor_x, 28, kw.cursor_x + 7, 43);
+            /*  コンソールのカーソルON  */
+            fifo32_put(&task_cons->fifo, 2);
+        } else {
+            kw.key_to = 0;
+            make_wtitle8(buf_win,  sht_win->bxsize,  "task_a",  1);
+            make_wtitle8(buf_cons, sht_cons->bxsize, "console", 0);
+            kw.cursor_c = COL8_000000;      /*  カーソルを出す  */
+            /*  コンソールのカーソル OFF    */
+            fifo32_put(&task_cons->fifo, 3);
+        }
+        sheet_refresh(sht_win,  0, 0, sht_win->bxsize,  21);
+        sheet_refresh(sht_cons, 0, 0, sht_cons->bxsize, 21);
+    }
+
+    /*  シフトキー  */
+    if (i == 256 + 0x2a) {
+        kw.key_shift |= 1;
+    }
+    if (i == 256 + 0x36) {
+        kw.key_shift |= 2;
+    }
+    if (i == 256 + 0xaa) {
+        kw.key_shift &= ~1;
+    }
+    if (i == 256 + 0xb6) {
+        kw.key_shift &= ~2;
+    }
+
+    if (i == 256 + 0x3a) {  /*  CapsLock    */
+        kw.key_leds ^= 4;
+        fifo32_put(pkeycmd, KEYCMD_LED);
+        fifo32_put(pkeycmd, kw.key_leds);
+    }
+    if (i == 256 + 0x45) {  /*  NumLock     */
+        kw.key_leds ^= 2;
+        fifo32_put(pkeycmd, KEYCMD_LED);
+        fifo32_put(pkeycmd, kw.key_leds);
+    }
+    if (i == 256 + 0x46) {  /*  ScrollLock  */
+        kw.key_leds ^= 1;
+        fifo32_put(pkeycmd, KEYCMD_LED);
+        fifo32_put(pkeycmd, kw.key_leds);
+    }
+    if (i == 256 + 0x3b && kw.key_shift != 0 && task_cons->tss.ss0 != 0)
+    {
+        /*  Shift + F1  */
+        cons = (struct CONSOLE *) *((int *) 0x0fec);
+        cons_putstr0(cons, "\nBreak(key) :\n");
+        io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
+        task_cons->tss.eax = (int) &(task_cons->tss.esp0);
+        task_cons->tss.eip = (int) asm_end_app;
+        io_sti();
+    }
+    if (i == 256 + 0x57 && shtctl->top > 2) {   /*  F11 */
+        sheet_updown(shtctl->sheets[1], shtctl->top - 1);
+    }
+
+    if (i == 256 + 0xfa) {
+        /*  キーボードがデータを無事に受け取った。  */
+        kw.keycmd_wait = -1;
+    }
+    if (i == 256 + 0xfe) {
+        /*  キーボードがデータを無事に受け取れなかった  */
+        wait_KBC_sendready();
+        io_out8(PORT_KEYDAT, kw.keycmd_wait);
+    }
+    /*  カーソルの再表示。  */
+    if (kw.cursor_c >= 0) {
+        boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
+                 kw.cursor_x, 28, kw.cursor_x + 7, 43);
+    }
+    sheet_refresh(sht_win, kw.cursor_x, 28, kw.cursor_x + 8, 44);
 
     (* pkw) = kw;
     return;
