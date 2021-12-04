@@ -33,6 +33,7 @@ struct MAIN_VARS {
     struct SHTCTL *shtctl;
     unsigned char *buf_win, *buf_cons;
     struct SHEET *sht_mouse, *sht_win, *sht_cons;
+    struct FIFO32 *keycmd;
 };
 
 /*  BootPack.c  */

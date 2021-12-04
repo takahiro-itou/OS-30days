@@ -71,6 +71,7 @@ void HariMain(void)
     struct CONSOLE *cons;
 
     kmv.binfo = binfo;
+    kmv.keycmd = &keycmd;
     kw.selsht = 0;
     kw.key_to = 0;
     kw.key_shift = 0;
