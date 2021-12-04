@@ -51,6 +51,10 @@ void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
         struct MAIN_VARS *vars);
 
+int keywin_off(
+        struct SHEET *key_win, struct SHEET *sht_win, int cur_c, int cur_x);
+int keywin_on(struct SHEET *key_win, struct SHEET *sht_win, int cur_c);
+
 void HariMain(void)
 {
     struct BOOTINFO *binfo = (struct BOOTINFO *)(ADR_BOOTINFO);
@@ -477,4 +481,37 @@ void process_mouse_data(
     (* pkw) = kw;
     pkw->selsht = sht;
     return;
+}
+
+int keywin_off(
+        struct SHEET *key_win, struct SHEET *sht_win, int cur_c, int cur_x)
+{
+    change_wtitle8(key_win, 0);
+    if (key_win == sht_win) {
+        cur_c = -1;     /*  カーソルを消す  */
+        boxfill8(sht_win->buf, sht_win->bxsize, COL8_FFFFFF,
+                 cur_x, 28, cur_x + 7, 43);
+    } else {
+        if ((key_win->flags & 0x20) != 0) {
+            /*  コンソールのカーソル OFF    */
+            fifo32_put(&key_win->task->fifo, 3);
+        }
+    }
+
+    return cur_c;
+}
+
+int keywin_on(struct SHEET *key_win, struct SHEET *sht_win, int cur_c)
+{
+    change_wtitle8(key_win, 1);
+    if (key_win == sht_win) {
+        cur_c = COL8_000000;    /*  カーソルを出す  */
+    } else {
+        if ((key_win->flags & 0x20) != 0) {
+            /*  コンソールのカーソル ON     */
+            fifo32_put(&key_win->task->fifo, 2);
+        }
+    }
+
+    return cur_c;
 }
