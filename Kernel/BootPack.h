@@ -21,6 +21,7 @@ struct KERNELWORK {
     int mx, my;         /*  マウスカーソルの座標。  */
     int mmx, mmy;       /*  マウスカーソル移動量。  */
     struct SHEET * selsht;      /*  選択中のシート  */
+    int key_shift;
     int key_leds;
     int keycmd_wait;
 };

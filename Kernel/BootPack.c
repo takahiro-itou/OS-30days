@@ -70,10 +70,11 @@ void HariMain(void)
     struct TIMER *timer;
 
     struct CONSOLE *cons;
-    int key_to = 0, key_shift = 0;
+    int key_to = 0;
 
     kmv.binfo = binfo;
     kw.selsht = 0;
+    kw.key_shift = 0;
     kw.key_leds = (binfo->leds >> 4) & 7;
     kw.keycmd_wait = -1;
 
@@ -212,7 +213,7 @@ void HariMain(void)
 # endif
                 if (i < 0x80 + 256) {
                     /*  キーコードを文字コードに変換。  */
-                    if (key_shift == 0) {
+                    if (kw.key_shift == 0) {
                         s[0] = keytable0[i - 256];
                     } else {
                         s[0] = keytable1[i - 256];
@@ -222,8 +223,8 @@ void HariMain(void)
                 }
                 if ('A' <= s[0] && s[0] <= 'Z') {
                     /*  入力文字がアルファベット。  */
-                    if ( ((kw.key_leds & 4) == 0 && key_shift == 0) ||
-                            ((kw.key_leds & 4) != 0 && key_shift != 0) )
+                    if ( ((kw.key_leds & 4) == 0 && kw.key_shift == 0) ||
+                            ((kw.key_leds & 4) != 0 && kw.key_shift != 0) )
                     {
                         s[0] += 0x20;
                     }
@@ -281,16 +282,16 @@ void HariMain(void)
                 }
                 /*  シフトキー  */
                 if (i == 256 + 0x2a) {
-                    key_shift |= 1;
+                    kw.key_shift |= 1;
                 }
                 if (i == 256 + 0x36) {
-                    key_shift |= 2;
+                    kw.key_shift |= 2;
                 }
                 if (i == 256 + 0xaa) {
-                    key_shift &= ~1;
+                    kw.key_shift &= ~1;
                 }
                 if (i == 256 + 0xb6) {
-                    key_shift &= ~2;
+                    kw.key_shift &= ~2;
                 }
                 if (i == 256 + 0x3a) {  /*  CapsLock    */
                     kw.key_leds ^= 4;
@@ -307,7 +308,7 @@ void HariMain(void)
                     fifo32_put(&keycmd, KEYCMD_LED);
                     fifo32_put(&keycmd, kw.key_leds);
                 }
-                if (i == 256 + 0x3b && key_shift != 0
+                if (i == 256 + 0x3b && kw.key_shift != 0
                         && task_cons->tss.ss0 != 0)
                 {
                     /*  Shift + F1  */
