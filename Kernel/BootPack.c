@@ -399,24 +399,25 @@ void sheet_leftbutton_down(
         const int y,
         struct MAIN_VARS *vars)
 {
-    struct KERNELWORK kw = (* pkw);
     struct TASK *task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
     struct SHEET *sht_win = vars->sht_win;
 
+    struct SHEET *key_win = pkw->key_win;
     struct CONSOLE *cons;
 
     sheet_updown(sht, shtctl->top - 1);
-    if (sht != kw.key_win) {
-        kw.cursor_c = keywin_off(kw.key_win, sht_win, kw.cursor_c, kw.cursor_x);
-        kw.key_win = sht;
-        kw.cursor_c = keywin_on(kw.key_win, sht_win, kw.cursor_c);
+    if (sht != key_win) {
+        pkw->cursor_c = keywin_off(key_win, sht_win,
+                                   pkw->cursor_c, pkw->cursor_x);
+        key_win = sht;
+        pkw->cursor_c = keywin_on(key_win, sht_win, pkw->cursor_c);
     }
 
-    if (3 <= x && x < sht->bxsize && 3 <= y  && y < 21)
+    if (3 <= x && x < sht->bxsize && 3 <= y && y < 21)
     {
-        kw.mmx = kw.mx;
-        kw.mmy = kw.my;
+        pkw->mmx = pkw->mx;
+        pkw->mmy = pkw->my;
     }
 
     if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 3 <= y && y < 19)
@@ -433,7 +434,7 @@ void sheet_leftbutton_down(
         }
     }
 
-    (* pkw) = kw;
+    pkw->key_win = key_win;
     return;
 }
 
@@ -479,7 +480,7 @@ void process_mouse_data(
                 if (0 <= x && x < sht->bxsize && 0 <= y && y < sht->bysize)
                 {
                     if (sht->buf[y * sht->bxsize + x] != sht->col_inv) {
-                        sheet_leftbutton_down(pkw, sht, x, y, vars);
+                        sheet_leftbutton_down(&kw, sht, x, y, vars);
                         break;
                     }
                 }
