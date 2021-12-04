@@ -392,6 +392,44 @@ void process_key_data(
     return;
 }
 
+void sheet_leftbutton_down(
+        struct KERNELWORK *pkw,
+        struct SHEET *sht,
+        const int x,
+        const int y,
+        struct MAIN_VARS *vars)
+{
+    struct KERNELWORK kw = (* pkw);
+    struct TASK *task_cons = vars->task_cons;
+    struct SHTCTL *shtctl = vars->shtctl;
+
+    struct CONSOLE *cons;
+
+    sheet_updown(sht, shtctl->top - 1);
+    if (3 <= x && x < sht->bxsize && 3 <= y  && y < 21)
+    {
+        kw.mmx = kw.mx;
+        kw.mmy = kw.my;
+    }
+    if (sht->bxsize - 21 <= x && x < sht->bxsize - 5
+            && 3 <= y && y < 19)
+    {
+        /*  「×」ボタンクリック。  */
+        if ((sht->flags & 0x10) != 0) {
+            /*  アプリが作ったウィンドウ。  */
+            cons = (struct CONSOLE *) *((int *) 0x0fec);
+            cons_putstr0(cons, "\nBreak(mouse) :\n");
+            io_cli();
+            task_cons->tss.eax = (int) &(task_cons->tss.esp0);
+            task_cons->tss.eip = (int) asm_end_app;
+            io_sti();
+        }
+    }
+
+    (* pkw) = kw;
+    return;
+}
+
 
 void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
@@ -401,11 +439,9 @@ void process_mouse_data(
     struct SHEET * sht = pkw->selsht;
 
     struct BOOTINFO *binfo = vars->binfo;
-    struct TASK *task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
     struct SHEET *sht_mouse = vars->sht_mouse;
 
-    struct CONSOLE *cons;
     int j, x, y;
 
 
@@ -438,26 +474,7 @@ void process_mouse_data(
                 if (0 <= x && x < sht->bxsize && 0 <= y && y < sht->bysize)
                 {
                     if (sht->buf[y * sht->bxsize + x] != sht->col_inv) {
-                        sheet_updown(sht, shtctl->top - 1);
-                        if (3 <= x && x < sht->bxsize && 3 <= y  && y < 21)
-                        {
-                            kw.mmx = kw.mx;
-                            kw.mmy = kw.my;
-                        }
-                        if (sht->bxsize - 21 <= x && x < sht->bxsize - 5
-                                && 3 <= y && y < 19)
-                        {
-                            /*  「×」ボタンクリック。  */
-                            if ((sht->flags & 0x10) != 0) {
-                                /*  アプリが作ったウィンドウ。  */
-                                cons = (struct CONSOLE *) *((int *) 0x0fec);
-                                cons_putstr0(cons, "\nBreak(mouse) :\n");
-                                io_cli();
-                                task_cons->tss.eax = (int) &(task_cons->tss.esp0);
-                                task_cons->tss.eip = (int) asm_end_app;
-                                io_sti();
-                            }
-                        }
+                        sheet_leftbutton_down(pkw, sht, x, y, vars);
                         break;
                     }
                 }
