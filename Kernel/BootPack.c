@@ -402,17 +402,24 @@ void sheet_leftbutton_down(
     struct KERNELWORK kw = (* pkw);
     struct TASK *task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
+    struct SHEET *sht_win = vars->sht_win;
 
     struct CONSOLE *cons;
 
     sheet_updown(sht, shtctl->top - 1);
+    if (sht != kw.key_win) {
+        kw.cursor_c = keywin_off(kw.key_win, sht_win, kw.cursor_c, kw.cursor_x);
+        kw.key_win = sht;
+        kw.cursor_c = keywin_on(kw.key_win, sht_win, kw.cursor_c);
+    }
+
     if (3 <= x && x < sht->bxsize && 3 <= y  && y < 21)
     {
         kw.mmx = kw.mx;
         kw.mmy = kw.my;
     }
-    if (sht->bxsize - 21 <= x && x < sht->bxsize - 5
-            && 3 <= y && y < 19)
+
+    if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 3 <= y && y < 19)
     {
         /*  「×」ボタンクリック。  */
         if ((sht->flags & 0x10) != 0) {
@@ -430,7 +437,6 @@ void sheet_leftbutton_down(
     return;
 }
 
-
 void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
         struct MAIN_VARS *vars)
@@ -443,7 +449,6 @@ void process_mouse_data(
     struct SHEET *sht_mouse = vars->sht_mouse;
 
     int j, x, y;
-
 
     /*  マウスカーソルの移動。  */
     kw.mx += mdec.x;
