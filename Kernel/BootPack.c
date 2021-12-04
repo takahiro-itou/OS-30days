@@ -68,7 +68,7 @@ void HariMain(void)
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
-    unsigned char *buf_back, buf_mouse[256], *buf_win, *buf_cons;
+    unsigned char *buf_back, buf_mouse[256];
     struct SHEET *sht_back, *sht_win, *sht_cons;
     struct TASK *task_a, *task_cons;
     struct TIMER *timer;
@@ -182,9 +182,7 @@ void HariMain(void)
     }
     keyseq[sizeof(keyseq) - 1] = 0;
 
-    buf_win = kmv.buf_win;
     sht_win = kmv.sht_win;
-    buf_cons = kmv.buf_cons;
     sht_cons = kmv.sht_cons;
 
     for (;;) {
