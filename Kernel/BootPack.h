@@ -382,7 +382,8 @@ void sheet_free(struct SHEET *sht);
 
 struct TIMER {
     struct TIMER *next;
-    unsigned int timeout, flags;
+    unsigned int timeout;
+    char flags, flags2;
     struct FIFO32 * fifo;
     int data;
 };
