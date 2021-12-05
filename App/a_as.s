@@ -192,6 +192,7 @@ api_getkey:
 api_alloctimer:
     MOVL    $16,    %EDX
     INT     $0x40
+    RET
 
 api_inittimer:
     PUSHL   %EBX
