@@ -340,6 +340,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
                     sheet_free(sht);
                 }
             }
+            timer_cancelall(&task->fifo);
             memman_free_4k(memman, (int) q, segsiz);
         } else {
             cons_putstr0(cons, ".hrb file format error.\n");
