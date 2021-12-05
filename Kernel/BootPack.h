@@ -403,6 +403,9 @@ void timer_settime(struct TIMER *timer, unsigned int timeout);
 
 void inthandler20(int *esp);
 
+int timer_cancel(struct TIMER *timer);
+
+
 /*  Window.c    */
 
 void make_window8(unsigned char *buf, int xsize, int ysize,

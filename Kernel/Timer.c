@@ -128,3 +128,34 @@ void inthandler20(int *esp)
 
     return;
 }
+
+int timer_cancel(struct TIMER *timer)
+{
+    int e;
+    struct TIMER *t;
+    e = io_load_eflags();
+    io_cli();   /*  設定中にタイマの状態が変化しないようにするため  */
+    if (timer->flags == TIMER_FLAGS_USING) {
+        if (timer == timerctl.t0) {
+            /*  先頭だった場合の取り消し処理。  */
+            t = timer->next;
+            timerctl.t0 = t;
+            timerctl.next = t->timeout;
+        } else {
+            /*  先頭以外の場合の取り消し処理。  */
+            t = timerctl.t0;
+            for (;;) {
+                if (t->next == timer) {
+                    break;
+                }
+                t = t->next;
+            }
+            t->next = timer->next;
+        }
+        timer->flags = TIMER_FLAGS_ALLOC;
+        io_store_eflags(e);
+        return 1;   /*  キャンセル処理成功  */
+    }
+    io_store_eflags(e);
+    return 0;   /*  キャンセル処理は不要だった  */
+}
