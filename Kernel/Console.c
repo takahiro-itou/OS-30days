@@ -361,6 +361,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct CONSOLE *cons = (struct CONSOLE *) *((int *) 0x0fec);
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
     struct SHEET *sht;
+    struct TIMER *timer;
     volatile int *reg = &eax + 1;
     int i;
 
@@ -454,7 +455,9 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
             }
         }
     } else if (edx == 16) {
-        reg[7] = (int) timer_alloc();
+        timer = timer_alloc();
+        timer->flags2 = 1;      /*  自動キャンセル有効  */
+        reg[7] = (int) timer;
     } else if (edx == 17) {
         timer_init((struct TIMER *) ebx, &task->fifo, eax + 256);
     } else if (edx == 18) {

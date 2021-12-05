@@ -37,6 +37,7 @@ struct TIMER *timer_alloc(void)
     for (i = 0; i < MAX_TIMER; ++ i) {
         if (timerctl.timers0[i].flags == 0) {
             timerctl.timers0[i].flags = TIMER_FLAGS_ALLOC;
+            timerctl.timers0[i].flags2 = 0;
             return &timerctl.timers0[i];
         }
     }
