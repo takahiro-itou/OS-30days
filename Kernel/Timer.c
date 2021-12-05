@@ -134,8 +134,10 @@ int timer_cancel(struct TIMER *timer)
 {
     int e;
     struct TIMER *t;
+
     e = io_load_eflags();
     io_cli();   /*  設定中にタイマの状態が変化しないようにするため  */
+
     if (timer->flags == TIMER_FLAGS_USING) {
         if (timer == timerctl.t0) {
             /*  先頭だった場合の取り消し処理。  */
@@ -159,4 +161,24 @@ int timer_cancel(struct TIMER *timer)
     }
     io_store_eflags(e);
     return 0;   /*  キャンセル処理は不要だった  */
+}
+
+void timer_cancelall(struct FIFO32 *fifo)
+{
+    int e, i;
+    struct TIMER *t;
+
+    e = io_load_eflags();
+    io_cli();   /*  設定中にタイマの状態が変化しないようにするため  */
+
+    for(i = 0; i < MAX_TIMER; ++ i) {
+        t = &timerctl.timers0[i];
+        if (t->flags != 0 && t->flags2 != 0 && t->fifo == fifo) {
+            timer_cancel(t);
+            timer_free(t);
+        }
+    }
+
+    io_store_eflags(e);
+    return;
 }

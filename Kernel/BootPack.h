@@ -405,6 +405,7 @@ void timer_settime(struct TIMER *timer, unsigned int timeout);
 void inthandler20(int *esp);
 
 int timer_cancel(struct TIMER *timer);
+void timer_cancelall(struct FIFO32 *fifo);
 
 
 /*  Window.c    */
