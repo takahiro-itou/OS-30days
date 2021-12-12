@@ -262,14 +262,12 @@ void process_key_data(
 {
     struct KERNELWORK kw = (* pkw);
     int i = code + 256;
-    struct TASK **task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
     unsigned char *buf_win = vars->buf_win;
-    unsigned char **buf_cons = vars->buf_cons;
     struct SHEET *sht_win = vars->sht_win;
-    struct SHEET **sht_cons = vars->sht_cons;
     struct FIFO32 *pkeycmd = vars->keycmd;
-    struct CONSOLE *cons;
+
+    struct TASK *task;
     int j;
     char s[40];
 
@@ -365,15 +363,17 @@ void process_key_data(
         fifo32_put(pkeycmd, KEYCMD_LED);
         fifo32_put(pkeycmd, kw.key_leds);
     }
-    if (i == 256 + 0x3b && kw.key_shift != 0 && task_cons[0]->tss.ss0 != 0)
+    if (i == 256 + 0x3b && kw.key_shift != 0)
     {
         /*  Shift + F1  */
-        cons = (struct CONSOLE *) *((int *) 0x0fec);
-        cons_putstr0(cons, "\nBreak(key) :\n");
-        io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
-        task_cons[0]->tss.eax = (int) &(task_cons[0]->tss.esp0);
-        task_cons[0]->tss.eip = (int) asm_end_app;
-        io_sti();
+        task = kw.key_win->task;
+        if (task != 0 && task->tss.ss0 != 0) {
+            cons_putstr0(task->cons, "\nBreak(key) :\n");
+            io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
+            task->tss.eax = (int) &(task->tss.esp0);
+            task->tss.eip = (int) asm_end_app;
+            io_sti();
+        }
     }
     if (i == 256 + 0x57 && shtctl->top > 2) {   /*  F11 */
         sheet_updown(shtctl->sheets[1], shtctl->top - 1);
@@ -406,12 +406,11 @@ void sheet_leftbutton_down(
         const int y,
         struct MAIN_VARS *vars)
 {
-    struct TASK **task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
     struct SHEET *sht_win = vars->sht_win;
-
     struct SHEET *key_win = pkw->key_win;
-    struct CONSOLE *cons;
+
+    struct TASK *task;
 
     sheet_updown(sht, shtctl->top - 1);
     if (sht != key_win) {
@@ -432,11 +431,11 @@ void sheet_leftbutton_down(
         /*  「×」ボタンクリック。  */
         if ((sht->flags & 0x10) != 0) {
             /*  アプリが作ったウィンドウ。  */
-            cons = (struct CONSOLE *) *((int *) 0x0fec);
-            cons_putstr0(cons, "\nBreak(mouse) :\n");
+            task = sht->task;
+            cons_putstr0(task->cons, "\nBreak(mouse) :\n");
             io_cli();
-            task_cons[0]->tss.eax = (int) &(task_cons[0]->tss.esp0);
-            task_cons[0]->tss.eip = (int) asm_end_app;
+            task->tss.eax = (int) &(task->tss.esp0);
+            task->tss.eip = (int) asm_end_app;
             io_sti();
         }
     }
