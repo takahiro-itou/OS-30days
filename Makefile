@@ -66,6 +66,7 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
             App/winhelo.hrb App/winhelo2.hrb App/winhelo3.hrb   \
             App/star1.hrb App/stars.hrb App/stars2.hrb          \
             App/lines.hrb App/walk.hrb App/noodle.hrb           \
+            App/beepdown.hrb                                    \
             ::
 
 ##
