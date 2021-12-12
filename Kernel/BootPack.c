@@ -70,7 +70,7 @@ void HariMain(void)
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
     unsigned char *buf_back, buf_mouse[256];
     struct SHEET *sht_back, *sht_win;
-    struct TASK *task_a, *task_cons;
+    struct TASK *task_a, *task_cons[MAX_CONSOLE];
     struct TIMER *timer;
     struct CONSOLE *cons;
 
@@ -115,31 +115,38 @@ void HariMain(void)
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 
     /*  sht_cons    */
-    kmv.sht_cons = sheet_alloc(kmv.shtctl);
-    kmv.buf_cons = (unsigned char *) memman_alloc_4k(
-            memman, CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
-    sheet_setbuf(kmv.sht_cons, kmv.buf_cons,
-                 CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y, -1);
-    make_window8(kmv.buf_cons,
-                 CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y,
-                 "console", 0);
-    make_textbox8(kmv.sht_cons, CURSOR_LEFT, CURSOR_TOP,
-                  (CONSOLE_COLS * CURSOR_WIDTH),
-                  (CONSOLE_ROWS * CURSOR_HEIGHT),
-                  COL8_000000);
-    task_cons = task_alloc();
-    kmv.task_cons = task_cons;
-    task_cons->tss.esp  = memman_alloc_4k(memman, 64 * 1024) + 64 * 1024 - 12;
-    task_cons->tss.eip  = (int) &console_task;
-    task_cons->tss.es   = 1 * 8;
-    task_cons->tss.cs   = 2 * 8;
-    task_cons->tss.ss   = 1 * 8;
-    task_cons->tss.ds   = 1 * 8;
-    task_cons->tss.fs   = 1 * 8;
-    task_cons->tss.gs   = 1 * 8;
-    *((int *) (task_cons->tss.esp + 4)) = (int) kmv.sht_cons;
-    *((int *) (task_cons->tss.esp + 8)) = memtotal;
-    task_run(task_cons, 2, 2);
+    for (i = 0; i < MAX_CONSOLE; ++ i) {
+        kmv.sht_cons[i] = sheet_alloc(kmv.shtctl);
+        kmv.buf_cons[i] = (unsigned char *) memman_alloc_4k(
+                memman, CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
+        sheet_setbuf(kmv.sht_cons[i], kmv.buf_cons[i],
+                     CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y, -1);
+        make_window8(kmv.buf_cons[i],
+                     CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y,
+                     "console", 0);
+        make_textbox8(kmv.sht_cons[i], CURSOR_LEFT, CURSOR_TOP,
+                      (CONSOLE_COLS * CURSOR_WIDTH),
+                      (CONSOLE_ROWS * CURSOR_HEIGHT),
+                      COL8_000000);
+
+        task_cons[i] = task_alloc();
+        kmv.task_cons[i] = task_cons[i];
+        task_cons[i]->tss.esp  = memman_alloc_4k(memman, 64 * 1024)
+                + 64 * 1024 - 12;
+        task_cons[i]->tss.eip  = (int) &console_task;
+        task_cons[i]->tss.es   = 1 * 8;
+        task_cons[i]->tss.cs   = 2 * 8;
+        task_cons[i]->tss.ss   = 1 * 8;
+        task_cons[i]->tss.ds   = 1 * 8;
+        task_cons[i]->tss.fs   = 1 * 8;
+        task_cons[i]->tss.gs   = 1 * 8;
+        *((int *) (task_cons[i]->tss.esp + 4)) = (int) kmv.sht_cons[i];
+        *((int *) (task_cons[i]->tss.esp + 8)) = memtotal;
+        task_run(task_cons[i], 2, 2);
+
+        kmv.sht_cons[i]->task = kmv.task_cons[i];
+        kmv.sht_cons[i]->flags |= 0x20;     /*  カーソルあり。  */
+    }
 
     /*  sht_win     */
     kmv.sht_win   = sheet_alloc(kmv.shtctl);
@@ -164,17 +171,17 @@ void HariMain(void)
     kw.mmy = -1;
 
     sheet_slide(    sht_back,   0,  0);
-    sheet_slide(kmv.sht_cons,  32, 44);
-    sheet_slide(kmv.sht_win,   64, 96);
+    sheet_slide(kmv.sht_cons[1],  56,  6);
+    sheet_slide(kmv.sht_cons[0],   8,  2);
+    sheet_slide(kmv.sht_win,   64, 56);
     sheet_slide(kmv.sht_mouse, kw.mx, kw.my);
 
-    sheet_updown(    sht_back,  0);
-    sheet_updown(kmv.sht_cons,  1);
-    sheet_updown(kmv.sht_win,   2);
-    sheet_updown(kmv.sht_mouse, 3);
+    sheet_updown(    sht_back,     0);
+    sheet_updown(kmv.sht_cons[1],  1);
+    sheet_updown(kmv.sht_cons[0],  2);
+    sheet_updown(kmv.sht_win,      3);
+    sheet_updown(kmv.sht_mouse,    4);
     kw.key_win = kmv.sht_win;
-    kmv.sht_cons->task = kmv.task_cons;
-    kmv.sht_cons->flags |= 0x20;
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
@@ -255,12 +262,12 @@ void process_key_data(
 {
     struct KERNELWORK kw = (* pkw);
     int i = code + 256;
-    struct TASK *task_cons = vars->task_cons;
+    struct TASK **task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
     unsigned char *buf_win = vars->buf_win;
-    unsigned char *buf_cons = vars->buf_cons;
+    unsigned char **buf_cons = vars->buf_cons;
     struct SHEET *sht_win = vars->sht_win;
-    struct SHEET *sht_cons = vars->sht_cons;
+    struct SHEET **sht_cons = vars->sht_cons;
     struct FIFO32 *pkeycmd = vars->keycmd;
     struct CONSOLE *cons;
     int j;
@@ -358,14 +365,14 @@ void process_key_data(
         fifo32_put(pkeycmd, KEYCMD_LED);
         fifo32_put(pkeycmd, kw.key_leds);
     }
-    if (i == 256 + 0x3b && kw.key_shift != 0 && task_cons->tss.ss0 != 0)
+    if (i == 256 + 0x3b && kw.key_shift != 0 && task_cons[0]->tss.ss0 != 0)
     {
         /*  Shift + F1  */
         cons = (struct CONSOLE *) *((int *) 0x0fec);
         cons_putstr0(cons, "\nBreak(key) :\n");
         io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
-        task_cons->tss.eax = (int) &(task_cons->tss.esp0);
-        task_cons->tss.eip = (int) asm_end_app;
+        task_cons[0]->tss.eax = (int) &(task_cons[0]->tss.esp0);
+        task_cons[0]->tss.eip = (int) asm_end_app;
         io_sti();
     }
     if (i == 256 + 0x57 && shtctl->top > 2) {   /*  F11 */
@@ -399,7 +406,7 @@ void sheet_leftbutton_down(
         const int y,
         struct MAIN_VARS *vars)
 {
-    struct TASK *task_cons = vars->task_cons;
+    struct TASK **task_cons = vars->task_cons;
     struct SHTCTL *shtctl = vars->shtctl;
     struct SHEET *sht_win = vars->sht_win;
 
@@ -428,8 +435,8 @@ void sheet_leftbutton_down(
             cons = (struct CONSOLE *) *((int *) 0x0fec);
             cons_putstr0(cons, "\nBreak(mouse) :\n");
             io_cli();
-            task_cons->tss.eax = (int) &(task_cons->tss.esp0);
-            task_cons->tss.eip = (int) asm_end_app;
+            task_cons[0]->tss.eax = (int) &(task_cons[0]->tss.esp0);
+            task_cons[0]->tss.eip = (int) asm_end_app;
             io_sti();
         }
     }
