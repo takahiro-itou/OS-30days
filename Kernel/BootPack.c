@@ -7,9 +7,9 @@
 
 static const char keytable0[0x80] = {
     0  ,  0 , '1', '2',     '3', '4', '5', '6',
-    '7', '8', '9', '0',     '-', '^',  0 ,  0 ,
+    '7', '8', '9', '0',     '-', '^',0x08,  0 ,
     'Q', 'W', 'E', 'R',     'T', 'Y', 'U', 'I',
-    'O', 'P', '@', '[',      0 ,  0 , 'A', 'S',
+    'O', 'P', '@', '[',    0x0a,  0 , 'A', 'S',
     'D', 'F', 'G', 'H',     'J', 'K', 'L', ';',
     ':',  0 ,  0 , ']',     'Z', 'X', 'C', 'V',
     'B', 'N', 'M', ',',     '.', '/',  0 , '*',
@@ -26,9 +26,9 @@ static const char keytable0[0x80] = {
 
 static const char keytable1[0x80] = {
     0  ,  0 , '!', '"',     '#', '$', '%', '&',
-    '\'','(', ')', '~',     '=', '~',  0 ,  0 ,
+    '\'','(', ')', '~',     '=', '~',0x08,  0 ,
     'Q', 'W', 'E', 'R',     'T', 'Y', 'U', 'I',
-    'O', 'P', '`', '{',      0 ,  0 , 'A', 'S',
+    'O', 'P', '`', '{',    0x0a,  0 , 'A', 'S',
     'D', 'F', 'G', 'H',     'J', 'K', 'L', '+',
     '*',  0 ,  0 , '}',     'Z', 'X', 'C', 'V',
     'B', 'N', 'M', '<',     '>', '?',  0 , '*',
@@ -71,7 +71,6 @@ void HariMain(void)
     unsigned char *buf_back, buf_mouse[256];
     struct SHEET *sht_back;
     struct TASK *task_a, *task_cons[MAX_CONSOLE];
-    struct TIMER *timer;
     struct CONSOLE *cons;
 
     kmv.binfo = binfo;
@@ -147,10 +146,6 @@ void HariMain(void)
         kmv.sht_cons[i]->task = kmv.task_cons[i];
         kmv.sht_cons[i]->flags |= 0x20;     /*  カーソルあり。  */
     }
-
-    timer = timer_alloc();
-    timer_init(timer, &fifo, 1);
-    timer_settime(timer, 50);
 
     /*  sht_mouse   */
     kmv.sht_mouse = sheet_alloc(kmv.shtctl);
@@ -258,15 +253,8 @@ void process_key_data(
         }
     }
     if (s[0] != 0) {
-        /*  通常文字。  */
+        /*  通常文字、バックスペース、Enter.    */
         fifo32_put(&kw.key_win->task->fifo, s[0] + 256);
-    }
-    if (i == 256 + 0x0e) {
-        /*  バックスペース  */
-        fifo32_put(&kw.key_win->task->fifo, 8 + 256);
-    }
-    if (i == 256 + 0x1c) {      /*  Enter   */
-        fifo32_put(&kw.key_win->task->fifo, 10 + 256);
     }
     if (i == 256 + 0x0f) {      /*  Tab */
         keywin_off(kw.key_win);
