@@ -69,7 +69,7 @@ void HariMain(void)
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
     unsigned char *buf_back, buf_mouse[256];
-    struct SHEET *sht_back, *sht_win;
+    struct SHEET *sht_back;
     struct TASK *task_a, *task_cons[MAX_CONSOLE];
     struct TIMER *timer;
     struct CONSOLE *cons;
@@ -149,11 +149,6 @@ void HariMain(void)
     }
 
     /*  sht_win     */
-    kmv.sht_win   = sheet_alloc(kmv.shtctl);
-    kmv.buf_win   = (unsigned char *)memman_alloc_4k(memman, 160 * 52);
-    sheet_setbuf(kmv.sht_win, kmv.buf_win, 144, 52, -1);    /*  透明色なし  */
-    make_window8(kmv.buf_win, 144, 52, "task_a", 1);
-    make_textbox8(kmv.sht_win, 8, 28, 128, 16, COL8_FFFFFF);
     kw.cursor_x = 8;
     kw.cursor_c = COL8_FFFFFF;
 
@@ -170,18 +165,16 @@ void HariMain(void)
     kw.mmx = -1;
     kw.mmy = -1;
 
-    sheet_slide(    sht_back,   0,  0);
+    sheet_slide(    sht_back,      0,  0);
     sheet_slide(kmv.sht_cons[1],  56,  6);
     sheet_slide(kmv.sht_cons[0],   8,  2);
-    sheet_slide(kmv.sht_win,   64, 56);
     sheet_slide(kmv.sht_mouse, kw.mx, kw.my);
 
     sheet_updown(    sht_back,     0);
     sheet_updown(kmv.sht_cons[1],  1);
     sheet_updown(kmv.sht_cons[0],  2);
-    sheet_updown(kmv.sht_win,      3);
-    sheet_updown(kmv.sht_mouse,    4);
-    kw.key_win = kmv.sht_win;
+    sheet_updown(kmv.sht_mouse,    3);
+    kw.key_win = kmv.sht_cons[0];
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
@@ -191,7 +184,6 @@ void HariMain(void)
         keyseq[i] = ' ';
     }
     keyseq[sizeof(keyseq) - 1] = 0;
-    sht_win = kmv.sht_win;
 
     for (;;) {
         if (fifo32_status(&keycmd) > 0 && kw.keycmd_wait < 0) {
@@ -211,7 +203,7 @@ void HariMain(void)
             if (kw.key_win->flags == 0) {
                 /*  入力ウィンドウが閉じられた  */
                 kw.key_win = kmv.shtctl->sheets[kmv.shtctl->top - 1];
-                kw.cursor_c = keywin_on(kw.key_win, sht_win, kw.cursor_c);
+                kw.cursor_c = keywin_on(kw.key_win, 0, kw.cursor_c);
             }
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
@@ -233,6 +225,7 @@ void HariMain(void)
                 if (mouse_decode(&mdec, i - 512) != 0) {
                     process_mouse_data(&kw, mdec, &kmv);
                 }
+#if 0
             } else if (i <= 1) {    /*  カーソル用タイマ。  */
                 if (i != 0) {
                     timer_init(timer, &fifo, 0);
@@ -252,6 +245,7 @@ void HariMain(void)
                     sheet_refresh(sht_win, kw.cursor_x, 28,
                                   kw.cursor_x + 8, 44);
                 }
+#endif
             }
         }
     }
@@ -263,8 +257,8 @@ void process_key_data(
     struct KERNELWORK kw = (* pkw);
     int i = code + 256;
     struct SHTCTL *shtctl = vars->shtctl;
-    unsigned char *buf_win = vars->buf_win;
-    struct SHEET *sht_win = vars->sht_win;
+//    unsigned char *buf_win = vars->buf_win;
+    struct SHEET *sht_win = 0;
     struct FIFO32 *pkeycmd = vars->keycmd;
 
     struct TASK *task;
@@ -407,7 +401,7 @@ void sheet_leftbutton_down(
         struct MAIN_VARS *vars)
 {
     struct SHTCTL *shtctl = vars->shtctl;
-    struct SHEET *sht_win = vars->sht_win;
+    struct SHEET *sht_win = 0;
     struct SHEET *key_win = pkw->key_win;
 
     struct TASK *task;

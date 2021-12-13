@@ -31,8 +31,8 @@ struct MAIN_VARS {
     struct BOOTINFO *binfo;
     struct TASK *task_cons[MAX_CONSOLE];
     struct SHTCTL *shtctl;
-    unsigned char *buf_win, *buf_cons[MAX_CONSOLE];
-    struct SHEET *sht_mouse, *sht_win, *sht_cons[MAX_CONSOLE];
+    unsigned char *buf_cons[MAX_CONSOLE];
+    struct SHEET *sht_mouse, *sht_cons[MAX_CONSOLE];
     struct FIFO32 *keycmd;
 };
 
