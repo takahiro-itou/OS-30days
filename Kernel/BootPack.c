@@ -71,7 +71,6 @@ void HariMain(void)
     unsigned char *buf_back, buf_mouse[256];
     struct SHEET *sht_back;
     struct TASK *task_a, *task_cons[MAX_CONSOLE];
-    struct CONSOLE *cons;
 
     kmv.binfo = binfo;
     kmv.keycmd = &keycmd;
