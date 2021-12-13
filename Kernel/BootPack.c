@@ -51,8 +51,9 @@ void process_mouse_data(
         struct KERNELWORK *pkw, struct MOUSE_DEC mdec,
         struct MAIN_VARS *vars);
 
-void keywin_off(struct SHEET *key_win, struct SHEET *sht_win);
-void keywin_on(struct SHEET *key_win, struct SHEET *sht_win);
+void keywin_off(struct SHEET *key_win);
+void keywin_on(struct SHEET *key_win);
+
 
 void HariMain(void)
 {
@@ -198,7 +199,7 @@ void HariMain(void)
             if (kw.key_win->flags == 0) {
                 /*  入力ウィンドウが閉じられた  */
                 kw.key_win = kmv.shtctl->sheets[kmv.shtctl->top - 1];
-                keywin_on(kw.key_win, 0);
+                keywin_on(kw.key_win);
             }
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
@@ -289,13 +290,13 @@ void process_key_data(
         fifo32_put(&kw.key_win->task->fifo, 10 + 256);
     }
     if (i == 256 + 0x0f) {      /*  Tab */
-        keywin_off(kw.key_win, 0);
+        keywin_off(kw.key_win);
         j = kw.key_win->height - 1;
         if (j == 0) {
             j = shtctl->top - 1;
         }
         kw.key_win = shtctl->sheets[j];
-        keywin_on(kw.key_win, 0);
+        keywin_on(kw.key_win);
     }
 
     /*  シフトキー  */
@@ -365,16 +366,15 @@ void sheet_leftbutton_down(
         struct MAIN_VARS *vars)
 {
     struct SHTCTL *shtctl = vars->shtctl;
-    struct SHEET *sht_win = 0;
     struct SHEET *key_win = pkw->key_win;
 
     struct TASK *task;
 
     sheet_updown(sht, shtctl->top - 1);
     if (sht != key_win) {
-        keywin_off(key_win, sht_win);
+        keywin_off(key_win);
         key_win = sht;
-        keywin_on(key_win, sht_win);
+        keywin_on(key_win);
     }
 
     if (3 <= x && x < sht->bxsize && 3 <= y && y < 21)
@@ -466,7 +466,7 @@ void process_mouse_data(
     return;
 }
 
-void keywin_off(struct SHEET *key_win, struct SHEET *sht_win)
+void keywin_off(struct SHEET *key_win)
 {
     change_wtitle8(key_win, 0);
     if ((key_win->flags & 0x20) != 0) {
@@ -477,7 +477,7 @@ void keywin_off(struct SHEET *key_win, struct SHEET *sht_win)
     return;
 }
 
-void keywin_on(struct SHEET *key_win, struct SHEET *sht_win)
+void keywin_on(struct SHEET *key_win)
 {
     change_wtitle8(key_win, 1);
     if ((key_win->flags & 0x20) != 0) {
