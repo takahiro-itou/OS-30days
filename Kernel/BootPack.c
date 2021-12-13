@@ -221,27 +221,6 @@ void HariMain(void)
                 if (mouse_decode(&mdec, i - 512) != 0) {
                     process_mouse_data(&kw, mdec, &kmv);
                 }
-#if 0
-            } else if (i <= 1) {    /*  カーソル用タイマ。  */
-                if (i != 0) {
-                    timer_init(timer, &fifo, 0);
-                    if (kw.cursor_c >= 0) {
-                        kw.cursor_c = COL8_000000;
-                    }
-                } else {
-                    timer_init(timer, &fifo, 1);
-                    if (kw.cursor_c >= 0) {
-                        kw.cursor_c = COL8_FFFFFF;
-                    }
-                }
-                timer_settime(timer, 50);
-                if (kw.cursor_c >= 0) {
-                    boxfill8(sht_win->buf, sht_win->bxsize, kw.cursor_c,
-                             kw.cursor_x, 28, kw.cursor_x + 7, 43);
-                    sheet_refresh(sht_win, kw.cursor_x, 28,
-                                  kw.cursor_x + 8, 44);
-                }
-#endif
             }
         }
     }
