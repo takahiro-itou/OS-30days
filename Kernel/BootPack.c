@@ -63,7 +63,7 @@ void HariMain(void)
 
     char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
-    int fifobuf[128], keycmd_buf[32];
+    int fifobuf[128], keycmd_buf[32], *cons_fifo[MAX_CONSOLE];
     int i;
     unsigned int memtotal;
     struct MOUSE_DEC mdec;
@@ -144,6 +144,8 @@ void HariMain(void)
 
         kmv.sht_cons[i]->task = kmv.task_cons[i];
         kmv.sht_cons[i]->flags |= 0x20;     /*  カーソルあり。  */
+        cons_fifo[i] = (int *) memman_alloc_4k(memman, 128 * 4);
+        fifo32_init(&task_cons[i]->fifo, 128, cons_fifo[i], task_cons[i]);
     }
 
     /*  sht_mouse   */
