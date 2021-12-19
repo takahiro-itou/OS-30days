@@ -165,6 +165,7 @@ void HariMain(void)
     sheet_updown(kmv.sht_cons[0],  2);
     sheet_updown(kmv.sht_mouse,    3);
     kw.key_win = kmv.sht_cons[0];
+    keywin_on(kw.key_win);
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
