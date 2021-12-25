@@ -18,6 +18,7 @@ struct BOOTINFO
 struct KERNELWORK {
     int mx, my;         /*  マウスカーソルの座標。  */
     int mmx, mmy;       /*  マウスカーソル移動量。  */
+    int mmx2;
     struct SHEET *selsht;       /*  選択中のシート  */
     struct SHEET *key_win;
     int key_shift;

@@ -156,6 +156,7 @@ void HariMain(void)
     kw.my = (binfo->scrny - 28 - 16) / 2;
     kw.mmx = -1;
     kw.mmy = -1;
+    kw.mmx2 = 0;
 
     sheet_slide(    sht_back,      0,  0);
     sheet_slide(kmv.sht_cons[1],  56,  6);
@@ -348,8 +349,10 @@ void sheet_leftbutton_down(
 
     if (3 <= x && x < sht->bxsize && 3 <= y && y < 21)
     {
+        /*  ウィンドウ移動モードへ  */
         pkw->mmx = pkw->mx;
         pkw->mmy = pkw->my;
+        pkw->mmx2 = sht->vx0;
     }
 
     if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 3 <= y && y < 19)
@@ -421,8 +424,7 @@ void process_mouse_data(
             /*  ウィンドウ移動モードの場合  */
             x = kw.mx - kw.mmx;
             y = kw.my - kw.mmy;
-            sheet_slide(sht, sht->vx0 + x, sht->vy0 + y);
-            kw.mmx = kw.mx;
+            sheet_slide(sht, (kw.mmx2 + x +2) & ~3, sht->vy0 + y);
             kw.mmy = kw.my;
         }
     } else {
