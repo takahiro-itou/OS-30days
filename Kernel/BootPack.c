@@ -3,7 +3,8 @@
 #include "BootPack.h"
 #include "../Common/stdio.h"
 
-#define KEYCMD_LED      0xed
+#define KEYCMD_LED          0xed
+#define INVALID_WX          0x7fffffff
 
 static const char keytable0[0x80] = {
     0  ,  0 , '1', '2',     '3', '4', '5', '6',
@@ -154,6 +155,10 @@ void HariMain(void)
     init_mouse_cursor8(buf_mouse, 99);
     kw.mx = (binfo->scrnx - 16) / 2;
     kw.my = (binfo->scrny - 28 - 16) / 2;
+    kw.new_mx = -1;
+    kw.new_my = 0;
+    kw.new_wx = INVALID_WX;
+    kw.new_wy = 0;
     kw.mmx = -1;
     kw.mmy = -1;
     kw.mmx2 = 0;
@@ -189,8 +194,20 @@ void HariMain(void)
         io_cli();
 
         if (fifo32_status(&fifo) == 0) {
-            task_sleep(task_a);
-            io_sti();
+            /*  FIFO  がからっぽになったので、      **
+            **  保留している描画があれば実行する。  */
+            if (kw.new_mx >= 0) {
+                io_sti();
+                sheet_slide(kmv.sht_mouse, kw.new_mx, kw.new_my);
+                kw.new_mx = -1;
+            } else if (kw.new_wx != INVALID_WX) {
+                io_sti();
+                sheet_slide(kw.selsht, kw.new_wx, kw.new_wy);
+                kw.new_wx = INVALID_WX;
+            } else {
+                task_sleep(task_a);
+                io_sti();
+            }
         } else {
             i = fifo32_get(&fifo);
             io_sti();
@@ -353,6 +370,7 @@ void sheet_leftbutton_down(
         pkw->mmx = pkw->mx;
         pkw->mmy = pkw->my;
         pkw->mmx2 = sht->vx0;
+        pkw->new_wy = sht->vy0;
     }
 
     if (sht->bxsize - 21 <= x && x < sht->bxsize - 5 && 3 <= y && y < 19)
@@ -402,7 +420,9 @@ void process_mouse_data(
         kw.my = binfo->scrny - 1;
     }
 
-    sheet_slide(sht_mouse, kw.mx, kw.my);
+    kw.new_mx = kw.mx;
+    kw.new_my = kw.my;
+
     if ((mdec.btn & 0x01) != 0) {
         /*  左ボタンを押している。  */
         if (kw.mmx < 0) {
@@ -424,12 +444,17 @@ void process_mouse_data(
             /*  ウィンドウ移動モードの場合  */
             x = kw.mx - kw.mmx;
             y = kw.my - kw.mmy;
-            sheet_slide(sht, (kw.mmx2 + x +2) & ~3, sht->vy0 + y);
+            kw.new_wx = (kw.mmx2 + x + 2) & ~3;
+            kw.new_wy = kw.new_wy + y;
             kw.mmy = kw.my;
         }
     } else {
         /*  左ボタンを押していない  */
         kw.mmx = -1;    /*  通常モードへ。  */
+        if (kw.new_wx != INVALID_WX) {
+            sheet_slide(sht, kw.new_wx, kw.new_wy);
+            kw.new_wx = INVALID_WX;
+        }
     }
 
     (* pkw) = kw;
