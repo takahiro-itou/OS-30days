@@ -127,7 +127,7 @@ void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0,
 
 #define     WRITE_VRAM(dx, dy, sx, sy)                                  \
 if (map[(dy) * ctl->xsize + (dx)] == sid) {                             \
-    vram[(dy) * ctl->xsize + (dx)] = buf[(sy) * sht->bxsize + (sy)];    \
+    vram[(dy) * ctl->xsize + (dx)] = buf[(sy) * sht->bxsize + (sx)];    \
 }                                                                       \
 
 void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0,
