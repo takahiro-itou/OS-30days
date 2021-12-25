@@ -125,10 +125,16 @@ void sheet_refreshmap(struct SHTCTL *ctl, int vx0, int vy0,
     return;
 }
 
+#define     WRITE_VRAM(dx, dy, sx, sy)                                  \
+if (map[(dy) * ctl->xsize + (dx)] == sid) {                             \
+    vram[(dy) * ctl->xsize + (dx)] = buf[(sy) * sht->bxsize + (sy)];    \
+}                                                                       \
+
 void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0,
                       int vx1, int vy1, int h0, int h1)
 {
     int h, bx, by, vx, vy, bx0, by0, bx1, by1;
+    int bx2, sid4, i, i1, *p, *q, *r;
     unsigned char *buf, c, *vram = ctl->vram, *map = ctl->map, sid;
     struct SHEET *sht;
 
@@ -153,18 +159,56 @@ void sheet_refreshsub(struct SHTCTL *ctl, int vx0, int vy0,
         if (bx1 > sht->bxsize) { bx1 = sht->bxsize; }
         if (by1 > sht->bysize) { by1 = sht->bysize; }
 
-        for (by = by0; by < by1; ++ by) {
-            vy = sht->vy0 + by;
-            for (bx = bx0; bx < bx1; ++ bx) {
+        if ((sht->vx0 & 3) == 0) {
+            /*  4 バイト型  */
+            i  = (bx0 + 3) / 4;
+            i1 =  bx1      / 4;
+            i1 = i1 - i;
+            sid4 = sid | sid << 8 | sid << 16 | sid << 24;
+            for (by = by0; by < by1; ++ by) {
+                vy = sht->vy0 + by;
+                for (bx = bx0; bx < bx1 && (bx & 3) != 0; ++ bx) {
+                    /*  前の端数を 1バイトずつ  */
+                    vx = sht->vx0 + bx;
+                    WRITE_VRAM(vx, vy, bx, by);
+                }
                 vx = sht->vx0 + bx;
-                if (map[vy * ctl->xsize + vx] == sid) {
-                    vram[vy * ctl->xsize + vx] = buf[by * sht->bxsize + bx];
+                p = (int *) &map[vy * ctl->xsize + vx];
+                q = (int *) &vram[vy * ctl->xsize + vx];
+                r = (int *) &buf[by * sht->bxsize + bx];
+                for (i = 0; i < i1; ++ i) {
+                    if (p[i] == sid4) {
+                        q[i] = r[i];
+                    } else {
+                        bx2 = bx + i * 4;
+                        vx = sht->vx0 + bx2;
+                        WRITE_VRAM(vx + 0, vy, bx2 + 0, by);
+                        WRITE_VRAM(vx + 1, vy, bx2 + 1, by);
+                        WRITE_VRAM(vx + 2, vy, bx2 + 2, by);
+                        WRITE_VRAM(vx + 3, vy, bx2 + 3, by);
+                    }
+                }
+                for (bx += i1 * 4; bx < bx1; ++ bx) {
+                    /*  後ろの端数を 1バイトずつ。  */
+                    vx = sht->vx0 + bx;
+                    WRITE_VRAM(vx, vy, bx, by);
+                }
+            }
+        } else {
+            /*  1 バイト型  */
+            for (by = by0; by < by1; ++ by) {
+                vy = sht->vy0 + by;
+                for (bx = bx0; bx < bx1; ++ bx) {
+                    vx = sht->vx0 + bx;
+                    WRITE_VRAM(vx, vy, bx, by);
                 }
             }
         }
     }
     return;
 }
+
+#undef  WRITE_VRAM
 
 void sheet_updown(struct SHEET *sht, int height)
 {
