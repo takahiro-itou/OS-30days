@@ -115,9 +115,8 @@ void HariMain(void)
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 
     /*  sht_cons    */
-    for (i = 0; i < MAX_CONSOLE; ++ i) {
-        kmv.sht_cons[i] = open_console(kmv.shtctl, memtotal);
-    }
+    kmv.sht_cons[0] = open_console(kmv.shtctl, memtotal);
+    kmv.sht_cons[1] = 0;    /*  まだ開いてない  */
 
     /*  sht_mouse   */
     kmv.sht_mouse = sheet_alloc(kmv.shtctl);
@@ -134,14 +133,12 @@ void HariMain(void)
     kw.mmx2 = 0;
 
     sheet_slide(    sht_back,      0,  0);
-    sheet_slide(kmv.sht_cons[1],  56,  6);
-    sheet_slide(kmv.sht_cons[0],   8,  2);
+    sheet_slide(kmv.sht_cons[0],  32,  4);
     sheet_slide(kmv.sht_mouse, kw.mx, kw.my);
 
     sheet_updown(    sht_back,     0);
-    sheet_updown(kmv.sht_cons[1],  1);
-    sheet_updown(kmv.sht_cons[0],  2);
-    sheet_updown(kmv.sht_mouse,    3);
+    sheet_updown(kmv.sht_cons[0],  1);
+    sheet_updown(kmv.sht_mouse,    2);
     kw.key_win = kmv.sht_cons[0];
     keywin_on(kw.key_win);
 
