@@ -54,6 +54,7 @@ void process_mouse_data(
 
 void keywin_off(struct SHEET *key_win);
 void keywin_on(struct SHEET *key_win);
+struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal);
 
 
 void HariMain(void)
@@ -115,38 +116,7 @@ void HariMain(void)
 
     /*  sht_cons    */
     for (i = 0; i < MAX_CONSOLE; ++ i) {
-        kmv.sht_cons[i] = sheet_alloc(kmv.shtctl);
-        kmv.buf_cons[i] = (unsigned char *) memman_alloc_4k(
-                memman, CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
-        sheet_setbuf(kmv.sht_cons[i], kmv.buf_cons[i],
-                     CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y, -1);
-        make_window8(kmv.buf_cons[i],
-                     CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y,
-                     "console", 0);
-        make_textbox8(kmv.sht_cons[i], CURSOR_LEFT, CURSOR_TOP,
-                      (CONSOLE_COLS * CURSOR_WIDTH),
-                      (CONSOLE_ROWS * CURSOR_HEIGHT),
-                      COL8_000000);
-
-        task_cons[i] = task_alloc();
-        kmv.task_cons[i] = task_cons[i];
-        task_cons[i]->tss.esp  = memman_alloc_4k(memman, 64 * 1024)
-                + 64 * 1024 - 12;
-        task_cons[i]->tss.eip  = (int) &console_task;
-        task_cons[i]->tss.es   = 1 * 8;
-        task_cons[i]->tss.cs   = 2 * 8;
-        task_cons[i]->tss.ss   = 1 * 8;
-        task_cons[i]->tss.ds   = 1 * 8;
-        task_cons[i]->tss.fs   = 1 * 8;
-        task_cons[i]->tss.gs   = 1 * 8;
-        *((int *) (task_cons[i]->tss.esp + 4)) = (int) kmv.sht_cons[i];
-        *((int *) (task_cons[i]->tss.esp + 8)) = memtotal;
-        task_run(task_cons[i], 2, 2);
-
-        kmv.sht_cons[i]->task = kmv.task_cons[i];
-        kmv.sht_cons[i]->flags |= 0x20;     /*  カーソルあり。  */
-        cons_fifo[i] = (int *) memman_alloc_4k(memman, 128 * 4);
-        fifo32_init(&task_cons[i]->fifo, 128, cons_fifo[i], task_cons[i]);
+        kmv.sht_cons[i] = open_console(kmv.shtctl, memtotal);
     }
 
     /*  sht_mouse   */
@@ -482,4 +452,41 @@ void keywin_on(struct SHEET *key_win)
     }
 
     return;
+}
+
+struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
+{
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+
+    struct SHEET *sht = sheet_alloc(shtctl);
+    unsigned char *buf = (unsigned char *) memman_alloc_4k(
+            memman, CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
+    struct TASK *task = task_alloc();
+    int *cons_fifo = (int *) memman_alloc_4k(memman, 128 * 4);
+
+    sheet_setbuf(sht, buf, CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y, -1);
+    make_window8(buf, CONSOLE_WIN_SIZE_X, CONSOLE_WIN_SIZE_Y,
+                 "console", 0);
+    make_textbox8(sht, CURSOR_LEFT, CURSOR_TOP,
+                  (CONSOLE_COLS * CURSOR_WIDTH),
+                  (CONSOLE_ROWS * CURSOR_HEIGHT),
+                  COL8_000000);
+
+    task->tss.esp  = memman_alloc_4k(memman, 64 * 1024)
+                + 64 * 1024 - 12;
+    task->tss.eip  = (int) &console_task;
+    task->tss.es   = 1 * 8;
+    task->tss.cs   = 2 * 8;
+    task->tss.ss   = 1 * 8;
+    task->tss.ds   = 1 * 8;
+    task->tss.fs   = 1 * 8;
+    task->tss.gs   = 1 * 8;
+    *((int *) (task->tss.esp + 4)) = (int) sht;
+    *((int *) (task->tss.esp + 8)) = memtotal;
+    task_run(task, 2, 2);
+
+    sht->task = task;
+    sht->flags |= 0x20;     /*  カーソルあり。  */
+    fifo32_init(&task->fifo, 128, cons_fifo, task);
+    return sht;
 }
