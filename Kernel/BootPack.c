@@ -67,7 +67,6 @@ void HariMain(void)
     struct FIFO32 fifo, keycmd;
     int fifobuf[128], keycmd_buf[32], *cons_fifo[MAX_CONSOLE];
     int i;
-    unsigned int memtotal;
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
     unsigned char *buf_back, buf_mouse[256];
@@ -94,10 +93,10 @@ void HariMain(void)
     io_out8(PIC1_IMR, 0xef);    /*  マウスを許可            */
     fifo32_init(&keycmd, sizeof(keycmd_buf), keycmd_buf, 0);
 
-    memtotal = memtest(0x00400000, 0xbfffffff);
+    kmv.memtotal = memtest(0x00400000, 0xbfffffff);
     memman_init(memman);
     memman_free(memman, 0x00001000, 0x0009e000);
-    memman_free(memman, 0x00400000, memtotal - 0x00400000);
+    memman_free(memman, 0x00400000, kmv.memtotal - 0x00400000);
 
     init_palette();
     kmv.shtctl = shtctl_init(memman, binfo->vram, binfo->scrnx, binfo->scrny);
@@ -115,7 +114,7 @@ void HariMain(void)
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 
     /*  sht_cons    */
-    kmv.sht_cons[0] = open_console(kmv.shtctl, memtotal);
+    kmv.sht_cons[0] = open_console(kmv.shtctl, kmv.memtotal);
     kmv.sht_cons[1] = 0;    /*  まだ開いてない  */
 
     /*  sht_mouse   */
@@ -294,6 +293,17 @@ void process_key_data(
             io_sti();
         }
     }
+    if (i == 256 + 0x3c && kw.key_shift != 0)
+    {
+        /*  Shift + F2  */
+        vars->sht_cons[1] = open_console(shtctl, vars->memtotal);
+        sheet_slide(vars->sht_cons[1], 32, 4);
+        sheet_updown(vars->sht_cons[1], shtctl->top);
+        keywin_off(kw.key_win);
+        kw.key_win = vars->sht_cons[1];
+        keywin_on(kw.key_win);
+    }
+
     if (i == 256 + 0x57 && shtctl->top > 2) {   /*  F11 */
         sheet_updown(shtctl->sheets[1], shtctl->top - 1);
     }

@@ -35,6 +35,7 @@ struct MAIN_VARS {
     unsigned char *buf_cons[MAX_CONSOLE];
     struct SHEET *sht_mouse, *sht_cons[MAX_CONSOLE];
     struct FIFO32 *keycmd;
+    unsigned int memtotal;
 };
 
 /*  BootPack.c  */
