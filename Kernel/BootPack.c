@@ -371,6 +371,12 @@ void sheet_leftbutton_down(
             task->tss.eax = (int) &(task->tss.esp0);
             task->tss.eip = (int) asm_end_app;
             io_sti();
+        } else {
+            /*  コンソール  */
+            task = sht->task;
+            io_cli();
+            fifo32_put(&task->fifo, 4);
+            io_sti();
         }
     }
 

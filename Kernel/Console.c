@@ -63,6 +63,9 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                          cons.cur_y + CURSOR_HEIGHT - 1);
                 cons.cur_c = -1;
             }
+            if (i == 4) {
+                cmd_exit(&cons, fat);
+            }
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
                 if (i == 8 + 256) {
