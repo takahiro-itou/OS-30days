@@ -65,7 +65,7 @@ void HariMain(void)
 
     char s[40], keyseq[32];
     struct FIFO32 fifo, keycmd;
-    int fifobuf[128], keycmd_buf[32], *cons_fifo[MAX_CONSOLE];
+    int fifobuf[128], keycmd_buf[32];
     int i;
     struct MOUSE_DEC mdec;
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
