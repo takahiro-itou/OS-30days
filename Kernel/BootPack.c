@@ -476,8 +476,8 @@ struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
                   (CONSOLE_ROWS * CURSOR_HEIGHT),
                   COL8_000000);
 
-    task->tss.esp  = memman_alloc_4k(memman, 64 * 1024)
-                + 64 * 1024 - 12;
+    task->cons_stack = memman_alloc_4k(memman, 64 * 1024);
+    task->tss.esp  = task->cons_stack + 64 * 1024 - 12;
     task->tss.eip  = (int) &console_task;
     task->tss.es   = 1 * 8;
     task->tss.cs   = 2 * 8;
