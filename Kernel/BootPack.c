@@ -71,7 +71,7 @@ void HariMain(void)
     struct MEMMAN*memman = (struct MEMMAN *)(MEMMAN_ADDR);
     unsigned char *buf_back, buf_mouse[256];
     struct SHEET *sht_back;
-    struct TASK *task_a, *task_cons[MAX_CONSOLE];
+    struct TASK *task_a;
 
     kmv.binfo = binfo;
     kmv.keycmd = &keycmd;
