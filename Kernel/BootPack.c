@@ -208,6 +208,9 @@ void HariMain(void)
                 if (mouse_decode(&mdec, i - 512) != 0) {
                     process_mouse_data(&kw, mdec, &kmv);
                 }
+            } else if (768 <= i && i <= 1023) {
+                /*  コンソール終了処理  */
+                close_console(kmv.shtctl->sheets0 + (i - 768));
             }
         }
     }
