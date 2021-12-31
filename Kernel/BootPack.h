@@ -30,7 +30,6 @@ struct KERNELWORK {
 
 struct MAIN_VARS {
     struct BOOTINFO *binfo;
-    struct TASK *task_cons[MAX_CONSOLE];
     struct SHTCTL *shtctl;
     unsigned char *buf_cons[MAX_CONSOLE];
     struct SHEET *sht_mouse;
