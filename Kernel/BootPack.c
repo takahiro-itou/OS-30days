@@ -114,8 +114,7 @@ void HariMain(void)
     init_screen8(buf_back, binfo->scrnx, binfo->scrny);
 
     /*  sht_cons    */
-    kmv.sht_cons[0] = open_console(kmv.shtctl, kmv.memtotal);
-    kmv.sht_cons[1] = 0;    /*  まだ開いてない  */
+    kw.key_win = open_console(kmv.shtctl, kmv.memtotal);
 
     /*  sht_mouse   */
     kmv.sht_mouse = sheet_alloc(kmv.shtctl);
@@ -132,13 +131,12 @@ void HariMain(void)
     kw.mmx2 = 0;
 
     sheet_slide(    sht_back,      0,  0);
-    sheet_slide(kmv.sht_cons[0],  32,  4);
+    sheet_slide(kw.key_win,       32,  4);
     sheet_slide(kmv.sht_mouse, kw.mx, kw.my);
 
-    sheet_updown(    sht_back,     0);
-    sheet_updown(kmv.sht_cons[0],  1);
-    sheet_updown(kmv.sht_mouse,    2);
-    kw.key_win = kmv.sht_cons[0];
+    sheet_updown(    sht_back,  0);
+    sheet_updown(kw.key_win,    1);
+    sheet_updown(kmv.sht_mouse, 2);
     keywin_on(kw.key_win);
 
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
@@ -296,11 +294,10 @@ void process_key_data(
     if (i == 256 + 0x3c && kw.key_shift != 0)
     {
         /*  Shift + F2  */
-        vars->sht_cons[1] = open_console(shtctl, vars->memtotal);
-        sheet_slide(vars->sht_cons[1], 32, 4);
-        sheet_updown(vars->sht_cons[1], shtctl->top);
         keywin_off(kw.key_win);
-        kw.key_win = vars->sht_cons[1];
+        kw.key_win = open_console(shtctl, vars->memtotal);
+        sheet_slide(kw.key_win, 32, 4);
+        sheet_updown(kw.key_win, shtctl->top);
         keywin_on(kw.key_win);
     }
 

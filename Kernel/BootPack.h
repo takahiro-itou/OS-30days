@@ -33,7 +33,7 @@ struct MAIN_VARS {
     struct TASK *task_cons[MAX_CONSOLE];
     struct SHTCTL *shtctl;
     unsigned char *buf_cons[MAX_CONSOLE];
-    struct SHEET *sht_mouse, *sht_cons[MAX_CONSOLE];
+    struct SHEET *sht_mouse;
     struct FIFO32 *keycmd;
     unsigned int memtotal;
 };
