@@ -55,6 +55,8 @@ void process_mouse_data(
 void keywin_off(struct SHEET *key_win);
 void keywin_on(struct SHEET *key_win);
 struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal);
+void close_constask(struct TASK *task);
+void close_console(struct SHEET *sht);
 
 
 void HariMain(void)
@@ -493,4 +495,25 @@ struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal)
     sht->flags |= 0x20;     /*  カーソルあり。  */
     fifo32_init(&task->fifo, 128, cons_fifo, task);
     return sht;
+}
+
+void close_constask(struct TASK *task)
+{
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    task_sleep(task);
+    memman_free_4k(memman, task->cons_stack, 64 * 1024);
+    memman_free_4k(memman, (int) task->fifo.buf, 128 * 4);
+    task->flags = 0;
+    return;
+}
+
+void close_console(struct SHEET *sht)
+{
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    struct TASK *task = sht->task;
+    memman_free_4k(memman, (int) sht->buf,
+                   CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
+    sheet_free(sht);
+    close_constask(task);
+    return;
 }
