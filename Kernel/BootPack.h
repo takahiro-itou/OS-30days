@@ -50,6 +50,8 @@ struct SHEET;
 #define KEYCMD_SENDTO_MOUSE     0xd4
 #define MOUSECMD_ENABLE         0xf4
 
+struct SHEET *open_console(struct SHTCTL *shtctl, unsigned int memtotal);
+
 
 /*  Func.s  */
 
