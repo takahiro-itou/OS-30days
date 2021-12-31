@@ -13,7 +13,6 @@ struct BOOTINFO
 
 #define ADR_BOOTINFO    0x00000ff0
 #define ADR_DISKIMG     0x00100000
-#define MAX_CONSOLE     2
 
 struct KERNELWORK {
     int mx, my;         /*  マウスカーソルの座標。  */
