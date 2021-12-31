@@ -31,7 +31,6 @@ struct KERNELWORK {
 struct MAIN_VARS {
     struct BOOTINFO *binfo;
     struct SHTCTL *shtctl;
-    unsigned char *buf_cons[MAX_CONSOLE];
     struct SHEET *sht_mouse;
     struct FIFO32 *keycmd;
     unsigned int memtotal;
