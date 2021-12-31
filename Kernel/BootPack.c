@@ -178,10 +178,15 @@ void HariMain(void)
         } else {
             i = fifo32_get(&fifo);
             io_sti();
-            if (kw.key_win->flags == 0) {
+            if (kw.key_win != 0 && kw.key_win->flags == 0) {
                 /*  入力ウィンドウが閉じられた  */
-                kw.key_win = kmv.shtctl->sheets[kmv.shtctl->top - 1];
-                keywin_on(kw.key_win);
+                if (kmv.shtctl->top == 1) {
+                    /*  もうマウスと背景しかない。  */
+                    kw.key_win = 0;
+                } else {
+                    kw.key_win = kmv.shtctl->sheets[kmv.shtctl->top - 1];
+                    keywin_on(kw.key_win);
+                }
             }
             if (256 <= i && i <= 511) {
                 /*  キーボードデータ。  */
@@ -239,11 +244,11 @@ void process_key_data(
             s[0] += 0x20;
         }
     }
-    if (s[0] != 0) {
+    if (s[0] != 0 && kw.key_win != 0) {
         /*  通常文字、バックスペース、Enter.    */
-        fifo32_put(&kw.key_win->task->fifo, s[0] + 256);
+        fifo32_put(&(kw.key_win->task->fifo), s[0] + 256);
     }
-    if (i == 256 + 0x0f) {      /*  Tab */
+    if (i == 256 + 0x0f && kw.key_win != 0) {   /*  Tab */
         keywin_off(kw.key_win);
         j = kw.key_win->height - 1;
         if (j == 0) {
@@ -282,7 +287,7 @@ void process_key_data(
         fifo32_put(pkeycmd, KEYCMD_LED);
         fifo32_put(pkeycmd, kw.key_leds);
     }
-    if (i == 256 + 0x3b && kw.key_shift != 0)
+    if (i == 256 + 0x3b && kw.key_shift != 0 && kw.key_win != 0)
     {
         /*  Shift + F1  */
         task = kw.key_win->task;
@@ -297,7 +302,9 @@ void process_key_data(
     if (i == 256 + 0x3c && kw.key_shift != 0)
     {
         /*  Shift + F2  */
-        keywin_off(kw.key_win);
+        if (kw.key_win != 0) {
+            keywin_off(kw.key_win);
+        }
         kw.key_win = open_console(shtctl, vars->memtotal);
         sheet_slide(kw.key_win, 32, 4);
         sheet_updown(kw.key_win, shtctl->top);
