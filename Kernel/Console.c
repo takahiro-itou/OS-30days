@@ -188,6 +188,8 @@ void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
         cmd_dir(cons);
     } else if (strncmp(cmdline, "type ", 5) == 0) {
         cmd_type(cons, fat, cmdline);
+    } else if (strcmp(cmdline, "exit") == 0) {
+        cmd_exit(cons, fat);
     } else if (cmdline[0] != 0) {
         if (cmd_app(cons, fat, cmdline) == 0) {
             /*  コマンドではなく、アプリでもなく、さらに空行でもない。  */
@@ -271,6 +273,11 @@ void cmd_type(struct CONSOLE *cons, int *fat, char *cmdline)
         cons_putstr0(cons, "File not found.\n");
     }
     cons_newline(cons);
+    return;
+}
+
+void cmd_exit(struct CONSOLE *cons, int *fat)
+{
     return;
 }
 

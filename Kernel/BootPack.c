@@ -88,6 +88,7 @@ void HariMain(void)
     io_sti();
 
     fifo32_init(&fifo, sizeof(fifobuf), fifobuf, 0);
+    *((int *) 0x0fec) = (int) &fifo;
     init_pit();
     init_keyboard(&fifo, 256);
     enable_mouse(&fifo, 512, &mdec);
