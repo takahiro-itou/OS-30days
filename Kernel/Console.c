@@ -187,13 +187,13 @@ void cons_putstr1(struct CONSOLE *cons, char *s, int l)
 void cons_runcmd(char *cmdline, struct CONSOLE *cons, int *fat,
                   unsigned int memtotal)
 {
-    if (strcmp(cmdline, "mem") == 0) {
+    if (strcmp(cmdline, "mem") == 0 && cons->sht != 0) {
         cmd_mem(cons, memtotal);
-    } else if (strcmp(cmdline, "cls") == 0) {
+    } else if (strcmp(cmdline, "cls") == 0 && cons->sht != 0) {
         cmd_cls(cons);
-    } else if (strcmp(cmdline, "dir") == 0) {
+    } else if (strcmp(cmdline, "dir") == 0 && cons->sht != 0) {
         cmd_dir(cons);
-    } else if (strncmp(cmdline, "type ", 5) == 0) {
+    } else if (strncmp(cmdline, "type ", 5) == 0 && cons->sht != 0) {
         cmd_type(cons, fat, cmdline);
     } else if (strcmp(cmdline, "exit") == 0) {
         cmd_exit(cons, fat);
