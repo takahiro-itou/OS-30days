@@ -111,8 +111,10 @@ void cons_putchar(struct CONSOLE *cons, int chr, char move)
     s[1] = 0;
     if (s[0] == 0x09) {
         for (;;) {
-            putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
-                              COL8_FFFFFF, COL8_000000, " ", 1);
+            if (cons->sht != 0) {
+                putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
+                                  COL8_FFFFFF, COL8_000000, " ", 1);
+            }
             cons->cur_x += CURSOR_WIDTH;
             if (cons->cur_x == CONSOLE_SIZE_X) {
                 cons_newline(cons);
@@ -126,8 +128,10 @@ void cons_putchar(struct CONSOLE *cons, int chr, char move)
     } else if (s[0] == 0x0d) {
     } else {
         /*  普通の文字  */
-        putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
-                          COL8_FFFFFF, COL8_000000, s, 1);
+        if (cons->sht != 0) {
+            putfonts8_asc_sht(cons->sht, cons->cur_x, cons->cur_y,
+                              COL8_FFFFFF, COL8_000000, s, 1);
+        }
         if (move != 0) {
             cons->cur_x += CURSOR_WIDTH;
             if (cons->cur_x == CONSOLE_SIZE_X) {
@@ -145,7 +149,7 @@ void cons_newline(struct CONSOLE *cons)
     struct SHEET *sheet = cons->sht;
     if (cons->cur_y < CONSOLE_SIZE_Y - CURSOR_HEIGHT) {
         cons->cur_y += CURSOR_HEIGHT;       /*  次の行へ。  */
-    } else {
+    } else if (sheet != 0) {
         /*  スクロール  */
         for (y = CURSOR_TOP; y < CONSOLE_SIZE_Y - CURSOR_HEIGHT; ++ y) {
             for (x = CURSOR_LEFT; x < CONSOLE_SIZE_X; ++ x){
