@@ -211,6 +211,9 @@ void HariMain(void)
             } else if (768 <= i && i <= 1023) {
                 /*  コンソール終了処理  */
                 close_console(kmv.shtctl->sheets0 + (i - 768));
+            } else if (1024 <= i && i <= 2023) {
+                /*  コンソール終了処理  */
+                close_constask(taskctl->tasks0 + (i - 1024));
             }
         }
     }

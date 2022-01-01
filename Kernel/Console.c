@@ -300,11 +300,20 @@ void cmd_exit(struct CONSOLE *cons, int *fat)
     struct TASK *task = task_now();
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
     struct FIFO32 *fifo = (struct FIFO32 *) *((int *) 0x0fec);
-    timer_cancel(cons->timer);
+
+    if (cons->sht != 0) {
+        timer_cancel(cons->timer);
+    }
     memman_free_4k(memman, (int) fat, 4 * 2880);
+
     io_cli();
-    fifo32_put(fifo, cons->sht- shtctl->sheets0 + 768);
+    if (cons->sht != 0) {
+        fifo32_put(fifo, cons->sht - shtctl->sheets0 + 768);
+    } else {
+        fifo32_put(fifo, task - taskctl->tasks0 + 1024);
+    }
     io_sti();
+
     for(;;) {
         task_sleep(task);
     }
