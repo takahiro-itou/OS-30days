@@ -327,17 +327,30 @@ void cmd_start(struct CONSOLE *cons, char *cmdline, int memtotal)
     int i;
     sheet_slide(sht, 32, 4);
     sheet_updown(sht, shtctl->top);
+
     /*  コマンドラインに入力された文字列を、新しいコンソールに入力  */
     for (i = 6; cmdline[i] != 0; ++ i) {
         fifo32_put(fifo, cmdline[i] + 256);
     }
     fifo32_put(fifo, 10 + 256);     /*  Enter.  */
     cons_newline(cons);
+
     return;
 }
 
 void cmd_ncst(struct CONSOLE *cons, char *cmdline, int memtotal)
 {
+    struct TASK *task = open_constask(0, memtotal);
+    struct FIFO32 *fifo = &task->fifo;
+    int i;
+
+    /*  コマンドラインに入力された文字列を、新しいコンソールに入力  */
+    for (i = 5; cmdline[i] != 0; ++ i) {
+        fifo32_put(fifo, cmdline[i] + 256);
+    }
+    fifo32_put(fifo, 10 + 256);     /*  Enter.  */
+    cons_newline(cons);
+
     return;
 }
 
