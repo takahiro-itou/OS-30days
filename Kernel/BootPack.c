@@ -303,6 +303,7 @@ void process_key_data(
             task->tss.eax = (int) &(task->tss.esp0);
             task->tss.eip = (int) asm_end_app;
             io_sti();
+            task_run(task, -1, 0);
         }
     }
     if (i == 256 + 0x3c && kw.key_shift != 0)
@@ -374,6 +375,7 @@ void sheet_leftbutton_down(
             task->tss.eax = (int) &(task->tss.esp0);
             task->tss.eip = (int) asm_end_app;
             io_sti();
+            task_run(task, -1, 0);
         } else {
             /*  コンソール  */
             task = sht->task;
