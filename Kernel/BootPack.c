@@ -89,7 +89,7 @@ void HariMain(void)
     io_sti();
 
     fifo32_init(&fifo, sizeof(fifobuf), fifobuf, 0);
-    *((int *) 0x0fec) = (int) &fifo;
+    *((int *) ADR_SYS_FIFO) = (int) &fifo;
     init_pit();
     init_keyboard(&fifo, 256);
     enable_mouse(&fifo, 512, &mdec);
@@ -108,7 +108,7 @@ void HariMain(void)
     task_a = task_init(memman);
     fifo.task = task_a;
     task_run(task_a, 1, 2);
-    *((int *) 0x0fe4) = (int) (kmv.shtctl);
+    *((int *) ADR_SHT_CTL) = (int) (kmv.shtctl);
 
     /*  sht_back    */
     sht_back  = sheet_alloc(kmv.shtctl);
