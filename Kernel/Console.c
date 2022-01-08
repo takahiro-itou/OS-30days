@@ -443,6 +443,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct CONSOLE *cons = task->cons;
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
     struct SHEET *sht;
+    struct FIFO32 *sys_fifo = (struct FIFO32 *) *((int *) ADR_SYS_FIFO);
     struct TIMER *timer;
     volatile int *reg = &eax + 1;
     int i;
@@ -531,6 +532,13 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
             }
             if (i == 3) {   /*  カーソル OFF    */
                 cons->cur_c = -1;
+            }
+            if (i == 4) {   /*  コンソールだけを閉じる  */
+                timer_cancel(cons->timer);
+                io_cli();
+                fifo32_put(sys_fifo, cons->sht - shtctl->sheets0 + 2024);
+                cons->sht = 0;
+                io_sti();
             }
             if (i >= 256) {     /*  キーボードデータなど。  */
                 reg[7] = i - 256;
