@@ -74,6 +74,7 @@ void HariMain(void)
     unsigned char *buf_back, buf_mouse[256];
     struct SHEET *sht_back;
     struct TASK *task_a;
+    struct SHEET *sht2;
 
     kmv.binfo = binfo;
     kmv.keycmd = &keycmd;
@@ -214,6 +215,12 @@ void HariMain(void)
             } else if (1024 <= i && i <= 2023) {
                 /*  コンソール終了処理  */
                 close_constask(taskctl->tasks0 + (i - 1024));
+            } else if (2024 <= i && i <= 2279) {
+                /*  コンソールだけを閉じる  */
+                sht2 = kmv.shtctl->sheets0 + (i - 2024);
+                memman_free_4k(memman, (int) sht2->buf,
+                               CONSOLE_WIN_SIZE_X * CONSOLE_WIN_SIZE_Y);
+                sheet_free(sht2);
             }
         }
     }
