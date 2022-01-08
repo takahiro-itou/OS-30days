@@ -23,7 +23,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     cons.cur_c = -1;
     task->cons = &cons;
 
-    if (sheet != 0) {
+    if (cons.sht != 0) {
         cons.timer = timer_alloc();
         timer_init(cons.timer, &task->fifo, 1);
         timer_settime(cons.timer, 50);
@@ -41,7 +41,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
         } else {
             i = fifo32_get(&task->fifo);
             io_sti();
-            if (i <= 1) {   /*  カーソル用タイマ。  */
+            if (i <= 1 && cons.sht != 0) {      /*  カーソル用タイマ。  */
                 if (i != 0) {
                     timer_init(cons.timer, &task->fifo, 0);
                     if (cons.cur_c >= 0) {
@@ -59,10 +59,12 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                 cons.cur_c = COL8_FFFFFF;
             }
             if (i == 3) {       /*  カーソル OFF    */
-                boxfill8(sheet->buf, sheet->bxsize, COL8_000000,
-                         cons.cur_x, cons.cur_y,
-                         cons.cur_x + CURSOR_WIDTH  - 1,
-                         cons.cur_y + CURSOR_HEIGHT - 1);
+                if (cons.sht != 0) {
+                    boxfill8(cons.sht->buf, cons.sht->bxsize, COL8_000000,
+                             cons.cur_x, cons.cur_y,
+                             cons.cur_x + CURSOR_WIDTH  - 1,
+                             cons.cur_y + CURSOR_HEIGHT - 1);
+                }
                 cons.cur_c = -1;
             }
             if (i == 4) {
@@ -83,7 +85,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                     cmdline[cons.cur_x / CURSOR_WIDTH - 2] = 0;
                     cons_newline(&cons);
                     cons_runcmd(cmdline, &cons, fat, memtotal);
-                    if (sheet == 0) {
+                    if (cons.sht == 0) {
                         cmd_exit(&cons, fat);
                     }
                     /*  プロンプト表示  */
@@ -96,14 +98,14 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
                 }
             }
             /*  カーソル再表示  */
-            if (sheet != 0) {
+            if (cons.sht != 0) {
                 if (cons.cur_c >= 0) {
-                    boxfill8(sheet->buf, sheet->bxsize, cons.cur_c,
+                    boxfill8(cons.sht->buf, cons.sht->bxsize, cons.cur_c,
                              cons.cur_x, cons.cur_y,
                              cons.cur_x + CURSOR_WIDTH  - 1,
                              cons.cur_y + CURSOR_HEIGHT - 1);
                 }
-                sheet_refresh(sheet, cons.cur_x, cons.cur_y,
+                sheet_refresh(cons.sht, cons.cur_x, cons.cur_y,
                               cons.cur_x + CURSOR_WIDTH,
                               cons.cur_y + CURSOR_HEIGHT);
             }
