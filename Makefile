@@ -67,6 +67,7 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
             App/star1.hrb App/stars.hrb App/stars2.hrb          \
             App/lines.hrb App/walk.hrb App/noodle.hrb           \
             App/beepdown.hrb App/color.hrb App/color2.hrb       \
+            App/crack7.hrb                                      \
             ::
 
 ##

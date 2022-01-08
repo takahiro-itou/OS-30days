@@ -8,7 +8,7 @@ APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        winhelo2.hrb winhelo3.hrb star1.hrb      \
                        stars.hrb stars2.hrb lines.hrb           \
                        walk.hrb noodle.hrb beepdown.hrb         \
-                       color.hrb color2.hrb
+                       color.hrb color2.hrb crack7.hrb
 
 API_OBJS            =  a_as.obj
 
@@ -20,6 +20,7 @@ AS          =  /usr/bin/as
 CAT         =  /bin/cat
 CP          =  /bin/cp
 DD          =  /bin/dd
+NASM        =  /usr/bin/nasm
 OBJ2HRB     =  ../Tools/obj2hrb
 
 ##
@@ -27,7 +28,7 @@ OBJ2HRB     =  ../Tools/obj2hrb
 ##
 
 .PHONY      :  all  clean  cleanall  cleanobj
-.SUFFIXES   :  .hrb  .obj   .s
+.SUFFIXES   :  .hrb  .obj   .s  .asm
 
 all         :  ${APPLICATIONS}
 
@@ -50,6 +51,7 @@ cleanobj :
 ASFLAGS         =  -march=i386  --32
 CFLAGS          =  -march=i386  -m32  -fno-pie  -nostdlib  -O2
 CCVERBOSE       =
+NASMFLAGS       =  -fcoff
 
 MALLOC_SIZE     = 0x00010000
 STACK_SIZE      = 0x00004000
@@ -70,6 +72,11 @@ DATSEG_SIZE     = 0x00004000
 	${AS}  -o $@  \
         -a=${@:%.obj=%.lst}         \
         ${ASFLAGS}  $<
+
+.asm.obj    :
+	${NASM} -o $@  \
+        -l ${@:%.obj=%.lst}         \
+        ${NASMFLAGS}  $<
 
 .c.obj  :
 	${CC}  -o $@  \
@@ -99,3 +106,4 @@ noodle.hrb    : noodle.obj    ${API_OBJS}  ../Common/stdio.obj
 beepdown.hrb  : beepdown.obj  ${API_OBJS}
 color.hrb     : color.obj     ${API_OBJS}
 color2.hrb    : color2.obj    ${API_OBJS}
+crack7.hrb    : crack7.obj
