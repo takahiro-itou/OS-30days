@@ -300,8 +300,8 @@ void cmd_exit(struct CONSOLE *cons, int *fat)
 {
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
     struct TASK *task = task_now();
-    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
-    struct FIFO32 *fifo = (struct FIFO32 *) *((int *) 0x0fec);
+    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
+    struct FIFO32 *fifo = (struct FIFO32 *) *((int *) ADR_SYS_FIFO);
 
     if (cons->sht != 0) {
         timer_cancel(cons->timer);
@@ -323,7 +323,7 @@ void cmd_exit(struct CONSOLE *cons, int *fat)
 
 void cmd_start(struct CONSOLE *cons, char *cmdline, int memtotal)
 {
-    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
+    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
     struct SHEET *sht = open_console(shtctl, memtotal);
     struct FIFO32 *fifo = &sht->task->fifo;
     int i;
@@ -413,7 +413,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
             }
             start_app(0x1b, task->sel + 1000 * 8,
                       esp,  task->sel + 2000 * 8, &(task->tss.esp0));
-            shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
+            shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
             for (i = 0; i < MAX_SHEETS; ++ i) {
                 sht = &(shtctl->sheets0[i]);
                 if ((sht->flags & 0x11) == 0x11 && sht->task == task) {
@@ -441,7 +441,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct TASK *task = task_now();
     int ds_base = task->ds_base;
     struct CONSOLE *cons = task->cons;
-    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) 0x0fe4);
+    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
     struct SHEET *sht;
     struct TIMER *timer;
     volatile int *reg = &eax + 1;
