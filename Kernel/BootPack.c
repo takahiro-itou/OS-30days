@@ -379,6 +379,10 @@ void sheet_leftbutton_down(
         } else {
             /*  コンソール  */
             task = sht->task;
+            sheet_updown(sht, -1);  /*  とりあえず非表示にしておく  */
+            keywin_off(key_win);
+            key_win = shtctl->sheets[shtctl->top - 1];
+            keywin_on(key_win);
             io_cli();
             fifo32_put(&task->fifo, 4);
             io_sti();
