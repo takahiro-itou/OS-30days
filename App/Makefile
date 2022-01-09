@@ -8,7 +8,7 @@ APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        winhelo2.hrb winhelo3.hrb star1.hrb      \
                        stars.hrb stars2.hrb lines.hrb           \
                        walk.hrb noodle.hrb beepdown.hrb         \
-                       color.hrb color2.hrb crack7.hrb
+                       color.hrb color2.hrb
 
 API_OBJS            =  a_as.obj
 
@@ -106,4 +106,3 @@ noodle.hrb    : noodle.obj    ${API_OBJS}  ../Common/stdio.obj
 beepdown.hrb  : beepdown.obj  ${API_OBJS}
 color.hrb     : color.obj     ${API_OBJS}
 color2.hrb    : color2.obj    ${API_OBJS}
-crack7.hrb    : crack7.obj
