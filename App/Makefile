@@ -10,7 +10,7 @@ APPLICATIONS        =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
                        walk.hrb noodle.hrb beepdown.hrb         \
                        color.hrb color2.hrb
 
-API_OBJS            =  a_as.obj
+API_OBJS            =  ../ApiLib/a_as.obj
 
 ##
 ##    Commands.
