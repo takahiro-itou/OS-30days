@@ -11,6 +11,7 @@ APPLICATIONS    =  hello.hrb hello2.hrb a.hrb hello3.hrb        \
                    color.hrb color2.hrb
 
 API_OBJS_NAME   =  api001.obj api002.obj api003.obj api004.obj  \
+                   api005.obj api006.obj api007.obj api008.obj  \
                    a_as.obj
 API_OBJS        =  $(addprefix  ../ApiLib/, ${API_OBJS_NAME})
 

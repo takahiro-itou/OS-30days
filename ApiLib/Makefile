@@ -77,4 +77,12 @@ DATSEG_SIZE     = 0x00004000
 
 
 api001.obj  : Makefile
+api002.obj  : Makefile
+api003.obj  : Makefile
+api004.obj  : Makefile
+api005.obj  : Makefile
+api006.obj  : Makefile
+api007.obj  : Makefile
+api008.obj  : Makefile
+
 a_as.obj    : Makefile

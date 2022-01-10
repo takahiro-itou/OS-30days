@@ -3,7 +3,7 @@
 ##    List of Sub Directory.
 ##
 
-SUBDIRS  =  BootSector  Kernel  App
+SUBDIRS  =  BootSector  Kernel  ApiLib  App
 
 ##
 ##    List of Files.
