@@ -6,7 +6,7 @@
 API_OBJS        =  api001.obj api002.obj api003.obj api004.obj  \
                    api005.obj api006.obj api007.obj api008.obj  \
                    api009.obj api010.obj api011.obj api012.obj  \
-                   api013.obj                                   \
+                   api013.obj api014.obj api015.obj             \
                    a_as.obj
 
 ##
