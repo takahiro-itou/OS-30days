@@ -1,6 +1,5 @@
 
 .code32
-.globl      api_putchar
 .globl      api_putstr0
 .globl      api_end
 .globl      api_openwin
@@ -21,12 +20,6 @@
 .globl      api_beep
 
 .text
-
-api_putchar:    # void api_putchar(int c)
-    MOVL    $1,     %EDX
-    MOVB    4(%ESP),    %AL
-    INT     $0x40
-    RET
 
 api_putstr0:    # void api_putstr0(char *s)
     PUSHL   %EBX
