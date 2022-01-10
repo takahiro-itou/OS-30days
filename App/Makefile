@@ -3,14 +3,15 @@
 ##    List of Files.
 ##
 
-APPLICATIONS    =  hello.hrb hello2.hrb a.hrb hello3.hrb    \
-                   hello4.hrb hello5.hrb winhelo.hrb        \
-                   winhelo2.hrb winhelo3.hrb star1.hrb      \
-                   stars.hrb stars2.hrb lines.hrb           \
-                   walk.hrb noodle.hrb beepdown.hrb         \
+APPLICATIONS    =  hello.hrb hello2.hrb a.hrb hello3.hrb        \
+                   hello4.hrb hello5.hrb winhelo.hrb            \
+                   winhelo2.hrb winhelo3.hrb star1.hrb          \
+                   stars.hrb stars2.hrb lines.hrb               \
+                   walk.hrb noodle.hrb beepdown.hrb             \
                    color.hrb color2.hrb
 
-API_OBJS_NAME   =  api001.obj a_as.obj
+API_OBJS_NAME   =  api001.obj api002.obj api003.obj api004.obj  \
+                   a_as.obj
 API_OBJS        =  $(addprefix  ../ApiLib/, ${API_OBJS_NAME})
 
 ##

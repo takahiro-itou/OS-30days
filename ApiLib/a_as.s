@@ -1,7 +1,5 @@
 
 .code32
-.globl      api_putstr0
-.globl      api_end
 .globl      api_openwin
 .globl      api_putstrwin
 .globl      api_boxfilwin
@@ -20,18 +18,6 @@
 .globl      api_beep
 
 .text
-
-api_putstr0:    # void api_putstr0(char *s)
-    PUSHL   %EBX
-    MOVL    $2,     %EDX
-    MOVL    8(%ESP),    %EBX
-    INT     $0x40
-    POPL    %EBX
-    RET
-
-api_end:        # void api_end(void)
-    MOVL    $4,     %EDX
-    INT     $0x40
 
 api_openwin:    # int api_openwin(char *buf, int xsiz, int ysiz,
                 #                 int col_inv, char *title)

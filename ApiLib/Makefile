@@ -3,7 +3,8 @@
 ##    List of Files.
 ##
 
-API_OBJS            =  api001.obj a_as.obj
+API_OBJS        =  api001.obj api002.obj api003.obj api004.obj  \
+                   a_as.obj
 
 ##
 ##    Commands.
@@ -77,4 +78,3 @@ DATSEG_SIZE     = 0x00004000
 
 api001.obj  : Makefile
 a_as.obj    : Makefile
-
