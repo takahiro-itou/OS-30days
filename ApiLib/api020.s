@@ -9,4 +9,3 @@ api_beep:
     MOVL    4(%ESP),    %EAX
     INT     $0x40
     RET
-
