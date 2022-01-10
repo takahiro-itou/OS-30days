@@ -1,26 +1,10 @@
 
 .code32
-.globl      api_alloctimer
-.globl      api_inittimer
 .globl      api_settimer
 .globl      api_freetimer
 .globl      api_beep
 
 .text
-
-api_alloctimer:
-    MOVL    $16,    %EDX
-    INT     $0x40
-    RET
-
-api_inittimer:
-    PUSHL   %EBX
-    MOVL    $17,    %EDX
-    MOVL     8(%ESP),   %EBX
-    MOVL    12(%ESP),   %EAX
-    INT     $0x40
-    POPL    %EBX
-    RET
 
 api_settimer:
     PUSHL   %EBX

@@ -6,7 +6,8 @@
 API_OBJS        =  api001.obj api002.obj api003.obj api004.obj  \
                    api005.obj api006.obj api007.obj api008.obj  \
                    api009.obj api010.obj api011.obj api012.obj  \
-                   api013.obj api014.obj api015.obj             \
+                   api013.obj api014.obj api015.obj api016.obj  \
+                   api017.obj                                   \
                    a_as.obj
 
 ##
@@ -92,5 +93,9 @@ api010.obj  : Makefile
 api011.obj  : Makefile
 api012.obj  : Makefile
 api013.obj  : Makefile
+api014.obj  : Makefile
+api015.obj  : Makefile
+api016.obj  : Makefile
+api017.obj  : Makefile
 
 a_as.obj    : Makefile
