@@ -9,10 +9,13 @@ API_OBJS        =  api001.obj api002.obj api003.obj api004.obj  \
                    api013.obj api014.obj api015.obj api016.obj  \
                    api017.obj api018.obj api019.obj api020.obj
 
+API_LIB         =  apilib.a
+
 ##
 ##    Commands.
 ##
 
+AR          =  /usr/bin/ar
 AS          =  /usr/bin/as
 CAT         =  /bin/cat
 CP          =  /bin/cp
@@ -27,9 +30,10 @@ OBJ2HRB     =  ../Tools/obj2hrb
 .PHONY      :  all  clean  cleanall  cleanobj
 .SUFFIXES   :  .hrb  .obj   .s  .asm
 
-all         :  ${API_OBJS}
+all         :  ${API_LIB}
 
 clean       :  cleanobj
+	${RM}  -f  ${API_LIB}
 
 cleanall :  clean
 
@@ -42,6 +46,7 @@ cleanobj :
 ##    Compile and Link Flags.
 ##
 
+ARFLAGS         =  rcs
 ASFLAGS         =  -march=i386  --32
 CFLAGS          =  -march=i386  -m32  -fno-pie  -nostdlib  -O2
 CCVERBOSE       =
@@ -54,6 +59,9 @@ DATSEG_SIZE     = 0x00004000
 ##
 ##    Build.
 ##
+
+${API_LIB}  : Makefile ${API_OBJS}
+	${AR}  ${ARFLAGS}  ${API_LIB}  ${API_OBJS}
 
 ##
 ##    Suffix Rules.
@@ -77,7 +85,6 @@ DATSEG_SIZE     = 0x00004000
 ##
 ##    Dependencies
 ##
-
 
 api001.obj  : Makefile
 api002.obj  : Makefile

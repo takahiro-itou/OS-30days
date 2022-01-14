@@ -9,4 +9,5 @@
 *.obj
 *.sys
 /App/*.ls
+/ApiLib/apilib.a
 
