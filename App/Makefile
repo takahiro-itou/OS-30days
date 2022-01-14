@@ -10,13 +10,7 @@ APPLICATIONS    =  hello.hrb hello2.hrb a.hrb hello3.hrb        \
                    walk.hrb noodle.hrb beepdown.hrb             \
                    color.hrb color2.hrb
 
-API_OBJS_NAME   =  api001.obj api002.obj api003.obj api004.obj  \
-                   api005.obj api006.obj api007.obj api008.obj  \
-                   api009.obj api010.obj api011.obj api012.obj  \
-                   api013.obj api014.obj api015.obj api016.obj  \
-                   api017.obj api018.obj api019.obj api020.obj
-
-API_OBJS        =  $(addprefix  ../ApiLib/, ${API_OBJS_NAME})
+API_LIBS        =  ../ApiLib/apilib.a
 
 ##
 ##    Commands.
@@ -47,7 +41,6 @@ cleanobj :
 	${RM}  -f                           \
         ${APPLICATIONS:%.hrb=%.obj}     \
         ${APPLICATIONS:%.hrb=%.ls}      \
-        ${API_OBJS}                     \
         *.lst  *.map
 
 ##
@@ -93,22 +86,22 @@ DATSEG_SIZE     = 0x00004000
 ##    Dependencies
 ##
 
-hello.hrb     : hello.obj     ${API_OBJS}
-hello2.hrb    : hello2.obj    ${API_OBJS}
+hello.hrb     : hello.obj     ${API_LIBS}
+hello2.hrb    : hello2.obj    ${API_LIBS}
 
-a.hrb         : a.obj         ${API_OBJS}
-hello3.hrb    : hello3.obj    ${API_OBJS}
-hello4.hrb    : hello4.obj    ${API_OBJS}
-hello5.hrb    : hello5.obj    ${API_OBJS}
-winhelo.hrb   : winhelo.obj   ${API_OBJS}
-winhelo2.hrb  : winhelo2.obj  ${API_OBJS}
-winhelo3.hrb  : winhelo3.obj  ${API_OBJS}
-star1.hrb     : star1.obj     ${API_OBJS}
-stars.hrb     : stars.obj     ${API_OBJS}  ../Common/stdlib.obj
-stars2.hrb    : stars2.obj    ${API_OBJS}  ../Common/stdlib.obj
-lines.hrb     : lines.obj     ${API_OBJS}
-walk.hrb      : walk.obj      ${API_OBJS}
-noodle.hrb    : noodle.obj    ${API_OBJS}  ../Common/stdio.obj
-beepdown.hrb  : beepdown.obj  ${API_OBJS}
-color.hrb     : color.obj     ${API_OBJS}
-color2.hrb    : color2.obj    ${API_OBJS}
+a.hrb         : a.obj         ${API_LIBS}
+hello3.hrb    : hello3.obj    ${API_LIBS}
+hello4.hrb    : hello4.obj    ${API_LIBS}
+hello5.hrb    : hello5.obj    ${API_LIBS}
+winhelo.hrb   : winhelo.obj   ${API_LIBS}
+winhelo2.hrb  : winhelo2.obj  ${API_LIBS}
+winhelo3.hrb  : winhelo3.obj  ${API_LIBS}
+star1.hrb     : star1.obj     ${API_LIBS}
+stars.hrb     : stars.obj     ${API_LIBS}  ../Common/stdlib.obj
+stars2.hrb    : stars2.obj    ${API_LIBS}  ../Common/stdlib.obj
+lines.hrb     : lines.obj     ${API_LIBS}
+walk.hrb      : walk.obj      ${API_LIBS}
+noodle.hrb    : noodle.obj    ${API_LIBS}  ../Common/stdio.obj
+beepdown.hrb  : beepdown.obj  ${API_LIBS}
+color.hrb     : color.obj     ${API_LIBS}
+color2.hrb    : color2.obj    ${API_LIBS}
