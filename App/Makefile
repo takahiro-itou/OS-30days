@@ -4,13 +4,13 @@
 ##    List of Sub Directory.
 ##
 
-SUBDIRS  =  a hello3 hello4
+SUBDIRS  =  a hello3 hello4 hello5
 
 ##
 ##    List of Files.
 ##
 
-APPLICATIONS    =  hello5.hrb winhelo.hrb                       \
+APPLICATIONS    =  winhelo.hrb                                  \
                    winhelo2.hrb winhelo3.hrb star1.hrb          \
                    stars.hrb stars2.hrb lines.hrb               \
                    walk.hrb noodle.hrb beepdown.hrb             \

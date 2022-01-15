@@ -17,7 +17,7 @@ APPLICATIONS    =  \
         App/a/a.hrb                 \
         App/hello3/hello3.hrb       \
         App/hello4/hello4.hrb       \
-        App/hello5.hrb              \
+        App/hello5/hello5.hrb       \
         App/winhelo.hrb             \
         App/winhelo2.hrb            \
         App/winhelo3.hrb            \
