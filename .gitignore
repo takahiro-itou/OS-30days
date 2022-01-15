@@ -8,6 +8,6 @@
 *.map
 *.obj
 *.sys
-/App/*.ls
+/App/*/*.ls
 /ApiLib/apilib.a
 
