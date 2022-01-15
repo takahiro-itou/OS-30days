@@ -99,11 +99,11 @@ DATSEG_SIZE     = 0x00004000
 ##    Dependencies
 ##
 
-stars.hrb     : stars.obj     ${API_LIBS}  ../Common/stdlib.obj
-stars2.hrb    : stars2.obj    ${API_LIBS}  ../Common/stdlib.obj
+stars.hrb     : stars.obj     ${API_LIBS}
+stars2.hrb    : stars2.obj    ${API_LIBS}
 lines.hrb     : lines.obj     ${API_LIBS}
 walk.hrb      : walk.obj      ${API_LIBS}
-noodle.hrb    : noodle.obj    ${API_LIBS}  ../Common/stdio.obj
+noodle.hrb    : noodle.obj    ${API_LIBS}
 beepdown.hrb  : beepdown.obj  ${API_LIBS}
 color.hrb     : color.obj     ${API_LIBS}
 color2.hrb    : color2.obj    ${API_LIBS}
