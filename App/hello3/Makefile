@@ -1,5 +1,5 @@
 
-APP_NAME        = a
+APP_NAME        = hello3
 
 MALLOC_SIZE     = 0x00000000
 STACK_SIZE      = 0x00004000
