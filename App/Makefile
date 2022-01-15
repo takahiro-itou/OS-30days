@@ -4,14 +4,13 @@
 ##    List of Sub Directory.
 ##
 
-SUBDIRS  =  a hello3 hello4 hello5
+SUBDIRS  =  a hello3 hello4 hello5 winhelo
 
 ##
 ##    List of Files.
 ##
 
-APPLICATIONS    =  winhelo.hrb                                  \
-                   winhelo2.hrb winhelo3.hrb star1.hrb          \
+APPLICATIONS    =  winhelo2.hrb winhelo3.hrb star1.hrb          \
                    stars.hrb stars2.hrb lines.hrb               \
                    walk.hrb noodle.hrb beepdown.hrb             \
                    color.hrb color2.hrb
@@ -100,8 +99,6 @@ DATSEG_SIZE     = 0x00004000
 ##    Dependencies
 ##
 
-hello5.hrb    : hello5.obj    ${API_LIBS}
-winhelo.hrb   : winhelo.obj   ${API_LIBS}
 winhelo2.hrb  : winhelo2.obj  ${API_LIBS}
 winhelo3.hrb  : winhelo3.obj  ${API_LIBS}
 star1.hrb     : star1.obj     ${API_LIBS}
