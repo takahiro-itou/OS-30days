@@ -6,13 +6,13 @@
 
 SUBDIRS     =  a hello3 hello4 hello5 winhelo winhelo2          \
                winhelo3 star1 stars stars2 lines walk           \
-               noodle
+               noodle beepdown
 
 ##
 ##    List of Files.
 ##
 
-APPLICATIONS    =  beepdown.hrb color.hrb color2.hrb
+APPLICATIONS    =  color.hrb color2.hrb
 
 API_LIBS        =  ../ApiLib/apilib.a
 
@@ -98,6 +98,5 @@ DATSEG_SIZE     = 0x00004000
 ##    Dependencies
 ##
 
-beepdown.hrb  : beepdown.obj  ${API_LIBS}
 color.hrb     : color.obj     ${API_LIBS}
 color2.hrb    : color2.obj    ${API_LIBS}

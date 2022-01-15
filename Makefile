@@ -27,7 +27,7 @@ APPLICATIONS    =  \
         App/lines/lines.hrb         \
         App/walk/walk.hrb           \
         App/noodle/noodle.hrb       \
-        App/beepdown.hrb            \
+        App/beepdown/beepdown.hrb   \
         App/color.hrb               \
         App/color2.hrb
 
