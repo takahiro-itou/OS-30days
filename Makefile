@@ -23,7 +23,7 @@ APPLICATIONS    =  \
         App/winhelo3/winhelo3.hrb   \
         App/star1/star1.hrb         \
         App/stars/stars.hrb         \
-        App/stars2.hrb              \
+        App/stars2/stars2.hrb       \
         App/lines.hrb               \
         App/walk.hrb                \
         App/noodle.hrb              \

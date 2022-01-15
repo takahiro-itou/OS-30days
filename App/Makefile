@@ -5,13 +5,13 @@
 ##
 
 SUBDIRS     =  a hello3 hello4 hello5 winhelo winhelo2          \
-               winhelo3 star1 stars
+               winhelo3 star1 stars stars2
 
 ##
 ##    List of Files.
 ##
 
-APPLICATIONS    =            stars2.hrb lines.hrb               \
+APPLICATIONS    =                       lines.hrb               \
                    walk.hrb noodle.hrb beepdown.hrb             \
                    color.hrb color2.hrb
 
@@ -99,7 +99,6 @@ DATSEG_SIZE     = 0x00004000
 ##    Dependencies
 ##
 
-stars2.hrb    : stars2.obj    ${API_LIBS}
 lines.hrb     : lines.obj     ${API_LIBS}
 walk.hrb      : walk.obj      ${API_LIBS}
 noodle.hrb    : noodle.obj    ${API_LIBS}
