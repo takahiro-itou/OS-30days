@@ -10,7 +10,7 @@ SUBDIRS  =  a
 ##    List of Files.
 ##
 
-APPLICATIONS    =  hello.hrb hello2.hrb hello3.hrb              \
+APPLICATIONS    =  hello3.hrb                                   \
                    hello4.hrb hello5.hrb winhelo.hrb            \
                    winhelo2.hrb winhelo3.hrb star1.hrb          \
                    stars.hrb stars2.hrb lines.hrb               \
@@ -100,9 +100,6 @@ DATSEG_SIZE     = 0x00004000
 ##
 ##    Dependencies
 ##
-
-hello.hrb     : hello.obj     ${API_LIBS}
-hello2.hrb    : hello2.obj    ${API_LIBS}
 
 hello3.hrb    : hello3.obj    ${API_LIBS}
 hello4.hrb    : hello4.obj    ${API_LIBS}
