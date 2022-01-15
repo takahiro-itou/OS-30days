@@ -25,7 +25,7 @@ APPLICATIONS    =  \
         App/stars/stars.hrb         \
         App/stars2/stars2.hrb       \
         App/lines/lines.hrb         \
-        App/walk.hrb                \
+        App/walk/walk.hrb           \
         App/noodle.hrb              \
         App/beepdown.hrb            \
         App/color.hrb               \

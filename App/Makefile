@@ -5,14 +5,13 @@
 ##
 
 SUBDIRS     =  a hello3 hello4 hello5 winhelo winhelo2          \
-               winhelo3 star1 stars stars2 lines
+               winhelo3 star1 stars stars2 lines walk
 
 ##
 ##    List of Files.
 ##
 
-APPLICATIONS    =  walk.hrb noodle.hrb beepdown.hrb             \
-                   color.hrb color2.hrb
+APPLICATIONS    =  noodle.hrb beepdown.hrb color.hrb color2.hrb
 
 API_LIBS        =  ../ApiLib/apilib.a
 
