@@ -61,12 +61,24 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  Makefile
 	mformat  -f 1440  -C  -B ${IPLBIN_IMAGE}  -i $@  ::
 	${DD}  if=${IPLBIN_IMAGE}  bs=512  count=1  of=$@  conv=notrunc
 	mcopy  -i $@  ${KERNEL_IMAGE}  ::
-	mcopy  -i $@  App/hello.hrb App/hello2.hrb App/a.hrb        \
-            App/hello3.hrb App/hello4.hrb App/hello5.hrb        \
-            App/winhelo.hrb App/winhelo2.hrb App/winhelo3.hrb   \
-            App/star1.hrb App/stars.hrb App/stars2.hrb          \
-            App/lines.hrb App/walk.hrb App/noodle.hrb           \
-            App/beepdown.hrb App/color.hrb App/color2.hrb       \
+	mcopy  -i $@  App/hello.hrb               \
+            App/hello2.hrb              \
+            App/a/a.hrb                 \
+            App/hello3.hrb              \
+            App/hello4.hrb              \
+            App/hello5.hrb              \
+            App/winhelo.hrb             \
+            App/winhelo2.hrb            \
+            App/winhelo3.hrb            \
+            App/star1.hrb               \
+            App/stars.hrb               \
+            App/stars2.hrb              \
+            App/lines.hrb               \
+            App/walk.hrb                \
+            App/noodle.hrb              \
+            App/beepdown.hrb            \
+            App/color.hrb               \
+            App/color2.hrb              \
             ::
 
 ##

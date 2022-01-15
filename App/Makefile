@@ -1,9 +1,16 @@
 
+
+##
+##    List of Sub Directory.
+##
+
+SUBDIRS  =  a
+
 ##
 ##    List of Files.
 ##
 
-APPLICATIONS    =  hello.hrb hello2.hrb a.hrb hello3.hrb        \
+APPLICATIONS    =  hello.hrb hello2.hrb hello3.hrb              \
                    hello4.hrb hello5.hrb winhelo.hrb            \
                    winhelo2.hrb winhelo3.hrb star1.hrb          \
                    stars.hrb stars2.hrb lines.hrb               \
@@ -30,18 +37,26 @@ OBJ2HRB     =  ../Tools/obj2hrb
 .PHONY      :  all  clean  cleanall  cleanobj
 .SUFFIXES   :  .hrb  .obj   .s  .asm
 
-all         :  ${APPLICATIONS}
+all         :  ${SUBDIRS}  ${APPLICATIONS}
 
-clean       :  cleanobj
+clean       :  ${SUBDIRS}  cleanobj
 	${RM}  -f  ${APPLICATIONS}
 
-cleanall :  clean
+cleanall    :  ${SUBDIRS}  clean
 
-cleanobj :
+cleanobj    :  ${SUBDIRS}
 	${RM}  -f                           \
         ${APPLICATIONS:%.hrb=%.obj}     \
         ${APPLICATIONS:%.hrb=%.ls}      \
         *.lst  *.map
+
+##
+##    Make Sub Directories.
+##
+
+RECURSIVE   :
+${SUBDIRS}  :  RECURSIVE
+	${MAKE}  -C $@  ${MAKECMDGOALS}
 
 ##
 ##    Compile and Link Flags.
@@ -89,7 +104,6 @@ DATSEG_SIZE     = 0x00004000
 hello.hrb     : hello.obj     ${API_LIBS}
 hello2.hrb    : hello2.obj    ${API_LIBS}
 
-a.hrb         : a.obj         ${API_LIBS}
 hello3.hrb    : hello3.obj    ${API_LIBS}
 hello4.hrb    : hello4.obj    ${API_LIBS}
 hello5.hrb    : hello5.obj    ${API_LIBS}
