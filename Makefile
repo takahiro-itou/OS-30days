@@ -21,7 +21,7 @@ APPLICATIONS    =  \
         App/winhelo/winhelo.hrb     \
         App/winhelo2/winhelo2.hrb   \
         App/winhelo3/winhelo3.hrb   \
-        App/star1.hrb               \
+        App/star1/star1.hrb         \
         App/stars.hrb               \
         App/stars2.hrb              \
         App/lines.hrb               \
