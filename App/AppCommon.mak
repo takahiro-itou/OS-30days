@@ -37,8 +37,10 @@ cleanobj    :
 ##    Compile and Link Flags.
 ##
 
+API_INC_DIR     =  -I../../ApiLib/
 ASFLAGS         =  -march=i386  --32
-CFLAGS          =  -march=i386  -m32  -fno-pie  -nostdlib  -O2
+CFLAGS          =  -march=i386  -m32  -fno-pie  -nostdlib  -O2  \
+                   ${API_INC_DIR}
 CCVERBOSE       =
 NASMFLAGS       =  -fcoff
 
