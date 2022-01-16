@@ -30,7 +30,8 @@ APPLICATIONS    =  \
         App/beepdown/beepdown.hrb   \
         App/color/color.hrb         \
         App/color2/color2.hrb       \
-        App/sosu/sosu.hrb
+        App/sosu/sosu.hrb           \
+        App/sosu2/sosu2.hrb
 
 ##
 ##    Commands.
