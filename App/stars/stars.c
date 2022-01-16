@@ -17,5 +17,11 @@ void HariMain(void)
         y = (rand() %  67) + 26;
         api_point(win, x, y, 3);
     }
+
+    for (;;) {
+        if (api_getkey(1) == 0x0a) {
+            break;      /*  Enter なら break;   */
+        }
+    }
     api_end();
 }
