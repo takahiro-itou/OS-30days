@@ -29,7 +29,7 @@ APPLICATIONS    =  \
         App/noodle/noodle.hrb       \
         App/beepdown/beepdown.hrb   \
         App/color/color.hrb         \
-        App/color2.hrb
+        App/color2/color2.hrb
 
 ##
 ##    Commands.
