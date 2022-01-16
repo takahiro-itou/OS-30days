@@ -6,15 +6,11 @@
 
 SUBDIRS     =  a hello3 hello4 hello5 winhelo winhelo2          \
                winhelo3 star1 stars stars2 lines walk           \
-               noodle beepdown color color2
+               noodle beepdown color color2 sosu
 
 ##
 ##    List of Files.
 ##
-
-APPLICATIONS    =
-
-API_LIBS        =  ../ApiLib/apilib.a
 
 ##
 ##    Commands.
@@ -34,17 +30,14 @@ OBJ2HRB     =  ../Tools/obj2hrb
 .PHONY      :  all  clean  cleanall  cleanobj
 .SUFFIXES   :  .hrb  .obj   .s  .asm
 
-all         :  ${SUBDIRS}  ${APPLICATIONS}
+all         :  ${SUBDIRS}
 
 clean       :  ${SUBDIRS}  cleanobj
-	${RM}  -f  ${APPLICATIONS}
 
 cleanall    :  ${SUBDIRS}  clean
 
 cleanobj    :  ${SUBDIRS}
 	${RM}  -f                           \
-        ${APPLICATIONS:%.hrb=%.obj}     \
-        ${APPLICATIONS:%.hrb=%.ls}      \
         *.lst  *.map
 
 ##
