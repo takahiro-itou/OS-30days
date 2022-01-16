@@ -31,7 +31,8 @@ APPLICATIONS    =  \
         App/color/color.hrb         \
         App/color2/color2.hrb       \
         App/sosu/sosu.hrb           \
-        App/sosu2/sosu2.hrb
+        App/sosu2/sosu2.hrb         \
+        App/sosu3/sosu3.hrb
 
 ##
 ##    Commands.

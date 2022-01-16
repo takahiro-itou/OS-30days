@@ -6,7 +6,8 @@
 
 SUBDIRS     =  a hello3 hello4 hello5 winhelo winhelo2          \
                winhelo3 star1 stars stars2 lines walk           \
-               noodle beepdown color color2 sosu sosu2
+               noodle beepdown color color2 sosu sosu2          \
+               sosu3
 
 ##
 ##    List of Files.
