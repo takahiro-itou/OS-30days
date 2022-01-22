@@ -603,6 +603,10 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
                               task->fat, (char *) (ADR_DISKIMG + 0x003e00));
             }
         }
+    } else if (edx == 22) {
+        fh = (struct FILEHANDLE *) eax;
+        memman_free_4k(memman, (int) fh->buf, fh->size);
+        fh->buf = 0;
     }
 
     return 0;
