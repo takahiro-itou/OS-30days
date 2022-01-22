@@ -12,7 +12,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     int i;
     int *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
     struct CONSOLE cons;
-
+    struct FILEHANDLE fhandle[8];
     char s[30], cmdline[30], *p;
     int x, y;
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
@@ -29,6 +29,11 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
         timer_settime(cons.timer, 50);
     }
     file_readfat(fat, (unsigned char *)(ADR_DISKIMG + 0x000200));
+    for (i = 0; i < 8; ++ i) {
+        fhandle[i].buf = 0;     /*  未使用マーク。  */
+    }
+    task->fhandle = fhandle;
+    task->fat = fat;
 
     /*  プロンプト表示  */
     cons_putchar(&cons, '>', 1);
