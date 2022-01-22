@@ -13,8 +13,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     int *fat = (int *) memman_alloc_4k(memman, 4 * 2880);
     struct CONSOLE cons;
     struct FILEHANDLE fhandle[8];
-    char s[30], cmdline[30], *p;
-    int x, y;
+    char cmdline[30];
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
 
     cons.sht = sheet;
