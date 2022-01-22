@@ -480,6 +480,20 @@ int hrb_api_024_fsize(int ecx, int eax)
     return  reg7;
 }
 
+int hrb_api_025_fread(int ebx, int ecx, int eax, int ds_base)
+{
+    struct FILEHANDLE *fh = (struct FILEHANDLE *) eax;
+    int i;
+
+    for (i = 0; i < ecx; ++ i) {
+        if (fh->pos == fh->size) {
+            break;
+        }
+        *((char *) ebx + ds_base + i) = fh->buf[fh->pos];
+        ++ fh->pos;
+    }
+    return  i;
+}
 
 int *hrb_api(int edi, int esi, int ebp, int esp,
              int ebx, int edx, int ecx, int eax)
@@ -646,6 +660,8 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
         hrb_api_023_fseek(ebx, ecx, eax);
     } else if (edx == 24) {
         reg[7] = hrb_api_024_fsize(ecx, eax);
+    } else if (edx == 25) {
+        reg[7] = hrb_api_025_fread(ebx, ecx, eax, ds_base);
     }
 
     return 0;
