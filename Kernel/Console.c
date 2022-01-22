@@ -446,6 +446,27 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
     return 0;
 }
 
+int hrb_api_023_fseek(int ebx, int ecx, int eax)
+{
+    struct FILEHANDLE *fh;
+    fh = (struct FILEHANDLE *) eax;
+    if (ecx == 0) {
+        fh->pos = ebx;
+    } else if (ecx == 1) {
+        fh->pos += ebx;
+    } else if (ecx == 2) {
+        fh->pos = fh->size + ebx;
+    }
+    if (fh->pos < 0) {
+        fh->pos = 0;
+    }
+    if (fh->pos > fh->size) {
+        fh->pos = fh->size;
+    }
+
+    return  0;
+}
+
 int *hrb_api(int edi, int esi, int ebp, int esp,
              int ebx, int edx, int ecx, int eax)
 {
@@ -607,6 +628,8 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
         fh = (struct FILEHANDLE *) eax;
         memman_free_4k(memman, (int) fh->buf, fh->size);
         fh->buf = 0;
+    } else if (edx == 23) {
+        hrb_api_023_fseek(ebx, ecx, eax);
     }
 
     return 0;
