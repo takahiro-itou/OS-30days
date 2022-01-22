@@ -458,6 +458,9 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct TIMER *timer;
     volatile int *reg = &eax + 1;
     int i;
+    struct FILEINFO *finfo;
+    struct FILEHANDLE *fh;
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
 
     if (edx == 1) {
         cons_putchar(cons, eax & 0xff, 1);
@@ -577,6 +580,28 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
             io_out8(0x42, i >> 8);
             i = io_in8(0x61);
             io_out8(0x61, (i | 0x03) & 0x0f);
+        }
+    } else if (edx == 21) {
+        for (i = 0; i < 8; ++ i) {
+            if (task->fhandle[i].buf == 0) {
+                break;
+            }
+        }
+        fh = &task->fhandle[i];
+        reg[7] = 0;
+        if (i < 8) {
+            finfo = file_search(
+                        (char *) ebx + ds_base,
+                        (struct FILEINFO *) (ADR_DISKIMG + 0x002600),
+                        224);
+            if (finfo != 0) {
+                reg[7] = (int) fh;
+                fh->buf = (char *) memman_alloc_4k(memman, finfo->size);
+                fh->size = finfo->size;
+                fh->pos = 0;
+                file_loadfile(finfo->clustno, finfo->size, fh->buf,
+                              task->fat, (char *) (ADR_DISKIMG + 0x003e00));
+            }
         }
     }
 
