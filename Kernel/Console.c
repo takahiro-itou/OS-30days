@@ -424,6 +424,14 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
                     sheet_free(sht);
                 }
             }
+            for (i = 0; i < 8; ++ i) {
+                /*  クローズしてないファイルをクローズ  */
+                if (task->fhandle[i].buf != 0) {
+                    memman_free_4k(memman, (int) task->fhandle[i].buf,
+                                   task->fhandle[i].size);
+                    task->fhandle[i].buf = 0;
+                }
+            }
             timer_cancelall(&task->fifo);
             memman_free_4k(memman, (int) q, segsiz);
         } else {
