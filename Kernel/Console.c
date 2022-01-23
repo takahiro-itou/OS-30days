@@ -512,8 +512,9 @@ void  hrb_api_020_beep(int eax)
     }
 }
 
-int hrb_api_021_fopen(int ebx, struct TASK *task, int ds_base)
+int hrb_api_021_fopen(int ebx, struct TASK *task)
 {
+    const int ds_base = task->ds_base;
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
     int i, reg7;
     struct FILEINFO *finfo;
@@ -596,7 +597,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
              int ebx, int edx, int ecx, int eax)
 {
     struct TASK *task = task_now();
-    int ds_base = task->ds_base;
+    const int ds_base = task->ds_base;
     struct CONSOLE *cons = task->cons;
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
     struct SHEET *sht;
@@ -679,7 +680,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     } else if (edx == 20) {
         hrb_api_020_beep(eax);
     } else if (edx == 21) {
-        reg[7] = hrb_api_021_fopen(ebx, task, ds_base);
+        reg[7] = hrb_api_021_fopen(ebx, task);
     } else if (edx == 22) {
         fh = (struct FILEHANDLE *) eax;
         memman_free_4k(memman, (int) fh->buf, fh->size);
