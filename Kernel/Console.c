@@ -593,6 +593,23 @@ int hrb_api_025_fread(int ebx, int ecx, int eax, int ds_base)
     return  i;
 }
 
+int hrb_api_026_cmdline(int ebx, int ecx, struct TASK *task)
+{
+    const int ds_base = task->ds_base;
+    int i = 0;
+    for (;;) {
+        *((char *) ebx + ds_base + i) = task->cmdline[i];
+        if (task->cmdline[i] == 0) {
+            break;
+        }
+        if (i >= ecx) {
+            break;
+        }
+        ++ i;
+    }
+    return  i;
+}
+
 int *hrb_api(int edi, int esi, int ebp, int esp,
              int ebx, int edx, int ecx, int eax)
 {
@@ -691,6 +708,8 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
         reg[7] = hrb_api_024_fsize(ecx, eax);
     } else if (edx == 25) {
         reg[7] = hrb_api_025_fread(ebx, ecx, eax, ds_base);
+    } else if (edx == 26) {
+        reg[7] = hrb_api_026_cmdline(ebx, ecx, task);
     }
 
     return 0;
