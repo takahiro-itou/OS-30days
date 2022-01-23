@@ -446,6 +446,54 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
     return 0;
 }
 
+
+int hrb_api_015_getkey(int eax, struct TASK *task)
+{
+    struct CONSOLE *cons = task->cons;
+    struct FIFO32 *sys_fifo = (struct FIFO32 *) *((int *) ADR_SYS_FIFO);
+    struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
+    int i;
+
+    for (;;) {
+        io_cli();
+        if (fifo32_status(&task->fifo) == 0) {
+            if (eax != 0) {
+                task_sleep(task);   /*  FIFOが空なので寝て待つ  */
+            } else {
+                io_sti();
+                return  -1;
+            }
+        }
+
+        i = fifo32_get(&task->fifo);
+        io_sti();
+        if (i <= 1) {   /*  カーソル用タイマ。  */
+            /*  アプリ実行中はカーソルが出ないので、
+            いつも次は表示用の 1を注文しておく  */
+            timer_init(cons->timer, &task->fifo, 1);
+            timer_settime(cons->timer, 50);
+        }
+        if (i == 2) {   /*  カーソル ON */
+            cons->cur_c = COL8_FFFFFF;
+        }
+        if (i == 3) {   /*  カーソル OFF    */
+            cons->cur_c = -1;
+        }
+        if (i == 4) {   /*  コンソールだけを閉じる  */
+            timer_cancel(cons->timer);
+            io_cli();
+            fifo32_put(sys_fifo, cons->sht - shtctl->sheets0 + 2024);
+            cons->sht = 0;
+            io_sti();
+        }
+        if (i >= 256) {     /*  キーボードデータなど。  */
+            return  i - 256;
+        }
+    }
+
+    return  0;
+}
+
 int hrb_api_023_fseek(int ebx, int ecx, int eax)
 {
     struct FILEHANDLE *fh = (struct FILEHANDLE *) eax;
@@ -571,43 +619,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     } else if (edx == 14) {
         sheet_free((struct SHEET *) ebx);
     } else if (edx == 15) {
-        for (;;) {
-            io_cli();
-            if (fifo32_status(&task->fifo) == 0) {
-                if (eax != 0) {
-                    task_sleep(task);   /*  FIFOが空なので寝て待つ  */
-                } else {
-                    io_sti();
-                    reg[7] = -1;
-                    return 0;
-                }
-            }
-            i = fifo32_get(&task->fifo);
-            io_sti();
-            if (i <= 1) {   /*  カーソル用タイマ。  */
-                /*  アプリ実行中はカーソルが出ないので、
-                いつも次は表示用の 1を注文しておく  */
-                timer_init(cons->timer, &task->fifo, 1);
-                timer_settime(cons->timer, 50);
-            }
-            if (i == 2) {   /*  カーソル ON */
-                cons->cur_c = COL8_FFFFFF;
-            }
-            if (i == 3) {   /*  カーソル OFF    */
-                cons->cur_c = -1;
-            }
-            if (i == 4) {   /*  コンソールだけを閉じる  */
-                timer_cancel(cons->timer);
-                io_cli();
-                fifo32_put(sys_fifo, cons->sht - shtctl->sheets0 + 2024);
-                cons->sht = 0;
-                io_sti();
-            }
-            if (i >= 256) {     /*  キーボードデータなど。  */
-                reg[7] = i - 256;
-                return 0;
-            }
-        }
+        reg[7] = hrb_api_015_getkey(eax, task);
     } else if (edx == 16) {
         timer = timer_alloc();
         timer->flags2 = 1;      /*  自動キャンセル有効  */
