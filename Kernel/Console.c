@@ -494,6 +494,23 @@ int hrb_api_015_getkey(int eax, struct TASK *task)
     return  0;
 }
 
+void  hrb_api_020_beep(int eax)
+{
+    int i;
+
+    if (eax == 0) {
+        i = io_in8(0x61);
+        io_out8(0x61, i & 0x0d);
+    } else {
+        i = 1193180000 / eax;
+        io_out8(0x43, 0xb6);
+        io_out8(0x42, i & 0xff);
+        io_out8(0x42, i >> 8);
+        i = io_in8(0x61);
+        io_out8(0x61, (i | 0x03) & 0x0f);
+    }
+}
+
 int hrb_api_023_fseek(int ebx, int ecx, int eax)
 {
     struct FILEHANDLE *fh = (struct FILEHANDLE *) eax;
@@ -631,17 +648,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     } else if (edx == 19) {
         timer_free((struct TIMER *) ebx);
     } else if (edx == 20) {
-        if (eax == 0) {
-            i = io_in8(0x61);
-            io_out8(0x61, i & 0x0d);
-        } else {
-            i = 1193180000 / eax;
-            io_out8(0x43, 0xb6);
-            io_out8(0x42, i & 0xff);
-            io_out8(0x42, i >> 8);
-            i = io_in8(0x61);
-            io_out8(0x61, (i | 0x03) & 0x0f);
-        }
+        hrb_api_020_beep(eax);
     } else if (edx == 21) {
         for (i = 0; i < 8; ++ i) {
             if (task->fhandle[i].buf == 0) {
