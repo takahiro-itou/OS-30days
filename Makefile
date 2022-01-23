@@ -32,7 +32,8 @@ APPLICATIONS    =  \
         App/color2/color2.hrb       \
         App/sosu/sosu.hrb           \
         App/sosu2/sosu2.hrb         \
-        App/sosu3/sosu3.hrb
+        App/sosu3/sosu3.hrb         \
+        App/type/type.hrb
 
 ##
 ##    Commands.
@@ -82,8 +83,9 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  \
                   ${APPLICATIONS}  Makefile
 	mformat  -f 1440  -C  -B ${IPLBIN_IMAGE}  -i $@  ::
 	${DD}  if=${IPLBIN_IMAGE}  bs=512  count=1  of=$@  conv=notrunc
-	mcopy  -i $@  ${KERNEL_IMAGE}  ::
-	mcopy  -i $@  ${APPLICATIONS}  ::
+	mcopy  -i $@  ${KERNEL_IMAGE}   ::
+	mcopy  -i $@  ${APPLICATIONS}   ::
+	mcopy  -i $@  BootSector/Ipl.s  ::
 
 ##
 ##    Suffix Rules.
