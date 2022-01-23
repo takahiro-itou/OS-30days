@@ -4,7 +4,7 @@
 
 .text
 
-api_fread:
+api_cmdline:
     PUSHL   %EBX
     MOVL    $26,    %EDX
     MOVL    12(%ESP),   %ECX
