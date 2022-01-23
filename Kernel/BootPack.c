@@ -226,6 +226,15 @@ void HariMain(void)
     }
 }
 
+void exit_application(struct TASK *task)
+{
+    io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
+    task->tss.eax = (int) &(task->tss.esp0);
+    task->tss.eip = (int) asm_end_app;
+    io_sti();
+    task_run(task, -1, 0);
+}
+
 void process_key_data(
         struct KERNELWORK *pkw, int code, struct MAIN_VARS *vars)
 {
@@ -306,11 +315,7 @@ void process_key_data(
         task = kw.key_win->task;
         if (task != 0 && task->tss.ss0 != 0) {
             cons_putstr0(task->cons, "\nBreak(key) :\n");
-            io_cli();   /*  レジスタ変更中にタスクが変わると困る。  */
-            task->tss.eax = (int) &(task->tss.esp0);
-            task->tss.eip = (int) asm_end_app;
-            io_sti();
-            task_run(task, -1, 0);
+            exit_application(task);
         }
     }
     if (i == 256 + 0x3c && kw.key_shift != 0)
@@ -378,11 +383,7 @@ void sheet_leftbutton_down(
             /*  アプリが作ったウィンドウ。  */
             task = sht->task;
             cons_putstr0(task->cons, "\nBreak(mouse) :\n");
-            io_cli();
-            task->tss.eax = (int) &(task->tss.esp0);
-            task->tss.eip = (int) asm_end_app;
-            io_sti();
-            task_run(task, -1, 0);
+            exit_application(task);
         } else {
             /*  コンソール  */
             task = sht->task;
