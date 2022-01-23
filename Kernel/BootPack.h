@@ -340,6 +340,7 @@ struct TASK {
     int ds_base, cons_stack;
     struct FILEHANDLE *fhandle;
     int *fat;
+    const char *cmdline;
 };
 
 struct TASKLEVEL {
