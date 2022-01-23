@@ -511,6 +511,37 @@ void  hrb_api_020_beep(int eax)
     }
 }
 
+int hrb_api_021_fopen(int ebx, struct TASK *task, int ds_base)
+{
+    struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
+    int i, reg7;
+    struct FILEINFO *finfo;
+    struct FILEHANDLE *fh;
+
+    for (i = 0; i < 8; ++ i) {
+        if (task->fhandle[i].buf == 0) {
+            break;
+        }
+    }
+    fh = &task->fhandle[i];
+    reg7 = 0;
+    if (i < 8) {
+        finfo = file_search(
+                    (char *) ebx + ds_base,
+                    (struct FILEINFO *) (ADR_DISKIMG + 0x002600),
+                    224);
+        if (finfo != 0) {
+            reg7 = (int) fh;
+            fh->buf = (char *) memman_alloc_4k(memman, finfo->size);
+            fh->size = finfo->size;
+            fh->pos = 0;
+            file_loadfile(finfo->clustno, finfo->size, fh->buf,
+                          task->fat, (char *) (ADR_DISKIMG + 0x003e00));
+        }
+    }
+    return  reg7;
+}
+
 int hrb_api_023_fseek(int ebx, int ecx, int eax)
 {
     struct FILEHANDLE *fh = (struct FILEHANDLE *) eax;
@@ -571,8 +602,6 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct FIFO32 *sys_fifo = (struct FIFO32 *) *((int *) ADR_SYS_FIFO);
     struct TIMER *timer;
     volatile int *reg = &eax + 1;
-    int i;
-    struct FILEINFO *finfo;
     struct FILEHANDLE *fh;
     struct MEMMAN *memman = (struct MEMMAN *) MEMMAN_ADDR;
 
@@ -650,27 +679,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     } else if (edx == 20) {
         hrb_api_020_beep(eax);
     } else if (edx == 21) {
-        for (i = 0; i < 8; ++ i) {
-            if (task->fhandle[i].buf == 0) {
-                break;
-            }
-        }
-        fh = &task->fhandle[i];
-        reg[7] = 0;
-        if (i < 8) {
-            finfo = file_search(
-                        (char *) ebx + ds_base,
-                        (struct FILEINFO *) (ADR_DISKIMG + 0x002600),
-                        224);
-            if (finfo != 0) {
-                reg[7] = (int) fh;
-                fh->buf = (char *) memman_alloc_4k(memman, finfo->size);
-                fh->size = finfo->size;
-                fh->pos = 0;
-                file_loadfile(finfo->clustno, finfo->size, fh->buf,
-                              task->fat, (char *) (ADR_DISKIMG + 0x003e00));
-            }
-        }
+        reg[7] = hrb_api_021_fopen(ebx, task, ds_base);
     } else if (edx == 22) {
         fh = (struct FILEHANDLE *) eax;
         memman_free_4k(memman, (int) fh->buf, fh->size);
