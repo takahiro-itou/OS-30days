@@ -599,7 +599,6 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
     struct CONSOLE *cons = task->cons;
     struct SHTCTL *shtctl = (struct SHTCTL *) *((int *) ADR_SHT_CTL);
     struct SHEET *sht;
-    struct FIFO32 *sys_fifo = (struct FIFO32 *) *((int *) ADR_SYS_FIFO);
     struct TIMER *timer;
     volatile int *reg = &eax + 1;
     struct FILEHANDLE *fh;
