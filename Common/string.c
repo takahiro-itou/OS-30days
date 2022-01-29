@@ -1,6 +1,20 @@
 
 #include "string.h"
 
+int memcmp(const void *buf1, const void *buf2, size_t n)
+{
+    const unsigned char *p1 = (const unsigned char *)buf1;
+    const unsigned char *p2 = (const unsigned char *)buf2;
+    while ( (n --) > 0 ) {
+        if (*p1 != *p2) {
+            return (*p1 - *p2);
+        }
+        ++ p1;
+        ++ p2;
+    }
+    return 0;
+}
+
 int strcmp(const char *s1, const char *s2)
 {
     while ( *s1 == *s2 ) {
