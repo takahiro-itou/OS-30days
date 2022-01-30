@@ -111,10 +111,22 @@ void putfont8(char *vram, int xsize, int x, int y, char c, const char *font)
 void putfonts8_asc(char *vram, int xsize, int x, int y,
                    char c, const unsigned char *s)
 {
-    for (; *s != 0x00; ++s) {
-        putfont8(vram, xsize, x, y, c, hankaku + (*s) * 16);
-        x += 8;
+    struct TASK *task = task_now();
+    char *nihongo = (char *) *((int *) ADR_NIHONGO_FONT);
+
+    if (task->langmode == 0) {
+        for (; *s != 0x00; ++s) {
+            putfont8(vram, xsize, x, y, c, hankaku + (*s) * 16);
+            x += 8;
+        }
     }
+    if (task->langmode == 1) {
+        for (; *s != 0x00: ++s) {
+            putfont8(vram, xsize, x, y, c, nihongo + (*s) * 16);
+            x += 8;
+        }
+    }
+
     return;
 }
 
