@@ -121,7 +121,7 @@ void putfonts8_asc(char *vram, int xsize, int x, int y,
         }
     }
     if (task->langmode == 1) {
-        for (; *s != 0x00: ++s) {
+        for (; *s != 0x00; ++s) {
             putfont8(vram, xsize, x, y, c, nihongo + (*s) * 16);
             x += 8;
         }
