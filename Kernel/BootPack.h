@@ -38,6 +38,7 @@ struct MAIN_VARS {
 /*  BootPack.c  */
 
 #define ADR_SHT_CTL             0x0fe4
+#define ADR_NIHONGO_FONT        0x0fe8
 #define ADR_SYS_FIFO            0x0fec
 
 struct SHEET;

@@ -75,6 +75,9 @@ void HariMain(void)
     struct SHEET *sht_back;
     struct TASK *task_a;
     struct SHEET *sht2;
+    int *fat;
+    unsigned char *nihongo;
+    struct FILEINFO *finfo;
 
     kmv.binfo = binfo;
     kmv.keycmd = &keycmd;
@@ -146,6 +149,29 @@ void HariMain(void)
     /*  最初にキーボード状態との食い違いがないように、設定しておく  */
     fifo32_put(&keycmd, KEYCMD_LED);
     fifo32_put(&keycmd, kw.key_leds);
+
+    /*  nihongo.fnt の読み込み  */
+    nihongo = (unsigned char *) memman_alloc_4k(
+            memman, 16 * 256 + 32 * 94 * 47);
+    fat = (int *) memman_alloc_4k(memman, 4 * 2880);
+    file_readfat(fat, (unsigned char *) (ADR_DISKIMG + 0x000200));
+    finfo = file_search("nihongo.fnt",
+                        (struct FILEINFO *) (ADR_DISKIMG + 0x002600), 224);
+    if (finfo != 0) {
+        file_loadfile(finfo->clustno, finfo->size, nihongo, fat,
+                      (char *) (ADR_DISKIMG + 0x003e00));
+    } else {
+        /*  フォントがなかったので半角部分をコピー  */
+        for (i = 0; i < 16 * 256; ++ i) {
+            nihongo[i] = hankaku[i];
+        }
+        /*  フォントがなかったので全角部分を 0xff で埋め尽くす  */
+        for (i = 16 * 256; i < 16 * 256 + 32 * 94 * 47; ++ i) {
+            nihongo[i] = 0xff;
+        }
+    }
+    *((int *) ADR_NIHONGO_FONT) = (int) nihongo;
+    memman_free_4k(memman, (int) fat, 4 * 2880);
 
     for (i = 0; i < sizeof(keyseq); ++ i) {
         keyseq[i] = ' ';
