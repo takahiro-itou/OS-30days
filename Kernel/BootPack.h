@@ -211,6 +211,11 @@ void file_loadfile(int clustno, int size, char *buf, int *fat, char *img);
 struct FILEINFO *file_search(char *name, struct FILEINFO *finfo, int max);
 
 
+/*  FontHankaku.c   */
+
+extern const char hankaku[4096];
+
+
 /*  Graphic.c   */
 
 void init_palette(void);
