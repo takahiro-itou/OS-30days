@@ -341,6 +341,7 @@ struct TASK {
     struct FILEHANDLE *fhandle;
     int *fat;
     const char *cmdline;
+    char langmode;
 };
 
 struct TASKLEVEL {
