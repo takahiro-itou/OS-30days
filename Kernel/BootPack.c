@@ -112,6 +112,7 @@ void HariMain(void)
     fifo.task = task_a;
     task_run(task_a, 1, 2);
     *((int *) ADR_SHT_CTL) = (int) (kmv.shtctl);
+    task_a->langmode = 0;
 
     /*  sht_back    */
     sht_back  = sheet_alloc(kmv.shtctl);
