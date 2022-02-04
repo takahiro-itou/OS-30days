@@ -14,6 +14,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     struct CONSOLE cons;
     struct FILEHANDLE fhandle[8];
     char cmdline[30];
+    unsigned char *nihongo = (char *) *((int *) ADR_NIHONGO_FONT);
     struct FILEINFO *finfo = (struct FILEINFO *) (ADR_DISKIMG + 0x002600);
 
     cons.sht = sheet;
@@ -34,6 +35,11 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     }
     task->fhandle = fhandle;
     task->fat = fat;
+    if (nihongo[4096] != 0xff) {
+        task->langmode = 1;
+    } else {
+        task->langmode = 0;
+    }
 
     /*  プロンプト表示  */
     cons_putchar(&cons, '>', 1);
