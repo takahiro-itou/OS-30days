@@ -33,7 +33,8 @@ APPLICATIONS    =  \
         App/sosu/sosu.hrb           \
         App/sosu2/sosu2.hrb         \
         App/sosu3/sosu3.hrb         \
-        App/type/type.hrb
+        App/type/type.hrb           \
+        App/iroha/iroha.hrb
 
 FONT_FILE      =  Font/nihongo.fnt
 
