@@ -40,6 +40,7 @@ void console_task(struct SHEET *sheet, unsigned int memtotal)
     } else {
         task->langmode = 0;
     }
+    task->langbyte1 = 0;
 
     /*  プロンプト表示  */
     cons_putchar(&cons, '>', 1);
@@ -430,6 +431,7 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
             }
             timer_cancelall(&task->fifo);
             memman_free_4k(memman, (int) q, segsiz);
+            task->langbyte1 = 0;
         } else {
             cons_putstr0(cons, ".hrb file format error.\n");
         }
