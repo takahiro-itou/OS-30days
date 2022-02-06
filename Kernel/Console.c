@@ -168,6 +168,8 @@ void cons_newline(struct CONSOLE *cons)
 {
     int x, y;
     struct SHEET *sheet = cons->sht;
+    struct TASK *task = task_now();
+
     if (cons->cur_y < CONSOLE_SIZE_Y - CURSOR_HEIGHT) {
         cons->cur_y += CURSOR_HEIGHT;       /*  次の行へ。  */
     } else if (sheet != 0) {
@@ -185,6 +187,10 @@ void cons_newline(struct CONSOLE *cons)
                       CONSOLE_SIZE_X, CONSOLE_SIZE_Y);
     }
     cons->cur_x = CURSOR_LEFT;
+    if (task->langmode == 1 && task->langbyte1 != 0) {
+        cons->cur_x += CURSOR_WIDTH;
+    }
+
     return;
 }
 
