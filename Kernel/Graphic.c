@@ -125,7 +125,7 @@ void putfonts8_asc(char *vram, int xsize, int x, int y,
     if (task->langmode == 1) {
         for (; *s != 0x00; ++s) {
             if (task->langbyte1 == 0) {
-                if ((0x81 <= *s && *s <= 0x9f) || (0xe0 <= *s && s <= 0xfc))
+                if ((0x81 <= *s && *s <= 0x9f) || (0xe0 <= *s && *s <= 0xfc))
                 {
                     task->langbyte1 = *s;
                 } else {
@@ -147,10 +147,10 @@ void putfonts8_asc(char *vram, int xsize, int x, int y,
                 }
                 task->langbyte1 = 0;
                 font = nihongo + 256 * 16 + (k * 94 + t) * 32;
-                putfont8(vram, xsize, x - 8, y, c, font     );
-                putfont8(vram, xsize, x    , y, c, font + 16);
+                putfont8(vram, xsize, x - CURSOR_WIDTH, y, c, font     );
+                putfont8(vram, xsize, x               , y, c, font + 16);
             }
-            x += 8;
+            x += CURSOR_WIDTH;
         }
     }
 
