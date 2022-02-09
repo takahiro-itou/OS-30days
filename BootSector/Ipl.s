@@ -2,7 +2,7 @@
 ##  hello-os
 ##  TAB=4
 
-    .EQU    CYLS,   10
+    .EQU    CYLS,   20
     .EQU    ADDR,   0xC200
 
 .code16
