@@ -89,6 +89,7 @@ ${TARGET_IMAGE} : ${IPLBIN_IMAGE}  ${KERNEL_IMAGE}  \
 	mcopy  -i $@  ${KERNEL_IMAGE}   ::
 	mcopy  -i $@  ${APPLICATIONS}   ::
 	mcopy  -i $@  Font/test.txt     ::
+	mcopy  -i $@  Font/euc.txt      ::
 	mcopy  -i $@  ${FONT_FILE}      ::
 
 ##
