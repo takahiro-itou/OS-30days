@@ -713,6 +713,8 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
         reg[7] = hrb_api_025_fread(ebx, ecx, eax, ds_base);
     } else if (edx == 26) {
         reg[7] = hrb_api_026_cmdline(ebx, ecx, task);
+    } else if (edx == 27) {
+        reg[7] = task->langmode;
     }
 
     return 0;
