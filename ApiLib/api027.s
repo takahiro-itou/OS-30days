@@ -4,7 +4,7 @@
 
 .text
 
-api_cmdline:
+api_getlang:
     MOVL    $27,    %EDX
     INT     $0x40
     RET
