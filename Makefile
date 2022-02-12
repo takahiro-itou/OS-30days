@@ -36,7 +36,8 @@ APPLICATIONS    =  \
         App/type/type.hrb           \
         App/iroha/iroha.hrb         \
         App/chklang/chklang.hrb     \
-        App/notrec/notrec.hrb
+        App/notrec/notrec.hrb       \
+        App/bball/bball.hrb
 
 FONT_FILE      =  Font/nihongo.fnt
 
