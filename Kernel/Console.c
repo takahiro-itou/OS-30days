@@ -451,6 +451,28 @@ int cmd_app(struct CONSOLE *cons, int *fat, char *cmdline)
 }
 
 
+void hrb_api_013_linewin(
+        int edi, int esi, int ebp, int ebx, int ecx, int eax)
+{
+    int tmp;
+    struct SHEET *sht = (struct SHEET *) (ebx & 0xfffffffe);
+
+    hrb_api_linewin(sht, eax, ecx, esi, edi, ebp);
+    if ((ebx & 1) == 0) {
+        if (eax > esi) {
+            tmp = eax;
+            eax = esi;
+            esi = tmp;
+        }
+        if (ecx > edi) {
+            tmp = ecx;
+            ecx = edi;
+            edi = tmp;
+        }
+        sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
+    }
+}
+
 int hrb_api_015_getkey(int eax, struct TASK *task)
 {
     struct CONSOLE *cons = task->cons;
@@ -678,11 +700,7 @@ int *hrb_api(int edi, int esi, int ebp, int esp,
         sht = (struct SHEET *) ebx;
         sheet_refresh(sht, eax, ecx, esi, edi);
     } else if (edx == 13) {
-        sht = (struct SHEET *) (ebx & 0xfffffffe);
-        hrb_api_liinewin(sht, eax, ecx, esi, edi, ebp);
-        if ((ebx & 1) == 0) {
-            sheet_refresh(sht, eax, ecx, esi + 1, edi + 1);
-        }
+        hrb_api_013_linewin(edi, esi, ebp, ebx, ecx, eax);
     } else if (edx == 14) {
         sheet_free((struct SHEET *) ebx);
     } else if (edx == 15) {
@@ -746,7 +764,7 @@ int *inthandler0d(int *esp)
     return &(task->tss.esp0);   /*  異常終了させる  */
 }
 
-void hrb_api_liinewin(
+void hrb_api_linewin(
         struct SHEET *sht, int x0, int y0, int x1, int y1, int col)
 {
     int i, x, y, len, dx, dy;
