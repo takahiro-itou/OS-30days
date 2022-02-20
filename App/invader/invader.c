@@ -83,6 +83,35 @@ void putstr(int win, char *winbuf, int x, int y, int col, unsigned char *s)
     return;
 }
 
+void wait(int i, int timer, char *keyflag)
+{
+    int j;
+    if (i > 0) {
+        /*  一定時間待つ。  */
+        api_settimer(timer, i);
+        i = 128;
+    } else {
+        i = 0x0a;   /*  Enter.  */
+    }
+
+    for (;;) {
+        j = api_getkey(1);
+        if (i == j) {
+            break;
+        }
+        if (j == '4') {
+            keyflag[0] = 1;     /*  left.   */
+        }
+        if (j == '6') {
+            keyflag[1] = 1;     /*  right.  */
+        }
+        if (j == ' ') {
+            keyflag[2] = 1;     /*  space.  */
+        }
+    }
+    return;
+}
+
 void HariMain(void)
 {
 }
