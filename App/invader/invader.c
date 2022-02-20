@@ -1,5 +1,6 @@
 
 #include "apilib.h"
+#include "string.h"
 
 static unsigned char charset[16 * 8] = {
 
@@ -35,6 +36,52 @@ static unsigned char charset[16 * 8] = {
     0x00, 0x18, 0x18, 0x18,  0x18, 0x18, 0x18, 0x18,
     0x18, 0x18, 0x18, 0x18,  0x18, 0x18, 0x18, 0x00
 };
+
+void putstr(int win, char *winbuf, int x, int y, int col, unsigned char *s)
+{
+    int c, x0, i;
+    char *p, *q, t[2];
+    x = x * 8 + 8;
+    y = y * 16 + 29;
+    x0 = x;
+
+    i = strlen(s);
+    api_boxfilwin(win + 1, x, y, x + i * 8 - 1, y + 15, 0);
+    q = winbuf + y * 336;
+    t[1] = 0;
+
+    for (;;) {
+        c = *s;
+        if (c == 0) {
+            break;
+        }
+        if (c != ' ') {
+            if ('a' <= c && c <= 'h') {
+                p = charset + 16 * (c - 'a');
+                q += x;
+                for (i = 0; i < 16; ++ i) {
+                    if ((p[i] & 0x80) != 0) { q[0] = col; }
+                    if ((p[i] & 0x40) != 0) { q[1] = col; }
+                    if ((p[i] & 0x20) != 0) { q[2] = col; }
+                    if ((p[i] & 0x10) != 0) { q[3] = col; }
+                    if ((p[i] & 0x08) != 0) { q[4] = col; }
+                    if ((p[i] & 0x04) != 0) { q[5] = col; }
+                    if ((p[i] & 0x02) != 0) { q[6] = col; }
+                    if ((p[i] & 0x01) != 0) { q[7] = col; }
+                    q += 336;
+                }
+                q -= (336 * 16 + x);
+            } else {
+                t[0] = *s;
+                api_putstrwin(win + 1, x, y, col, 1, t);
+            }
+        }
+        ++ s;
+        x += 8;
+    }
+    api_refreshwin(win, x0, y, x, y + 16);
+    return;
+}
 
 void HariMain(void)
 {
