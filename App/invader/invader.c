@@ -128,5 +128,6 @@ void HariMain(void)
     high = 0;
     putstr(win, winbuf, 22, 0, 7, "HIGH:00000000");
 
+    wait(0, timer, keyflag);
     api_end();
 }
