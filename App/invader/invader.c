@@ -114,4 +114,19 @@ void wait(int i, int timer, char *keyflag)
 
 void HariMain(void)
 {
+    int win, timer, i, j, fx, lazerwait, lx = 0, ly;
+    int ix, iy, movewait0, movewait, idir;
+    int invline, score, high, point;
+    char winbuf[336 * 261], invstr[32 * 6], s[12], keyflag[4], *p;
+    static char invstr0[32] = " abcd abcd abcd abcd acbcd ";
+
+    win = api_openwin(winbuf, 336, 261, -1, "invader");
+    api_boxfilwin(win, 6, 27, 329, 254, 0);
+    timer = api_alloctimer();
+    api_inittimer(timer, 128);
+
+    high = 0;
+    putstr(win, winbuf, 22, 0, 7, "HIGH:00000000");
+
+    api_end();
 }
