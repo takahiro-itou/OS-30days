@@ -2,13 +2,22 @@
 #include "apilib.h"
 #include "string.h"
 
-#define WIN_CX              336
-#define WIN_CY              261
 #define CHR_CX              8
 #define CHR_CY              16
 
+#define FLD_CX              37
+#define FLD_CY              14
+
+#define WIN_CX              336
+#define WIN_CY              261
+
+#define KF_LEFT             0
+#define KF_RIGHT            1
+#define KF_SPACE            2
+
 #define NUM_INVADER_LINES   6
 #define INV_BUF_SIZE        32
+#define FIGHTER_Y           13
 
 static unsigned char charset[CHR_CY * CHR_CX] = {
 
@@ -108,13 +117,13 @@ void wait(int i, int timer, char *keyflag)
             break;
         }
         if (j == '4') {
-            keyflag[0] = 1;     /*  left.   */
+            keyflag[KF_LEFT]  = 1;      /*  left.   */
         }
         if (j == '6') {
-            keyflag[1] = 1;     /*  right.  */
+            keyflag[KF_RIGHT] = 1;      /*  right.  */
         }
         if (j == ' ') {
-            keyflag[2] = 1;     /*  space.  */
+            keyflag[KF_SPACE] = 1;      /*  space.  */
         }
     }
     return;
@@ -143,8 +152,8 @@ restart:
     point = 1;
     putstr(win, winbuf,  4, 0, 7, "SCORE:00000000");
     movewait0 = 20;
-    fx = 18;
-    putstr(win, winbuf, fx, 13, 6, "efg");
+    fx = (FLD_CX / 2);
+    putstr(win, winbuf, fx, FIGHTER_Y, 6, "efg");
     wait(100, timer, keyflag);
 
 next_group:
@@ -168,6 +177,31 @@ next_group:
     movewait = movewait0;
     idir = +1;
     wait(100, timer, keyflag);
+
+    for (;;) {
+        if (laserwait != 0) {
+            -- laserwait;
+            keyflag[KF_SPACE] = 0;
+        }
+        wait(4, timer, keyflag);
+
+        /*  自機の処理  */
+        if (keyflag[KF_LEFT]  != 0 && fx > 0) {
+            -- fx;
+            putstr(win, winbuf, fx, FIGHTER_Y, 6, "efg ");
+            keyflag[KF_LEFT]  = 0;
+        }
+        if (keyflag[KF_RIGHT] != 0 && fx < FLD_CX) {
+            putstr(win, winbuf, fx, FIGHTER_Y, 6, " efg");
+            ++ fx;
+            keyflag[KF_RIGHT] = 0;
+        }
+        if (keyflag[KF_SPACE] != 0 && laserwait == 0) {
+            laserwait = 15;
+            lx = fx + 1;
+            ly = FIGHTER_Y;
+        }
+    }
 
     wait(0, timer, keyflag);
     api_end();
