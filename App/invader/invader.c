@@ -208,7 +208,7 @@ next_group:
         if (ly > 0) {
             if (ly < FIGHTER_Y) {
                 if (ix < lx && lx < ix + INV_WIDTH
-                        && iy <= ly && ly <= iy + invline)
+                        && iy <= ly && ly < iy + invline)
                 {
                     putstr(win, winbuf, ix, ly, 2,
                            invstr + (ly - iy) * INV_BUF_SIZE);
