@@ -292,7 +292,7 @@ alive:
     putstr(win, winbuf, 15, 6, 1, "GAME OVER");
     wait(0, timer, keyflag);
     for (i = 1; i < 14; ++ i) {
-        putstr(win, winbuf, 0, 1, 0, "                                        ");
+        putstr(win, winbuf, 0, i, 0, "                                        ");
     }
     goto restart;
 }
