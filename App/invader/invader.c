@@ -20,7 +20,7 @@
 #define INV_BUF_SIZE        32
 #define INV_WIDTH           24
 
-#define INV_MAX_X           (FLD_CX - INV_WIDTH + 1)
+#define INV_MAX_X           (FLD_CX - INV_WIDTH)
 #define FIGHTER_Y           13
 
 static unsigned char charset[CHR_CY * CHR_CX] = {
