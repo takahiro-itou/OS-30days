@@ -2,7 +2,15 @@
 #include "apilib.h"
 #include "string.h"
 
-static unsigned char charset[16 * 8] = {
+#define WIN_CX              336
+#define WIN_CY              261
+#define CHR_CX              8
+#define CHR_CY              16
+
+#define NUM_INVADER_LINES   6
+#define INV_BUF_SIZE        32
+
+static unsigned char charset[CHR_CY * CHR_CX] = {
 
     /*  invader(0)  */
     0x00, 0x00, 0x00, 0x43,  0x5f, 0x5f, 0x5f, 0x7f,
@@ -41,13 +49,13 @@ void putstr(int win, char *winbuf, int x, int y, int col, unsigned char *s)
 {
     int c, x0, i;
     char *p, *q, t[2];
-    x = x * 8 + 8;
-    y = y * 16 + 29;
+    x = x * CHR_CX + 8;
+    y = y * CHR_CY + 29;
     x0 = x;
 
     i = strlen(s);
-    api_boxfilwin(win + 1, x, y, x + i * 8 - 1, y + 15, 0);
-    q = winbuf + y * 336;
+    api_boxfilwin(win + 1, x, y, x + i * CHR_CX - 1, y + CHR_CY - 1, 0);
+    q = winbuf + y * WIN_CX;
     t[1] = 0;
 
     for (;;) {
@@ -57,9 +65,9 @@ void putstr(int win, char *winbuf, int x, int y, int col, unsigned char *s)
         }
         if (c != ' ') {
             if ('a' <= c && c <= 'h') {
-                p = charset + 16 * (c - 'a');
+                p = charset + CHR_CY * (c - 'a');
                 q += x;
-                for (i = 0; i < 16; ++ i) {
+                for (i = 0; i < CHR_CY; ++ i) {
                     if ((p[i] & 0x80) != 0) { q[0] = col; }
                     if ((p[i] & 0x40) != 0) { q[1] = col; }
                     if ((p[i] & 0x20) != 0) { q[2] = col; }
@@ -68,18 +76,18 @@ void putstr(int win, char *winbuf, int x, int y, int col, unsigned char *s)
                     if ((p[i] & 0x04) != 0) { q[5] = col; }
                     if ((p[i] & 0x02) != 0) { q[6] = col; }
                     if ((p[i] & 0x01) != 0) { q[7] = col; }
-                    q += 336;
+                    q += WIN_CX;
                 }
-                q -= (336 * 16 + x);
+                q -= (WIN_CX * CHR_CY + x);
             } else {
                 t[0] = *s;
                 api_putstrwin(win + 1, x, y, col, 1, t);
             }
         }
         ++ s;
-        x += 8;
+        x += CHR_CX;
     }
-    api_refreshwin(win, x0, y, x, y + 16);
+    api_refreshwin(win, x0, y, x, y + CHR_CY);
     return;
 }
 
@@ -117,10 +125,12 @@ void HariMain(void)
     int win, timer, i, j, fx, laserwait, lx = 0, ly;
     int ix, iy, movewait0, movewait, idir;
     int invline, score, high, point;
-    char winbuf[336 * 261], invstr[32 * 6], s[12], keyflag[4], *p;
-    static char invstr0[32] = " abcd abcd abcd abcd abcd ";
+    char winbuf[WIN_CX * WIN_CY];
+    char invstr[INV_BUF_SIZE * NUM_INVADER_LINES];
+    char s[12], keyflag[4], *p;
+    static char invstr0[INV_BUF_SIZE] = " abcd abcd abcd abcd abcd ";
 
-    win = api_openwin(winbuf, 336, 261, -1, "invader");
+    win = api_openwin(winbuf, WIN_CX, WIN_CY, -1, "invader");
     api_boxfilwin(win, 6, 27, 329, 254, 0);
     timer = api_alloctimer();
     api_inittimer(timer, 128);
@@ -141,13 +151,13 @@ next_group:
     wait(100, timer, keyflag);
     ix = 7;
     iy = 1;
-    invline = 6;
-    for (i = 0; i < 6; ++ i) {
+    invline = NUM_INVADER_LINES;
+    for (i = 0; i < NUM_INVADER_LINES; ++ i) {
         for (j = 0; j < 27; ++ j) {
-            invstr[i * 32 + j] = invstr0[j];
+            invstr[i * INV_BUF_SIZE + j] = invstr0[j];
         }
 
-        putstr(win, winbuf, ix, iy + i, 2, invstr + i * 32);
+        putstr(win, winbuf, ix, iy + i, 2, invstr + i * INV_BUF_SIZE);
     }
     keyflag[0] = 0;
     keyflag[1] = 0;
