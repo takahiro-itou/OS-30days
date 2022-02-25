@@ -114,11 +114,11 @@ void wait(int i, int timer, char *keyflag)
 
 void HariMain(void)
 {
-    int win, timer, i, j, fx, lazerwait, lx = 0, ly;
+    int win, timer, i, j, fx, laserwait, lx = 0, ly;
     int ix, iy, movewait0, movewait, idir;
     int invline, score, high, point;
     char winbuf[336 * 261], invstr[32 * 6], s[12], keyflag[4], *p;
-    static char invstr0[32] = " abcd abcd abcd abcd acbcd ";
+    static char invstr0[32] = " abcd abcd abcd abcd abcd ";
 
     win = api_openwin(winbuf, 336, 261, -1, "invader");
     api_boxfilwin(win, 6, 27, 329, 254, 0);
@@ -138,6 +138,26 @@ restart:
     wait(100, timer, keyflag);
 
 next_group:
+    wait(100, timer, keyflag);
+    ix = 7;
+    iy = 1;
+    invline = 6;
+    for (i = 0; i < 6; ++ i) {
+        for (j = 0; j < 27; ++ j) {
+            invstr[i * 32 + j] = invstr0[j];
+        }
+
+        putstr(win, winbuf, ix, iy + i, 2, invstr + i * 32);
+    }
+    keyflag[0] = 0;
+    keyflag[1] = 0;
+    keyflag[2] = 0;
+
+    ly = 0;     /*  非表示  */
+    laserwait = 0;
+    movewait = movewait0;
+    idir = +1;
+    wait(100, timer, keyflag);
 
     wait(0, timer, keyflag);
     api_end();
