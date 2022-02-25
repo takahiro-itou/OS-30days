@@ -128,6 +128,17 @@ void HariMain(void)
     high = 0;
     putstr(win, winbuf, 22, 0, 7, "HIGH:00000000");
 
+restart:
+    score = 0;
+    point = 1;
+    putstr(win, winbuf,  4, 0, 7, "SCORE:00000000");
+    movewait0 = 20;
+    fx = 18;
+    putstr(win, winbuf, fx, 13, 6, "efg");
+    wait(100, timer, keyflag);
+
+next_group:
+
     wait(0, timer, keyflag);
     api_end();
 }
