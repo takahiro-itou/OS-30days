@@ -1,5 +1,6 @@
 
 #include "apilib.h"
+#include "stdio.h"
 #include "string.h"
 
 #define CHR_CX              8
@@ -247,9 +248,51 @@ next_group:
                     point = 1;
                 }
             }
+            if (ix < lx && lx < ix + INV_WIDTH + 1
+                    && iy <= ly && ly < iy + invline)
+            {
+                p = invstr + (ly - iy) * INV_BUF_SIZE + (lx - ix);
+                if (*p != ' ') {
+                    /*  hit!    */
+                    score += point;
+                    ++ point;
+                    snprintf(s, sizeof(s), "%08d", score);
+                    putstr(win, winbuf, 10, 0, 7, s);
+                    if (high < score) {
+                        high = score;
+                        putstr(win, winbuf, 27, 0, 7, s);
+                    }
+                    for (-- p; *p != ' '; -- p) { }
+                    for (i = 1; i < 5; ++ i) {
+                        p[i] = ' ';
+                    }
+                    putstr(win, winbuf, ix, ly, 2,
+                           invstr + (ly - iy) * INV_BUF_SIZE);
+                    for (; invline > 0; -- invline) {
+                        for (p = invstr + (invline - 1) * INV_BUF_SIZE;
+                                *p != 0; ++ p)
+                        {
+                            if (*p != ' ') {
+                                goto alive;
+                            }
+                        }
+                    }
+                    /*  全部やっつけられた  */
+                    movewait0 -= movewait0 / 3;
+                    goto next_group;
+alive:
+                    ly = 0;
+                }
+            }
+
         }
     }
 
+    /*  GAME OVER.  */
+    putstr(win, winbuf, 15, 6, 1, "GAME OVER");
     wait(0, timer, keyflag);
-    api_end();
+    for (i = 1; i < 14; ++ i) {
+        putstr(win, winbuf, 0, 1, 0, "                                        ");
+    }
+    goto restart;
 }
