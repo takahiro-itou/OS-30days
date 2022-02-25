@@ -5,7 +5,8 @@
 #define CHR_CX              8
 #define CHR_CY              16
 
-#define FLD_CX              37
+#define FLD_MAX_X           37
+#define FLD_CX              38
 #define FLD_CY              14
 
 #define WIN_CX              336
@@ -17,8 +18,9 @@
 
 #define NUM_INVADER_LINES   6
 #define INV_BUF_SIZE        32
-#define INV_WIDTH           25
+#define INV_WIDTH           24
 
+#define INV_MAX_X           (FLD_CX - INV_WIDTH + 1)
 #define FIGHTER_Y           13
 
 static unsigned char charset[CHR_CY * CHR_CX] = {
@@ -154,7 +156,7 @@ restart:
     point = 1;
     putstr(win, winbuf,  4, 0, 7, "SCORE:00000000");
     movewait0 = 20;
-    fx = (FLD_CX / 2);
+    fx = (FLD_MAX_X / 2);
     putstr(win, winbuf, fx, FIGHTER_Y, 6, "efg");
     wait(100, timer, keyflag);
 
@@ -193,7 +195,7 @@ next_group:
             putstr(win, winbuf, fx, FIGHTER_Y, 6, "efg ");
             keyflag[KF_LEFT]  = 0;
         }
-        if (keyflag[KF_RIGHT] != 0 && fx < FLD_CX) {
+        if (keyflag[KF_RIGHT] != 0 && fx < FLD_MAX_X) {
             putstr(win, winbuf, fx, FIGHTER_Y, 6, " efg");
             ++ fx;
             keyflag[KF_RIGHT] = 0;
@@ -204,10 +206,30 @@ next_group:
             ly = FIGHTER_Y;
         }
 
+        /*  インベーダ移動  */
+        if (movewait != 0) {
+            -- movewait;
+        } else {
+            movewait = movewait0;
+            if (ix + idir > INV_MAX_X || ix + idir < 0) {
+                if (iy + invline == FIGHTER_Y) {
+                    break;      /*  GAME OVER   */
+                }
+                idir = - idir;
+                putstr(win, winbuf, ix + 1, iy, 0, "                         ");
+                ++ iy;
+            } else {
+                ix += idir;
+            }
+            for (i = 0; i < invline; ++ i) {
+                putstr(win, winbuf, ix, iy + i, 2, invstr + i * INV_BUF_SIZE);
+            }
+        }
+
         /*  レーザー処理。  */
         if (ly > 0) {
             if (ly < FIGHTER_Y) {
-                if (ix < lx && lx < ix + INV_WIDTH
+                if (ix < lx && lx < ix + INV_WIDTH + 1
                         && iy <= ly && ly < iy + invline)
                 {
                     putstr(win, winbuf, ix, ly, 2,
