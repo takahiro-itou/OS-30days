@@ -17,6 +17,8 @@
 
 #define NUM_INVADER_LINES   6
 #define INV_BUF_SIZE        32
+#define INV_WIDTH           25
+
 #define FIGHTER_Y           13
 
 static unsigned char charset[CHR_CY * CHR_CX] = {
@@ -200,6 +202,29 @@ next_group:
             laserwait = 15;
             lx = fx + 1;
             ly = FIGHTER_Y;
+        }
+
+        /*  レーザー処理。  */
+        if (ly > 0) {
+            if (ly < FIGHTER_Y) {
+                if (ix < lx && lx < ix + INV_WIDTH
+                        && iy <= ly && ly <= iy + invline)
+                {
+                    putstr(win, winbuf, ix, ly, 2,
+                           invstr + (ly - iy) * INV_BUF_SIZE);
+                } else {
+                    putstr(win, winbuf, lx, ly, 0, " ");
+                }
+            }
+            -- ly;
+            if (ly > 0) {
+                putstr(win, winbuf, lx, ly, 3, "h");
+            } else {
+                point -= 10;
+                if (point <= 0) {
+                    point = 1;
+                }
+            }
         }
     }
 
